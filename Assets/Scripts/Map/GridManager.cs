@@ -4,24 +4,36 @@ using UnityEngine.Tilemaps;
 
 public class GridManager : MonoBehaviour
 {
-    //Наша тайловая карта
+    //Тайловая карта пола
     [SerializeField]
     private Tilemap floorTilemap;
-    //Тайл которым будем все закрашивать (потом мы логику этого перепишем)
+    //Тайл которым будем закрашивать пол
     [SerializeField]
     private TileBase floorTile;
+    
+    //Тайловая карта стен
+    [SerializeField]
+    private Tilemap wallTilemap;
+    //Тайл которым будем закрашивать стены
+    [SerializeField]
+    private TileBase wallTile;
+    
     //Генератор данжей который юзаем
     [SerializeField]
     public GeneratorBase generator;
+    //Генератор стен
+    [SerializeField]
+    public WallsGenerator wallsGenerator;
 
     //Передаем позиции
-    public void PaintFloorTiles(IEnumerable<Vector2Int> floorPositions)
+    public void PaintTiles(IEnumerable<Vector2Int> floorPositions, IEnumerable<Vector2Int> wallPositions)
     {
-        PaintFloorTiles(floorPositions, floorTilemap, floorTile);
+        PaintTiles(floorPositions, floorTilemap, floorTile);
+        PaintTiles(wallPositions, wallTilemap, wallTile);
     }
 
     //Закрашиваем каждый тайл
-    private void PaintFloorTiles(IEnumerable<Vector2Int> positions, Tilemap tilemap, TileBase tile)
+    private void PaintTiles(IEnumerable<Vector2Int> positions, Tilemap tilemap, TileBase tile)
     {
         foreach (var position in positions)
         {
@@ -46,19 +58,28 @@ public class GridManager : MonoBehaviour
     public void Reload(int seed)
     {
         Clear();
-        PaintFloorTiles(generator.CreateDungeon(seed));
+        var floorPositions = generator.CreateDungeon(seed);
+        //Генерирует позиции стен на основе позиций пола
+        var wallPositions = wallsGenerator.CreateWalls(floorPositions);
+        PaintTiles(floorPositions, wallPositions);
     }
     public void Reload()
     {
         Clear();
-        PaintFloorTiles(generator.CreateDungeon());
+        var floorPositions = generator.CreateDungeon();
+        //Генерирует позиции стен на основе позиций пола
+        var wallPositions = wallsGenerator.CreateWalls(floorPositions);
+        PaintTiles(floorPositions, wallPositions);
     }
 
     //Генерим карту первый раз
     public void Start()
     {
         Clear();
-        PaintFloorTiles(generator.CreateDungeon());
+        var floorPositions = generator.CreateDungeon();
+        //Генерирует позиции стен на основе позиций пола
+        var wallPositions = wallsGenerator.CreateWalls(floorPositions);
+        PaintTiles(floorPositions, wallPositions);
     }
 
 }
