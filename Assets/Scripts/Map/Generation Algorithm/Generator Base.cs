@@ -85,4 +85,14 @@ public static class Direction2D
     {
         return cardinalDirectionsList[UnityEngine.Random.Range(0, cardinalDirectionsList.Count)];
     }
+    public static List<Vector2Int> GetNewCardinalPosesFromPos(Vector2Int pos)
+    {
+        List<Vector2Int> newPoses = new List<Vector2Int>();
+        foreach (Vector2Int direction in cardinalDirectionsList) 
+        { 
+            newPoses.Add(pos + direction);
+        }
+        return newPoses;
+    }
+
 }

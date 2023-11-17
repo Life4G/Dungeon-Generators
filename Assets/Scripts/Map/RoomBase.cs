@@ -1,13 +1,68 @@
 using System.Collections.Generic;
 using UnityEngine;
+using static SetOperations;
 
 //Возможные операции над комнатами (смтр теорию по множествам)
-public enum Operations
+public static class SetOperations
 {
-    Intersect,
-    Union,
-    Difference,
-    SymmetricDifference,
+    public enum Operations
+    {
+        Intersect,
+        Union,
+        Difference,
+        SymmetricDifference,
+        None
+    }
+    public static Operations GetRandomOperation()
+    {
+        int random = Random.Range(0, 4);
+        Operations operation = Operations.None;
+        switch (random)
+        {
+            case 0:
+                operation = Operations.Intersect;
+                break;
+            case 1:
+                operation = Operations.Union;
+                break;
+            case 2:
+                operation = Operations.Difference;
+                break;
+            case 3:
+                operation = Operations.SymmetricDifference;
+                break;
+        }
+        return operation;
+    }
+    public static Operations GetRandomSubOperation()
+    {
+        int random = Random.Range(0, 2);
+        Operations operation = Operations.None;
+        switch (random)
+        {
+            case 0:
+                operation = Operations.Union;
+                break;
+            case 1:
+                operation = Operations.Difference;
+                break;
+        }
+        return operation;
+    }
+    public static List<Operations> GetOperationsList = new List<Operations>
+    {
+        Operations.Intersect,
+        Operations.Union,
+        Operations.Difference,
+        Operations.SymmetricDifference
+
+    };
+    public static List<Operations> GetSubOperationsList = new List<Operations>
+    {
+        Operations.Union,
+        Operations.Difference,
+    };
+
 }
 
 //Возможные стили (если сделаешь класс то у меня есть пару идей как это все подвязать а пока будет enum)
@@ -100,6 +155,67 @@ public abstract class RoomBase
         positionRoomTiles.SymmetricExceptWith(other.GetTilesPos());
     }
 
-    //Функция валидации для реализации наследниками обязательна
+    public void DoOperation(RoomBase other, SetOperations.Operations operation)
+    {
+        switch(operation)
+        {
+            case SetOperations.Operations.Intersect:
+                Intersect(other);
+                break;
+            case SetOperations.Operations.Union:
+                Union(other);
+                break;
+            case SetOperations.Operations.Difference:
+                Difference(other);
+                break;
+            case SetOperations.Operations.SymmetricDifference:
+                SymmetricDifference(other);
+                break;
+        }
+    }
+    public bool TryOperation(RoomBase other, SetOperations.Operations operation)
+    {
+        RoomBase roomTest = this;
+        switch (operation)
+        {
+            case SetOperations.Operations.Intersect:
+                roomTest.Intersect(other);
+                break;
+            case SetOperations.Operations.Union:
+                roomTest.Union(other);
+                break;
+            case SetOperations.Operations.Difference:
+                roomTest.Difference(other);
+                break;
+            case SetOperations.Operations.SymmetricDifference:
+                roomTest.SymmetricDifference(other);
+                break;
+        }
+        return roomTest.Validate();
+    }
+
+    public SetOperations.Operations TryAllOperations(RoomBase other)
+    {
+        foreach (SetOperations.Operations op in GetOperationsList)
+        {
+            if (TryOperation(other, op))
+            {
+                return op;
+            }
+        }
+        return Operations.None;
+    }
+
+    public SetOperations.Operations TryAllSubOperations(RoomBase other)
+    {
+        foreach (SetOperations.Operations op in GetSubOperationsList)
+        {
+            if (TryOperation(other, op))
+            {
+                return op;
+            }
+        }
+        return Operations.None;
+    }
     public abstract bool Validate();
 }

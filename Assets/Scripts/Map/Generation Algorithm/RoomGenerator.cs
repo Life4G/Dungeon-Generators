@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class RoomGenerator : GeneratorBase
@@ -13,7 +14,9 @@ public class RoomGenerator : GeneratorBase
     [SerializeField]
     private int roomNumberMax = 32;
 
-    private List<RoomBase> rooms;
+    private List<RoomBase> roomsGenerated;
+    private List<RoomBase> roomsValidated;
+
     protected override HashSet<Vector2Int> GenerateDungeon()
     {
         return Run();
@@ -21,83 +24,98 @@ public class RoomGenerator : GeneratorBase
     protected HashSet<Vector2Int> Run()
     {
         HashSet<Vector2Int> floorPositions = new HashSet<Vector2Int>();
-        rooms = new List<RoomBase>();
+        roomsGenerated = new List<RoomBase>();
+        roomsValidated = new List<RoomBase>();
         //Генерируем несколько комнат разных форм
         int roomNumber = Random.Range(roomNumberMin, roomNumberMax);
         for (int i = 0; i < roomNumber; i++)
         {
-            switch (Random.Range(0, 2))
-            {
-                case 0:
-                    rooms.Add(GenerateCircleRoom());
-                    break;
-                case 1:
-                    rooms.Add(GenerateSquareRoom());
-                    break;
-            }
-            
+            roomsGenerated.Add(GenerateRandomRoom());
         }
         //Проводим операции над комнатами (гугли теорию по операциям на множестве если что)
-        for (int i = 0; i < rooms.Count - 1; i++)
-            for (int j = i + 1; j < rooms.Count; j++)
+        do
+        {
+            RoomBase room = roomsGenerated.First();
+            roomsGenerated.Remove(room);
+
+            for(int i =0; i < roomsValidated.Count; i++)
             {
-                //Проверяем пересечение всех комнат
-                if (rooms[i].CheckIntersection(rooms[j]))
+                if (room.CheckIntersection(roomsValidated[i]))
                 {
                     //Если комната полностью входит одна в другую
-                    if (rooms[i].IsProperSubsetOf(rooms[j]))
+                    if (room.IsProperSubsetOf(roomsValidated[i]))
                     {
-                        //То применяем либо объединение либо разность т.к. другие операции не имеют смысла
-                        switch (Random.Range(0, 2))
+                        List<SetOperations.Operations> operations = SetOperations.GetSubOperationsList;
+                        SetOperations.Operations operation = SetOperations.GetRandomSubOperation();
+                        operations.Remove(operation);
+                        if (!room.TryOperation(roomsValidated[i], operation))
+                        {
+                            operation = room.TryAllSubOperations(roomsValidated[i]);
+                            if(operation == SetOperations.Operations.None)
                             {
-                                case 0:
-                                    rooms[i].Union(rooms[j]);
-                                    break;
-                                case 1:
-                                    rooms[i].Difference(rooms[j]);
-                                    break;
+                                roomsGenerated.Add(GenerateRandomRoom());
+                                break;
                             }
-                        
-                        rooms.Remove(rooms[j]); // Выкидываем вторую комнату с которой уже провели оперцию
-                                                //Здесь должна быть проверка на валидацию но когда-то она там появится
+                            else
+                            {
+                                room.DoOperation(roomsValidated[i], operation);
+                                roomsValidated.Remove(roomsValidated[i]);
+                            }
+                        }
+                        else
+                        {
+                            room.DoOperation(room, operation);
+                            roomsGenerated.Add(room);
+                            break;
+                        }
                     }
                     else
                     {
-                        //Если нет то выбираем уже любую операцию из всех
-                        switch (Random.Range(0, 4))
+                        List<SetOperations.Operations> operations = SetOperations.GetOperationsList;
+                        SetOperations.Operations operation = SetOperations.GetRandomOperation();
+                        operations.Remove(operation);
+                        if (!room.TryOperation(roomsValidated[i], operation))
+                        {
+                            operation = room.TryAllOperations(roomsValidated[i]);
+                            if (operation == SetOperations.Operations.None)
                             {
-                                case 0:
-                                    rooms[i].Intersect(rooms[j]);
-                                    break;
-                                case 1:
-                                    rooms[i].Union(rooms[j]);
-                                    break;
-                                case 2:
-                                    rooms[i].Difference(rooms[j]);
-                                    break;
-                                case 3:
-                                    rooms[i].SymmetricDifference(rooms[j]);
-                                    break;
+                                roomsGenerated.Add(GenerateRandomRoom());
+                                break;
                             }
-
-                        rooms.Remove(rooms[j]); // Выкидываем вторую комнату с которой уже провели оперцию
-                                                //Здесь должна быть проверка на валидацию но когда-то она там появится
+                            else
+                            {
+                                room.DoOperation(roomsValidated[i], operation);
+                                roomsValidated.Remove(roomsValidated[i]);
+                            }
+                        }
+                        else
+                        {
+                            room.DoOperation(room, operation);
+                            roomsGenerated.Add(room);
+                            break;
+                        }
                     }
                 }
+                else
+                {
+                    roomsValidated.Add(room);
+                }
             }
+            
+        } while (CheckAllRoomsIntersection());
         //Объединяем все комнаты в единый хешсет
-        for (int i = 0; i < rooms.Count; i++)
+        for (int i = 0; i < roomsGenerated.Count; i++)
         {
-            floorPositions.UnionWith(rooms[i].GetTilesPos());
+            floorPositions.UnionWith(roomsGenerated[i].GetTilesPos());
         }
         return floorPositions;
     }
 
     //Создаем квадратную комнату
-    protected SquareRoom GenerateSquareRoom()
+    protected PreGenSquareRoom GenerateSquareRoom()
     {
         //Задаем случайную позицию
-        SquareRoom room = new SquareRoom();
+        PreGenSquareRoom room = new PreGenSquareRoom();
         Vector2Int roomCenterPos = CalculateRoomPos();
         room.SetPos(roomCenterPos);
 
@@ -120,10 +138,10 @@ public class RoomGenerator : GeneratorBase
         return room;
     }
     //Создаем круглую комнату
-    protected CircleRoom GenerateCircleRoom()
+    protected PreGenCircleRoom GenerateCircleRoom()
     {
         //Задаем случайную позицию
-        CircleRoom room = new CircleRoom();
+        PreGenCircleRoom room = new PreGenCircleRoom();
         Vector2Int roomCenterPos = CalculateRoomPos();
         room.SetPos(roomCenterPos);
 
@@ -157,4 +175,39 @@ public class RoomGenerator : GeneratorBase
             r = u;
         return new Vector2Int(Mathf.RoundToInt(radius * r * Mathf.Cos(t)), Mathf.RoundToInt(radius * r * Mathf.Sin(t)));
     }
+
+    private bool CheckAllRoomsIntersection()
+    {
+        List<RoomBase> rooms = roomsGenerated;
+        if (rooms == null)
+            return false;
+        while (rooms.Count > 1)
+        {
+            RoomBase room = rooms.First();
+            rooms.Remove(room);
+            foreach (RoomBase roomOther in rooms)
+            {
+                if (room.CheckIntersection(roomOther))
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    private RoomBase GenerateRandomRoom()
+    {
+        RoomBase room = null;
+        switch (Random.Range(0, 2))
+        {
+            case 0:
+                room =  GenerateSquareRoom();
+                break;
+            case 1:
+                room =  GenerateCircleRoom();
+                break;
+
+        }
+        return room;
+    }
+
 }
