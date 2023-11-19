@@ -296,11 +296,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   floorTilemap: {fileID: 1975189474}
-  floorTile: {fileID: 11400000, guid: 0fa483fe1f0c58f43bfbb2bbb4f65c73, type: 2}
-  wallTilemap: {fileID: 1975189474}
-  wallTile: {fileID: 11400000, guid: 33c1dadc343abf441b8dff4cd842f9c8, type: 2}
+  floorTile: {fileID: 11400000, guid: aa7d1cd45570fab4ca112ca47510cc6b, type: 2}
   generator: {fileID: 1145150985}
   wallsGenerator: {fileID: 1874707296}
+  wallTilemap: {fileID: 1975189474}
+  wallTilesList:
+  - name: defaultWallTile
+    tile: {fileID: 11400000, guid: 7ddbd7370807ec54b8bdf8575178a019, type: 2}
+  - name: topLeftCorner
+    tile: {fileID: 11400000, guid: 809151e28fbd5ab42aa3583f8450b766, type: 2}
+  - name: topRightCorner
+    tile: {fileID: 11400000, guid: dc8b0ca8fdde2f04f8515333471a2c01, type: 2}
+  - name: rightWall
+    tile: {fileID: 11400000, guid: 63d4bcab01a76004c83d3968e89c84fb, type: 2}
+  - name: leftWall
+    tile: {fileID: 11400000, guid: 63d4bcab01a76004c83d3968e89c84fb, type: 2}
+  - name: bottomWall
+    tile: {fileID: 11400000, guid: 9b26652cdab8582489935e5d96d03524, type: 2}
+  - name: topWall
+    tile: {fileID: 11400000, guid: 9b26652cdab8582489935e5d96d03524, type: 2}
 --- !u!156049354 &809028530
 Grid:
   m_ObjectHideFlags: 0
@@ -620,7 +634,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   grid: {fileID: 809028529}
   seed: -117438325
-  isNew: 0
+  isNew: 1
 --- !u!1 &1588477589
 GameObject:
   m_ObjectHideFlags: 0
