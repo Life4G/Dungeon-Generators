@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //Базовый класс для генераторов от которого наследуются все остальные
-public abstract class GeneratorBase : MonoBehaviour 
+public abstract class DungeonGeneratorBase : MonoBehaviour 
 {
     //Стартовая позиция равная 0 (можно поменять из редактора)
     [SerializeField]
@@ -10,6 +10,8 @@ public abstract class GeneratorBase : MonoBehaviour
     //Сид
     [SerializeField]
     protected int seed = 0;
+    [SerializeField]
+    public WallsGenerator wallsGenerator;
 
     //Функция по генерации сида
     protected int GenerateSeed()

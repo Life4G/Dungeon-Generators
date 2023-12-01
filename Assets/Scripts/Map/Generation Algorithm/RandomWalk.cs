@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 
 //Генерация через рандомное хождение (идея? берем точку и идем из неё куда-то. Потом берем другую из имеющихся и идем опять куда-то и так неск. раз)
-public class RandomWalk : GeneratorBase
+public class RandomWalk : DungeonGeneratorBase
 {
     //Кол-во повторений алгоритма
     [SerializeField]

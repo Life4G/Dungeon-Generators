@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WallsGenerator : GeneratorBase
+public class WallsGenerator : MonoBehaviour
 {
     // Направления, в т.ч. по диагоналям
     private static readonly Vector2Int[] AllDirections = {
@@ -14,11 +14,6 @@ public class WallsGenerator : GeneratorBase
         new Vector2Int(-1, 0),  // Влево
         new Vector2Int(-1, 1)   // Вверх-влево
     };
-
-    protected override HashSet<Vector2Int> GenerateDungeon()
-    {
-        throw new System.NotImplementedException();
-    }
 
     /// <summary>
     /// Генерирует набор позиций для стен на основе позиций пола.

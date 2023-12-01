@@ -26,6 +26,8 @@ public class PreGenCircleRoom : RoomBase
 
         List<Vector2Int> OpenStates = new List<Vector2Int>();
         List<Vector2Int> ClosedStates = new List<Vector2Int>();
+        if (GetTilesPos().Count == 0)
+            return false;
         OpenStates.Add(GetTilesPos().First());
         while (OpenStates.Count > 0)
         {
@@ -39,7 +41,7 @@ public class PreGenCircleRoom : RoomBase
             
             foreach (var pos in newPoses)
             {
-                if (!(OpenStates.Contains(pos) || ClosedStates.Contains(pos)))
+                if (!(OpenStates.Contains(pos) || ClosedStates.Contains(pos)) && GetTilesPos().Contains(pos))
                 {
                     OpenStates.Add(pos);
                 }

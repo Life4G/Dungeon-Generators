@@ -297,8 +297,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   floorTilemap: {fileID: 1975189474}
   floorTile: {fileID: 11400000, guid: aa7d1cd45570fab4ca112ca47510cc6b, type: 2}
-  generator: {fileID: 1145150985}
-  wallsGenerator: {fileID: 1874707296}
+  generator: {fileID: 2087062189}
   wallTilemap: {fileID: 1975189474}
   wallTilesList:
   - name: defaultWallTile
@@ -437,6 +436,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startPosition: {x: 0, y: 0}
   seed: 0
+  wallsGenerator: {fileID: 1874707296}
   iterations: 50
   length: 20
 --- !u!1 &1154309153
@@ -485,6 +485,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startPosition: {x: 0, y: 0}
   seed: 0
+  wallsGenerator: {fileID: 0}
   iterations: 10
   length: 10
 --- !u!1 &1479519703
@@ -935,8 +936,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9988fca3fcdd33345a63664af2e902c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startPosition: {x: 0, y: 0}
-  seed: 0
 --- !u!4 &1874707297
 Transform:
   m_ObjectHideFlags: 0
@@ -1203,9 +1202,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startPosition: {x: 0, y: 0}
   seed: -117438325
-  radius: 15
-  roomNumberMin: 4
-  roomNumberMax: 16
+  wallsGenerator: {fileID: 1874707296}
+  radius: 30
+  roomNumberMin: 16
+  roomNumberMax: 64
 --- !u!4 &2087062190
 Transform:
   m_ObjectHideFlags: 0

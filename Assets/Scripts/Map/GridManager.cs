@@ -13,10 +13,7 @@ public class GridManager : MonoBehaviour
     
     //Генератор данжей который юзаем
     [SerializeField]
-    public GeneratorBase generator;
-    //Генератор стен
-    [SerializeField]
-    public WallsGenerator wallsGenerator;
+    public DungeonGeneratorBase generator;
 
     public Tilemap wallTilemap;
 
@@ -124,7 +121,7 @@ public class GridManager : MonoBehaviour
         Clear();
         var floorPositions = generator.CreateDungeon(seed);
         //Генерирует позиции стен на основе позиций пола
-        var wallPositions = wallsGenerator.CreateWalls(floorPositions);
+        var wallPositions = generator.wallsGenerator.CreateWalls(floorPositions);
         PaintTiles(floorPositions, wallPositions);
     }
     public void Reload()
@@ -132,7 +129,7 @@ public class GridManager : MonoBehaviour
         Clear();
         var floorPositions = generator.CreateDungeon();
         //Генерирует позиции стен на основе позиций пола
-        var wallPositions = wallsGenerator.CreateWalls(floorPositions);
+        var wallPositions = generator.wallsGenerator.CreateWalls(floorPositions);
         PaintTiles(floorPositions, wallPositions);
     }
 
@@ -144,7 +141,7 @@ public class GridManager : MonoBehaviour
         Clear();
         var floorPositions = generator.CreateDungeon();
         //Генерирует позиции стен на основе позиций пола
-        var wallPositions = wallsGenerator.CreateWalls(floorPositions);
+        var wallPositions = generator.wallsGenerator.CreateWalls(floorPositions);
         PaintTiles(floorPositions, wallPositions);
     }
 

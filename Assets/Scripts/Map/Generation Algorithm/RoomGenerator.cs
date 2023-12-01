@@ -3,18 +3,18 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class RoomGenerator : GeneratorBase
+public class RoomGenerator : DungeonGeneratorBase
 {
     //Радиус для выбора рандомной точки на окружности
     [SerializeField]
-    private int radius = 50;
+    private int radius = 70;
     //Мин и макс комнат которое может быть нагенерено
     [SerializeField]
-    private int roomNumberMin = 10;
+    private int roomNumberMin = 16;
     [SerializeField]
-    private int roomNumberMax = 32;
+    private int roomNumberMax = 64;
 
-    private List<RoomBase> roomsGenerated;
+    public List<RoomBase> roomsGenerated;
     private List<RoomBase> roomsValidated;
 
     protected override HashSet<Vector2Int> GenerateDungeon()
@@ -25,7 +25,6 @@ public class RoomGenerator : GeneratorBase
     {
         HashSet<Vector2Int> floorPositions = new HashSet<Vector2Int>();
         roomsGenerated = new List<RoomBase>();
-        roomsValidated = new List<RoomBase>();
         //Генерируем несколько комнат разных форм
         int roomNumber = Random.Range(roomNumberMin, roomNumberMax);
         for (int i = 0; i < roomNumber; i++)
@@ -33,80 +32,103 @@ public class RoomGenerator : GeneratorBase
             roomsGenerated.Add(GenerateRandomRoom());
         }
         //Проводим операции над комнатами (гугли теорию по операциям на множестве если что)
+        bool roomNotIntersect = true;
         do
         {
-            RoomBase room = roomsGenerated.First();
-            roomsGenerated.Remove(room);
-
-            for(int i =0; i < roomsValidated.Count; i++)
+            List<RoomBase> roomsValidatedNew = new List<RoomBase>();
+            RoomBase room = null;
+            if (roomsGenerated.Count != 0)
             {
-                if (room.CheckIntersection(roomsValidated[i]))
+                room = roomsGenerated.First();
+                roomsGenerated.Remove(room);
+            }
+            else
+            {
+                room = roomsValidated.First();
+                roomsValidated.Remove(room);
+            }
+
+            if (roomsValidated != null)
+                for (int i = 0; i < roomsValidated.Count; i++)
                 {
-                    //Если комната полностью входит одна в другую
-                    if (room.IsProperSubsetOf(roomsValidated[i]))
+                    if (room.CheckIntersection(roomsValidated[i]))
                     {
-                        List<SetOperations.Operations> operations = SetOperations.GetSubOperationsList;
-                        SetOperations.Operations operation = SetOperations.GetRandomSubOperation();
-                        operations.Remove(operation);
-                        if (!room.TryOperation(roomsValidated[i], operation))
+                        roomNotIntersect = false;
+                        //Если комната полностью входит одна в другую
+                        if (room.IsProperSubsetOf(roomsValidated[i]))
                         {
-                            operation = room.TryAllSubOperations(roomsValidated[i]);
-                            if(operation == SetOperations.Operations.None)
+                            List<SetOperations.Operations> operations = SetOperations.GetSubOperationsList;
+                            SetOperations.Operations operation = SetOperations.GetRandomSubOperation();
+                            operations.Remove(operation);
+                            if (!room.TryOperation(roomsValidated[i], operation))
                             {
-                                roomsGenerated.Add(GenerateRandomRoom());
-                                break;
+                                operation = room.TryAllSubOperations(roomsValidated[i]);
+                                if (operation == SetOperations.Operations.None)
+                                {
+                                    roomsGenerated.Add(GenerateRandomRoom());
+                                    roomsValidatedNew.Add(roomsValidated[i]);
+                                }
+                                else
+                                {
+                                    room.DoOperation(roomsValidated[i], operation);
+                                    roomsValidatedNew.Add(room);
+                                }
                             }
                             else
                             {
                                 room.DoOperation(roomsValidated[i], operation);
-                                roomsValidated.Remove(roomsValidated[i]);
+                                roomsValidatedNew.Add(room);
                             }
                         }
                         else
                         {
-                            room.DoOperation(room, operation);
-                            roomsGenerated.Add(room);
-                            break;
+                            List<SetOperations.Operations> operations = SetOperations.GetOperationsList;
+                            SetOperations.Operations operation = SetOperations.GetRandomOperation();
+                            operations.Remove(operation);
+                            if (!room.TryOperation(roomsValidated[i], operation))
+                            {
+                                operation = room.TryAllOperations(roomsValidated[i]);
+                                if (operation == SetOperations.Operations.None)
+                                {
+                                    roomsGenerated.Add(GenerateRandomRoom());
+                                    roomsValidatedNew.Add(roomsValidated[i]);
+                                }
+                                else
+                                {
+                                    room.DoOperation(roomsValidated[i], operation);
+                                    roomsValidatedNew.Add(room);
+                                }
+                            }
+                            else
+                            {
+                                room.DoOperation(roomsValidated[i], operation);
+                                roomsValidatedNew.Add(room);
+                                break;
+                            }
                         }
                     }
                     else
                     {
-                        List<SetOperations.Operations> operations = SetOperations.GetOperationsList;
-                        SetOperations.Operations operation = SetOperations.GetRandomOperation();
-                        operations.Remove(operation);
-                        if (!room.TryOperation(roomsValidated[i], operation))
-                        {
-                            operation = room.TryAllOperations(roomsValidated[i]);
-                            if (operation == SetOperations.Operations.None)
-                            {
-                                roomsGenerated.Add(GenerateRandomRoom());
-                                break;
-                            }
-                            else
-                            {
-                                room.DoOperation(roomsValidated[i], operation);
-                                roomsValidated.Remove(roomsValidated[i]);
-                            }
-                        }
-                        else
-                        {
-                            room.DoOperation(room, operation);
-                            roomsGenerated.Add(room);
-                            break;
-                        }
+                        roomsValidatedNew.Add(roomsValidated[i]);
                     }
+                    if (roomNotIntersect)
+                        roomsValidatedNew.Add(room);
                 }
-                else
-                {
-                    roomsValidated.Add(room);
-                }
+            else
+            {
+                roomsValidatedNew.Add(room);
             }
+            roomsValidated = roomsValidatedNew;
+
+            if (roomsGenerated.Count < 0 && roomsValidated.Count < roomNumber / 2)
+                for(int i = roomsValidated.Count; i <roomNumber; i++)
+                    roomsGenerated.Add(GenerateRandomRoom());
             
-        } while (CheckAllRoomsIntersection());
+        } while (roomsGenerated.Count > 0 && roomNotIntersect);
         //Объединяем все комнаты в единый хешсет
-        for (int i = 0; i < roomsGenerated.Count; i++)
+        for (int i = 0; i < roomsValidated.Count; i++)
         {
-            floorPositions.UnionWith(roomsGenerated[i].GetTilesPos());
+            floorPositions.UnionWith(roomsValidated[i].GetTilesPos());
         }
         return floorPositions;
     }
@@ -176,23 +198,23 @@ public class RoomGenerator : GeneratorBase
         return new Vector2Int(Mathf.RoundToInt(radius * r * Mathf.Cos(t)), Mathf.RoundToInt(radius * r * Mathf.Sin(t)));
     }
 
-    private bool CheckAllRoomsIntersection()
-    {
-        List<RoomBase> rooms = roomsGenerated;
-        if (rooms == null)
-            return false;
-        while (rooms.Count > 1)
-        {
-            RoomBase room = rooms.First();
-            rooms.Remove(room);
-            foreach (RoomBase roomOther in rooms)
-            {
-                if (room.CheckIntersection(roomOther))
-                    return true;
-            }
-        }
-        return false;
-    }
+    //private bool CheckAllRoomsIntersection()
+    //{
+    //    List<RoomBase> rooms = roomsGenerated;
+    //    if (rooms == null)
+    //        return false;
+    //    while (rooms.Count > 1)
+    //    {
+    //        RoomBase room = rooms.First();
+    //        rooms.Remove(room);
+    //        foreach (RoomBase roomOther in rooms)
+    //        {
+    //            if (room.CheckIntersection(roomOther))
+    //                return true;
+    //        }
+    //    }
+    //    return false;
+    //}
 
     private RoomBase GenerateRandomRoom()
     {
@@ -200,10 +222,10 @@ public class RoomGenerator : GeneratorBase
         switch (Random.Range(0, 2))
         {
             case 0:
-                room =  GenerateSquareRoom();
+                room = GenerateSquareRoom();
                 break;
             case 1:
-                room =  GenerateCircleRoom();
+                room = GenerateCircleRoom();
                 break;
 
         }
