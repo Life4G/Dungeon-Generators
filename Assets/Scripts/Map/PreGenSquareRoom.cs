@@ -4,11 +4,11 @@ using UnityEngine;
 
 //Класс генерации квадратной комнаты
 //В процессе она квадратной быть перестанет
-public class PreGenSquareRoom : RoomBase
+public class PreGenSquareRoom : Room
 {
-    public int widthMin = 3;
+    public int widthMin = 5;
     public int widthMax = 16;
-    public int heighthMin = 3;
+    public int heighthMin = 5;
     public int heighthMax = 16;
 
     protected int width;
@@ -23,40 +23,6 @@ public class PreGenSquareRoom : RoomBase
     public void SetSize(Vector2Int size)
     {
         width = size.x; height = size.y;
-    }
-
-    //Проверка генерации когда-то будет :)
-    public override bool Validate()
-    {
-
-        if (positionRoomTiles.Count > widthMin * heighthMin)
-            return true;
-
-        List<Vector2Int> OpenStates = new List<Vector2Int>();
-        List<Vector2Int> ClosedStates = new List<Vector2Int>();
-        if (GetTilesPos().Count == 0)
-            return false;
-        OpenStates.Add(GetTilesPos().First());
-        while (OpenStates.Count > 0)
-        {
-            Vector2Int currentPos = OpenStates.First();
-            OpenStates.Remove(OpenStates.First());
-            ClosedStates.Add(currentPos);
-            List<Vector2Int> newPoses = Direction2D.GetNewCardinalPosesFromPos(currentPos);
-
-            if (newPoses.Count == 0 && OpenStates.Count != 0)
-                return false;
-
-            foreach (var pos in newPoses)
-            {
-                if (!(OpenStates.Contains(pos) || ClosedStates.Contains(pos)) && GetTilesPos().Contains(pos))
-                {
-                    OpenStates.Add(pos);
-                }
-            }
-        }
-        return true;
-
     }
 
 }

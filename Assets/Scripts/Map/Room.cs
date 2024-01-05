@@ -1,8 +1,8 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using static SetOperations;
 
-//Возможные операции над комнатами (смтр теорию по множествам)
 public static class SetOperations
 {
     public enum Operations
@@ -68,10 +68,10 @@ public static class SetOperations
 //Возможные стили (если сделаешь класс то у меня есть пару идей как это все подвязать а пока будет enum)
 public enum Styles
 {
-    Style1,
+    None,Style1,
 }
 
-public abstract class RoomBase
+public class Room
 {
     //Позиции центра комнаты (в прямом смысле центра; правда если условно размер 2x2 то центр там будет смещен :D)
     protected Vector2Int positionCenter;
@@ -111,51 +111,55 @@ public abstract class RoomBase
         positionRoomTiles = positions;
     }
     //Функция проверки пересечения
-    public bool CheckIntersection(RoomBase other)
+    public bool CheckIntersection(Room other)
     {
-        //return positionRoomTiles.Intersect(other.GetTilesPos()).Any();
         return positionRoomTiles.Overlaps(other.GetTilesPos());
     }
     //Функции проверки что эта комната входит в другую
-    public bool IsSubsetOf(RoomBase other)
+    public bool IsSubsetOf(Room other)
     {
         return positionRoomTiles.IsSubsetOf(other.GetTilesPos());
     }
-    public bool IsSupersetOf(RoomBase other)
+    public bool IsSupersetOf(Room other)
     {
         return positionRoomTiles.IsSupersetOf(other.GetTilesPos());
     }
     //Функции проверки что в эту комнату входит другая
-    public bool IsProperSubsetOf(RoomBase other)
+    public bool IsProperSubsetOf(Room other)
     {
         return positionRoomTiles.IsProperSubsetOf(other.GetTilesPos());
     }
-    public bool IsProperSupersetOf(RoomBase other)
+    public bool IsProperSupersetOf(Room other)
     {
         return positionRoomTiles.IsProperSupersetOf(other.GetTilesPos());
     }
     //Операция пересечения с другой комнатой
-    public void Intersect(RoomBase other)
+    public void Intersect(Room other)
     {
         positionRoomTiles.IntersectWith(other.GetTilesPos());
     }
     //Операция объединения с другой комнатой
-    public void Union(RoomBase other)
+    public void Union(Room other)
     {
         positionRoomTiles.UnionWith(other.GetTilesPos());
     }
     //Операция разности с другой комнатой
-    public void Difference(RoomBase other)
+    public void Difference(Room other)
     {
         positionRoomTiles.ExceptWith(other.GetTilesPos());
     }
     //Операция симметричной разности с другой комнатой
-    public void SymmetricDifference(RoomBase other)
+    public void SymmetricDifference(Room other)
     {
         positionRoomTiles.SymmetricExceptWith(other.GetTilesPos());
     }
 
-    public void DoOperation(RoomBase other, SetOperations.Operations operation)
+    public bool CheckConnection(Room other)
+    {
+        return Validate(other.GetTilesPos());
+    }
+
+    public void DoOperation(Room other, SetOperations.Operations operation)
     {
         switch(operation)
         {
@@ -173,9 +177,9 @@ public abstract class RoomBase
                 break;
         }
     }
-    public bool TryOperation(RoomBase other, SetOperations.Operations operation)
+    public bool TryOperation(Room other, SetOperations.Operations operation)
     {
-        RoomBase roomTest = this;
+        Room roomTest = this;
         switch (operation)
         {
             case SetOperations.Operations.Intersect:
@@ -194,7 +198,7 @@ public abstract class RoomBase
         return roomTest.Validate();
     }
 
-    public SetOperations.Operations TryAllOperations(RoomBase other)
+    public SetOperations.Operations TryAllOperations(Room other)
     {
         foreach (SetOperations.Operations op in GetOperationsList)
         {
@@ -206,7 +210,7 @@ public abstract class RoomBase
         return Operations.None;
     }
 
-    public SetOperations.Operations TryAllSubOperations(RoomBase other)
+    public SetOperations.Operations TryAllSubOperations(Room other)
     {
         foreach (SetOperations.Operations op in GetSubOperationsList)
         {
@@ -217,5 +221,73 @@ public abstract class RoomBase
         }
         return Operations.None;
     }
-    public abstract bool Validate();
+    public bool Validate()
+    {
+
+        if (positionRoomTiles.Count < 8)
+            return false;
+
+        List<Vector2Int> OpenStates = new List<Vector2Int>();
+        List<Vector2Int> ClosedStates = new List<Vector2Int>();
+        if (GetTilesPos().Count == 0)
+            return false;
+        OpenStates.Add(GetTilesPos().First());
+        while (OpenStates.Count > 0)
+        {
+            Vector2Int currentPos = OpenStates.First();
+            OpenStates.Remove(OpenStates.First());
+            ClosedStates.Add(currentPos);
+            List<Vector2Int> newPoses = Direction2D.GetNewCardinalPosesFromPos(currentPos);
+
+            if (newPoses.Count == 0 && OpenStates.Count != 0)
+                return false;
+
+            foreach (var pos in newPoses)
+            {
+                if (!(OpenStates.Contains(pos) || ClosedStates.Contains(pos)) && GetTilesPos().Contains(pos))
+                {
+                    OpenStates.Add(pos);
+                }
+            }
+        }
+        if (ClosedStates.Count == GetTilesPos().Count)
+            return true;
+
+        return false;
+    }
+    public bool Validate(HashSet<Vector2Int> tilesPos)
+    {
+        HashSet<Vector2Int> tilesPosTest = new HashSet<Vector2Int>(this.GetTilesPos());
+        tilesPosTest.UnionWith(tilesPos);
+        if(tilesPosTest.Count<16)
+            return false;
+
+        List<Vector2Int> OpenStates = new List<Vector2Int>();
+        List<Vector2Int> ClosedStates = new List<Vector2Int>();
+        if (tilesPosTest.Count == 0)
+            return false;
+        OpenStates.Add(tilesPosTest.First());
+        while (OpenStates.Count > 0)
+        {
+            Vector2Int currentPos = OpenStates.First();
+            OpenStates.Remove(OpenStates.First());
+            ClosedStates.Add(currentPos);
+            List<Vector2Int> newPoses = Direction2D.GetNewCardinalPosesFromPos(currentPos);
+
+            if (newPoses.Count == 0 && OpenStates.Count != 0)
+                return false;
+
+            foreach (var pos in newPoses)
+            {
+                if (!(OpenStates.Contains(pos) || ClosedStates.Contains(pos)) && tilesPosTest.Contains(pos))
+                {
+                    OpenStates.Add(pos);
+                }
+            }
+        }
+        if(ClosedStates.Count == tilesPosTest.Count)
+        return true;
+
+        return false;
+    }
 }
