@@ -24,6 +24,11 @@ public class RoomGenerator : DungeonGeneratorBase
     {
         return Run();
     }
+
+    protected int[,] GenerateDungeonMap()
+    {
+        return RunMap();
+    }
     protected HashSet<Vector2Int> Run()
     {
         HashSet<Vector2Int> floorPositions = new HashSet<Vector2Int>();
@@ -156,6 +161,139 @@ public class RoomGenerator : DungeonGeneratorBase
         }
 
         return floorPositions;
+    }
+
+    protected int[,] RunMap()
+    {
+        HashSet<Vector2Int> floorPositions = new HashSet<Vector2Int>();
+        roomsGenerated = new List<Room>();
+        //Генерируем несколько комнат разных форм
+        int roomNumber = Random.Range(roomNumberMin, roomNumberMax);
+        for (int i = 0; i < roomNumber; i++)
+        {
+            roomsGenerated.Add(GenerateRandomRoom());
+        }
+        //Проводим операции над комнатами (гугли теорию по операциям на множестве если что)
+        bool roomNotIntersect = true;
+        do
+        {
+            List<Room> roomsValidatedNew = new List<Room>();
+            Room room = null;
+            if (roomsGenerated.Count != 0)
+            {
+                room = roomsGenerated.First();
+                roomsGenerated.Remove(room);
+            }
+            else
+            {
+                room = roomsValidated.First();
+                roomsValidated.Remove(room);
+            }
+            roomNotIntersect = true;
+            if (roomsValidated != null)
+                for (int i = 0; i < roomsValidated.Count; i++)
+                {
+
+                    if (room.CheckIntersection(roomsValidated[i]))
+                    {
+                        roomNotIntersect = false;
+                        if (room.IsProperSubsetOf(roomsValidated[i]))
+                        {
+                            List<SetOperations.Operations> operations = SetOperations.GetSubOperationsList;
+                            SetOperations.Operations operation = SetOperations.GetRandomSubOperation();
+                            operations.Remove(operation);
+                            if (!room.TryOperation(roomsValidated[i], operation))
+                            {
+                                operation = room.TryAllSubOperations(roomsValidated[i]);
+                                if (operation == SetOperations.Operations.None)
+                                {
+                                    roomsGenerated.Add(GenerateRandomRoom());
+                                    roomsValidatedNew.Add(roomsValidated[i]);
+                                }
+                                else
+                                {
+                                    room.DoOperation(roomsValidated[i], operation);
+                                    roomsValidatedNew.Add(room);
+                                }
+                            }
+                            else
+                            {
+                                room.DoOperation(roomsValidated[i], operation);
+                                roomsValidatedNew.Add(room);
+                            }
+                        }
+                        else
+                        {
+                            List<SetOperations.Operations> operations = SetOperations.GetOperationsList;
+                            SetOperations.Operations operation = SetOperations.GetRandomOperation();
+                            operations.Remove(operation);
+                            if (!room.TryOperation(roomsValidated[i], operation))
+                            {
+                                operation = room.TryAllOperations(roomsValidated[i]);
+                                if (operation == SetOperations.Operations.None)
+                                {
+                                    roomsGenerated.Add(GenerateRandomRoom());
+                                    roomsValidatedNew.Add(roomsValidated[i]);
+                                }
+                                else
+                                {
+                                    room.DoOperation(roomsValidated[i], operation);
+                                    roomsValidatedNew.Add(room);
+                                }
+                            }
+                            else
+                            {
+                                room.DoOperation(roomsValidated[i], operation);
+                                roomsValidatedNew.Add(room);
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (room.CheckConnection(roomsValidated[i]))
+                        {
+                            room.Union(roomsValidated[i]);
+                            roomsValidatedNew.Add(room);
+                        }
+                        else
+                        {
+                            if (roomNotIntersect)
+                                roomsValidatedNew.Add(room);
+                            roomsValidatedNew.Add(roomsValidated[i]);
+                        }
+
+                    }
+                }
+            else
+            {
+                roomsValidatedNew.Add(room);
+            }
+            roomsValidated = roomsValidatedNew;
+
+            if (roomsGenerated.Count == 0 && roomsValidated.Count < roomNumber / 2)
+                for (int i = roomsValidated.Count; i < roomNumber; i++)
+                    roomsGenerated.Add(GenerateRandomRoom());
+
+        } while (roomsGenerated.Count > 0 || !roomNotIntersect);
+
+        for (int i = 0; i < mapMaxWidth; i++)
+            for (int j = 0; j < mapMaxHeight; j++)
+            {
+                map[i, j] = 0;
+            }
+
+        for (int i = 0; i < roomsValidated.Count; i++)
+        {
+            for (int x = 0; x < mapMaxWidth; x++)
+                for (int y = 0; y < mapMaxHeight; y++)
+                {
+                    if (roomsValidated[i].GetPos().x == x && roomsValidated[i].GetPos().y == y)
+                        map[x, y] = (int)roomsValidated[i].GetStyle();
+                }
+        }
+
+        return map;
     }
 
     protected Room GenerateSquareRoom()
