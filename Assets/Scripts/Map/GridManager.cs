@@ -5,6 +5,7 @@ using UnityEngine.Tilemaps;
 
 public class GridManager : MonoBehaviour
 {
+    //Управление текущим стилем
     [SerializeField]
     private RoomStyleManager roomStyleManager;
     private RoomStyle currentRoomStyle;
@@ -19,6 +20,18 @@ public class GridManager : MonoBehaviour
     public void SetRoomStyle(string styleName)
     {
         currentRoomStyle = roomStyleManager.GetRoomStyle(styleName);
+    }
+    public void SetRoomStyle(int styleIndex)
+    {
+        currentRoomStyle = roomStyleManager.GetRoomStyle(styleIndex);
+    }
+    public void SetRandomRoomStyle()
+    {
+        SetRoomStyle(roomStyleManager.GetRandomStyleIndex());
+    }
+    public int GetStylesCount()
+    {
+        return roomStyleManager.GetStylesCount();
     }
 
     public void PaintWalls(IEnumerable<Vector2Int> wallPositionsEnumerable)
@@ -90,6 +103,8 @@ public class GridManager : MonoBehaviour
     //Генерим карту заново
     public void Reload(int seed)
     {
+        SetRandomRoomStyle();
+
         Clear();
         var floorPositions = generator.CreateDungeon(seed);
         //Генерирует позиции стен на основе позиций пола
@@ -98,6 +113,8 @@ public class GridManager : MonoBehaviour
     }
     public void Reload()
     {
+        SetRandomRoomStyle();
+
         Clear();
         var floorPositions = generator.CreateDungeon();
         //Генерирует позиции стен на основе позиций пола
@@ -108,7 +125,7 @@ public class GridManager : MonoBehaviour
     //Генерим карту первый раз
     public void Start()
     {
-        SetRoomStyle("InversionRoomStyle");
+        SetRandomRoomStyle();
 
         Clear();
         var floorPositions = generator.CreateDungeon();

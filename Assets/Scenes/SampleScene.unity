@@ -170,6 +170,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   roomStyles:
+  - {fileID: 1648166057}
   - {fileID: 932313200}
 --- !u!1 &519420028
 GameObject:
@@ -391,7 +392,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   grid: {fileID: 0}
   seed: 0
-  isNew: 0
+  isNew: 1
 --- !u!1 &887072148
 GameObject:
   m_ObjectHideFlags: 0
