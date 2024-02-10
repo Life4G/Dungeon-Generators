@@ -123,6 +123,55 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &228170477
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 228170478}
+  - component: {fileID: 228170479}
+  m_Layer: 0
+  m_Name: RoomStyleManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &228170478
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 228170477}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 932313199}
+  - {fileID: 1648166056}
+  m_Father: {fileID: 809028531}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &228170479
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 228170477}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13c0a6d41aa9b474d80f43c6abace70a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  roomStyles:
+  - {fileID: 1648166057}
+  - {fileID: 932313200}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -295,25 +344,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0bf91208376da247a7005a41004fabe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  floorTilemap: {fileID: 1975189474}
-  floorTile: {fileID: 11400000, guid: aa7d1cd45570fab4ca112ca47510cc6b, type: 2}
-  generator: {fileID: 2087062189}
-  wallTilemap: {fileID: 1975189474}
-  wallTilesList:
-  - name: defaultWallTile
-    tile: {fileID: 11400000, guid: 7ddbd7370807ec54b8bdf8575178a019, type: 2}
-  - name: topLeftCorner
-    tile: {fileID: 11400000, guid: 809151e28fbd5ab42aa3583f8450b766, type: 2}
-  - name: topRightCorner
-    tile: {fileID: 11400000, guid: dc8b0ca8fdde2f04f8515333471a2c01, type: 2}
-  - name: rightWall
-    tile: {fileID: 11400000, guid: 63d4bcab01a76004c83d3968e89c84fb, type: 2}
-  - name: leftWall
-    tile: {fileID: 11400000, guid: 63d4bcab01a76004c83d3968e89c84fb, type: 2}
-  - name: bottomWall
-    tile: {fileID: 11400000, guid: 9b26652cdab8582489935e5d96d03524, type: 2}
-  - name: topWall
-    tile: {fileID: 11400000, guid: 9b26652cdab8582489935e5d96d03524, type: 2}
+  roomStyleManager: {fileID: 228170479}
+  generator: {fileID: 1145150985}
+  wallsGenerator: {fileID: 1874707296}
 --- !u!156049354 &809028530
 Grid:
   m_ObjectHideFlags: 0
@@ -342,6 +375,7 @@ Transform:
   - {fileID: 1626379069}
   - {fileID: 1839008776}
   - {fileID: 1975189476}
+  - {fileID: 228170478}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &809028532
@@ -358,7 +392,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   grid: {fileID: 0}
   seed: 0
-  isNew: 0
+  isNew: 1
 --- !u!1 &887072148
 GameObject:
   m_ObjectHideFlags: 0
@@ -390,6 +424,61 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1839008776}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &932313198
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 932313199}
+  - component: {fileID: 932313200}
+  m_Layer: 0
+  m_Name: InversionRoomStyle
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &932313199
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 932313198}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 228170478}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &932313200
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 932313198}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbaa51fae2321dc498c234a82ce622b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  styleName: InversionRoomStyle
+  styleTilemap: {fileID: 1975189474}
+  floorTile: {fileID: 11400000, guid: ad66817b31ebae146b8ce81a46bdb193, type: 2}
+  leftWallTile: {fileID: 11400000, guid: 8766b0593a2f59941940bda8e1122d98, type: 2}
+  rightWallTile: {fileID: 11400000, guid: 8766b0593a2f59941940bda8e1122d98, type: 2}
+  bottomWallTile: {fileID: 11400000, guid: 1b74cd26484b639458b2d49f901b8134, type: 2}
+  topWallTile: {fileID: 11400000, guid: 1b74cd26484b639458b2d49f901b8134, type: 2}
+  topLeftCornerTile: {fileID: 11400000, guid: 79f87c6bfb4a1de4b8d08b445795b13d, type: 2}
+  topRightCornerTile: {fileID: 11400000, guid: a46ac8fd56904b644971c49f46c56b83, type: 2}
+  bottomLeftCornerTile: {fileID: 11400000, guid: dd92f516d98d19b4e805e96c5e132d50, type: 2}
+  bottomRightCornerTile: {fileID: 11400000, guid: 1fc40740662a2624cafbe796b72509d2, type: 2}
 --- !u!1 &1145150982
 GameObject:
   m_ObjectHideFlags: 0
@@ -436,7 +525,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startPosition: {x: 0, y: 0}
   seed: 0
-  wallsGenerator: {fileID: 1874707296}
   iterations: 50
   length: 20
 --- !u!1 &1154309153
@@ -485,7 +573,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startPosition: {x: 0, y: 0}
   seed: 0
-  wallsGenerator: {fileID: 0}
   iterations: 10
   length: 10
 --- !u!1 &1479519703
@@ -772,6 +859,61 @@ Transform:
   - {fileID: 2087062190}
   m_Father: {fileID: 809028531}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1648166055
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1648166056}
+  - component: {fileID: 1648166057}
+  m_Layer: 0
+  m_Name: NormalRoomStyle
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1648166056
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1648166055}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 228170478}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1648166057
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1648166055}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbaa51fae2321dc498c234a82ce622b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  styleName: NormalRoomStyle
+  styleTilemap: {fileID: 1975189474}
+  floorTile: {fileID: 11400000, guid: 1a2cac622686eae4aab3bd97154adac5, type: 2}
+  leftWallTile: {fileID: 11400000, guid: 1b18e70986b36c042907752f50e415ed, type: 2}
+  rightWallTile: {fileID: 11400000, guid: 1b18e70986b36c042907752f50e415ed, type: 2}
+  bottomWallTile: {fileID: 11400000, guid: 8de7eb2ca50cdee4b91130292fa2371d, type: 2}
+  topWallTile: {fileID: 11400000, guid: 8de7eb2ca50cdee4b91130292fa2371d, type: 2}
+  topLeftCornerTile: {fileID: 11400000, guid: 25c1cb5f186e9b24c809149a9363f21f, type: 2}
+  topRightCornerTile: {fileID: 11400000, guid: acf1073695e4dfc4a81b59b32af6ac0e, type: 2}
+  bottomLeftCornerTile: {fileID: 11400000, guid: 072c11bc4498c3e4d9432b8309a95cbe, type: 2}
+  bottomRightCornerTile: {fileID: 11400000, guid: 79918bb5ff9a9af47a8c4e28975826c7, type: 2}
 --- !u!1 &1653075063
 GameObject:
   m_ObjectHideFlags: 0
@@ -936,6 +1078,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9988fca3fcdd33345a63664af2e902c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  startPosition: {x: 0, y: 0}
+  seed: 0
 --- !u!4 &1874707297
 Transform:
   m_ObjectHideFlags: 0
@@ -1202,10 +1346,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startPosition: {x: 0, y: 0}
   seed: -117438325
-  wallsGenerator: {fileID: 1874707296}
-  radius: 30
-  roomNumberMin: 16
-  roomNumberMax: 64
+  radius: 15
+  roomNumberMin: 4
+  roomNumberMax: 16
 --- !u!4 &2087062190
 Transform:
   m_ObjectHideFlags: 0
