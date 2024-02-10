@@ -10,7 +10,7 @@ public class GridManager : MonoBehaviour
     //Тайл которым будем закрашивать пол
     [SerializeField]
     private TileBase floorTile;
-    
+
     //Генератор данжей который юзаем
     [SerializeField]
     public DungeonGeneratorBase generator;
@@ -80,25 +80,27 @@ public class GridManager : MonoBehaviour
         if (left && right && !top && !bottom && wallTilesDictionary.TryGetValue("bottomWall", out tile)) return tile;
         if (left && right && !top && !bottom && wallTilesDictionary.TryGetValue("topWall", out tile)) return tile;
 
-        
+
         if (wallTilesDictionary.TryGetValue("defaultWallTile", out tile)) return tile;
 
         return null;
     }
 
     //Передаем позиции
-    public void PaintTiles(IEnumerable<Vector2Int> floorPositions, IEnumerable<Vector2Int> wallPositions)
+    public void PaintTiles(int[,] floorPositions, IEnumerable<Vector2Int> wallPositions)
     {
         PaintTiles(floorPositions, floorTilemap, floorTile);
         PaintWalls(wallPositions);
     }
 
     //Закрашиваем каждый тайл
-    private void PaintTiles(IEnumerable<Vector2Int> positions, Tilemap tilemap, TileBase tile)
+    private void PaintTiles(int[,] positions, Tilemap tilemap, TileBase tile)
     {
-        foreach (var position in positions)
+        for (int y = 0; y < positions.GetLength(0); y++)
         {
-            PaintSingleTile(tilemap, tile, position);
+            for (int x = 0; x < positions.GetLength(1); x++)
+                if (positions[y, x] != -1)
+                    PaintSingleTile(tilemap, tile, new Vector2Int(x, y));
         }
     }
     //Закраска
@@ -121,16 +123,17 @@ public class GridManager : MonoBehaviour
         Clear();
         var floorPositions = generator.CreateDungeon(seed);
         //Генерирует позиции стен на основе позиций пола
-        var wallPositions = generator.wallsGenerator.CreateWalls(floorPositions);
-        PaintTiles(floorPositions, wallPositions);
+        //var wallPositions = generator.wallsGenerator.CreateWalls(floorPositions);
+        //PaintTiles(floorPositions, wallPositions);
+        PaintTiles(floorPositions, floorTilemap, floorTile);
     }
     public void Reload()
     {
         Clear();
         var floorPositions = generator.CreateDungeon();
         //Генерирует позиции стен на основе позиций пола
-        var wallPositions = generator.wallsGenerator.CreateWalls(floorPositions);
-        PaintTiles(floorPositions, wallPositions);
+        //var wallPositions = generator.wallsGenerator.CreateWalls(floorPositions);
+        PaintTiles(floorPositions, floorTilemap, floorTile);
     }
 
     //Генерим карту первый раз
@@ -141,8 +144,10 @@ public class GridManager : MonoBehaviour
         Clear();
         var floorPositions = generator.CreateDungeon();
         //Генерирует позиции стен на основе позиций пола
-        var wallPositions = generator.wallsGenerator.CreateWalls(floorPositions);
-        PaintTiles(floorPositions, wallPositions);
+        //var wallPositions = generator.wallsGenerator.CreateWalls(floorPositions);
+        //PaintTiles(floorPositions, wallPositions);
+        PaintTiles(floorPositions, floorTilemap, floorTile);
+
     }
 
 }

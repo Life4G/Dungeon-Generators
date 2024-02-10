@@ -26,10 +26,10 @@ public abstract class DungeonGeneratorBase : MonoBehaviour
         return ((text == "") ? 0 : text.GetHashCode());
     }
     //Хешсет в котором валяются все плитки (а вернее их координаты)
-    protected HashSet<Vector2Int> resultPositions;
+    protected int[,] resultPositions;
 
     //Функция создания данжа которая вызывается по нажатию кнопки
-    public HashSet<Vector2Int> CreateDungeon()
+    public int[,] CreateDungeon()
     {
         seed = GenerateSeed();
         //Эта штука нужно чтобы запомнить состояние рандома до вызова генерации
@@ -46,7 +46,7 @@ public abstract class DungeonGeneratorBase : MonoBehaviour
     }
 
     //Функция создания данжа которая вызывается по нажатию кнопки (на этот раз есть сид)
-    public HashSet<Vector2Int> CreateDungeon(int seed)
+    public int[,] CreateDungeon(int seed)
     {
         this.seed = seed;
         //Эта штука нужно чтобы запомнить состояние рандома до вызова генерации
@@ -63,7 +63,12 @@ public abstract class DungeonGeneratorBase : MonoBehaviour
     }
 
     //Обстрактная функция которая создана другими объектами (наследники обязаны overridить эту функцию иначе жопа генерации ведь всё вкусное там)
-    protected abstract HashSet<Vector2Int> GenerateDungeon();
+    protected abstract int[,] GenerateDungeon();
+
+    public virtual int GetRoomStyle(int id)
+    {
+        return 1;
+    }
 
     public int GetSeed()
     {

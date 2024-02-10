@@ -4,17 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class PreGenCircleRoom : Room
+public class PreGenCircleRoom : MassRoom
 {
 
     public int radiusMin = 4;
     public int radiusMax = 8;
-
-    protected int radius;
-
-    public void SetSize(int radius)
-    {
-       this.radius = radius;
-    }
 
 }
