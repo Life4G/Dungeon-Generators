@@ -75,7 +75,7 @@ public class RoomGenerator : DungeonGeneratorBase
                             if (!room.TryOperation(roomsValidated[i], operation))
                             {
                                 operation = room.TryAllSubOperations(roomsValidated[i]);
-                                if (operation == SetOperations.Operations.None)
+                                if (operation == SetOperations.Operations.None && roomsValidated.Count + 1 < roomNumber)
                                 {
                                     roomsGenerated.Add(GenerateRandomRoom());
                                     roomsValidatedNew.Add(roomsValidated[i]);
@@ -100,9 +100,10 @@ public class RoomGenerator : DungeonGeneratorBase
                             if (!room.TryOperation(roomsValidated[i], operation))
                             {
                                 operation = room.TryAllOperations(roomsValidated[i]);
-                                if (operation == SetOperations.Operations.None)
+                                if (operation == SetOperations.Operations.None &&  roomsValidated.Count +1 < roomNumber)
                                 {
                                     roomsGenerated.Add(GenerateRandomRoom());
+                                    roomsValidatedNew.Add(roomsValidated[i]);
                                 }
                                 else
                                 {
@@ -336,7 +337,7 @@ public class RoomGenerator : DungeonGeneratorBase
         int x = 0, y = roomRadius, f = 1 - roomRadius, incrE = 3, incrSE = 5 - 2 * roomRadius;
         //tilePositions.Add(new Vector2Int(roomCenterPos.x, roomCenterPos.y + roomRadius));
         //tilePositions.Add(new Vector2Int(roomCenterPos.x + x, roomCenterPos.y - roomRadius));
-        tilePositions[roomRadius, roomRadius * 2 - 1] = 1;
+        tilePositions[roomRadius, roomRadius * 2] = 1;
         tilePositions[roomRadius * 2, 0] = 1;
 
         for (int i = 0; i <= roomRadius * 2; i++)

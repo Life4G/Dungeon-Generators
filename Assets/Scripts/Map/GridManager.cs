@@ -9,10 +9,11 @@ public class GridManager : MonoBehaviour
     [SerializeField]
     private RoomStyleManager roomStyleManager;
     private RoomStyle currentRoomStyle;
-    
+    public Tilemap styleTilemap;
+
     //Генератор данжей который юзаем
     [SerializeField]
-    public GeneratorBase generator;
+    public DungeonGeneratorBase generator;
     //Генератор стен
     [SerializeField]
     public WallsGenerator wallsGenerator;
@@ -78,6 +79,22 @@ public class GridManager : MonoBehaviour
         PaintWalls(wallPositions);
     }
 
+    //Передаем позиции
+    public void PaintTiles(int[,] floorPositions, IEnumerable<Vector2Int> wallPositions)
+    {
+        PaintTiles(floorPositions, currentRoomStyle.styleTilemap, currentRoomStyle.floorTile);
+    }
+    //Закрашиваем каждый тайл
+    private void PaintTiles(int[,] positions, Tilemap tilemap, TileBase tile)
+    {
+        for (int i = 0; i < positions.GetLength(0); i++)
+            for (int j = 0; j < positions.GetLength(1); j++)
+            {
+                if (positions[i, j] != -1)
+                    PaintSingleTile(tilemap, tile, new Vector2Int(i, j));
+            }
+    }
+
     //Закрашиваем каждый тайл
     private void PaintTiles(IEnumerable<Vector2Int> positions, Tilemap tilemap, TileBase tile)
     {
@@ -97,7 +114,7 @@ public class GridManager : MonoBehaviour
     //Очистка тайлов
     public void Clear()
     {
-        currentRoomStyle.styleTilemap.ClearAllTiles();
+        styleTilemap.ClearAllTiles();
     }
 
     //Генерим карту заново
@@ -108,8 +125,8 @@ public class GridManager : MonoBehaviour
         Clear();
         var floorPositions = generator.CreateDungeon(seed);
         //Генерирует позиции стен на основе позиций пола
-        var wallPositions = wallsGenerator.CreateWalls(floorPositions);
-        PaintTiles(floorPositions, wallPositions);
+        //var wallPositions = wallsGenerator.CreateWalls(floorPositions);
+        PaintTiles(floorPositions, styleTilemap, currentRoomStyle.floorTile);
     }
     public void Reload()
     {
@@ -118,8 +135,9 @@ public class GridManager : MonoBehaviour
         Clear();
         var floorPositions = generator.CreateDungeon();
         //Генерирует позиции стен на основе позиций пола
-        var wallPositions = wallsGenerator.CreateWalls(floorPositions);
-        PaintTiles(floorPositions, wallPositions);
+        //var wallPositions = wallsGenerator.CreateWalls(floorPositions);
+        //PaintTiles(floorPositions, wallPositions);
+        PaintTiles(floorPositions, styleTilemap, currentRoomStyle.floorTile);
     }
 
     //Генерим карту первый раз
@@ -130,8 +148,9 @@ public class GridManager : MonoBehaviour
         Clear();
         var floorPositions = generator.CreateDungeon();
         //Генерирует позиции стен на основе позиций пола
-        var wallPositions = wallsGenerator.CreateWalls(floorPositions);
-        PaintTiles(floorPositions, wallPositions);
+        //var wallPositions = wallsGenerator.CreateWalls(floorPositions);
+        //PaintTiles(floorPositions, wallPositions);
+        PaintTiles(floorPositions, styleTilemap, currentRoomStyle.floorTile);
     }
 
 }
