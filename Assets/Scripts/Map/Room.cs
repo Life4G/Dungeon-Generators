@@ -18,7 +18,7 @@ public static class SetOperations
     }
     public static Operations GetRandomOperation()
     {
-        return (Operations)Random.Range(1, 5);
+        return (Operations)Random.Range(1, 4);
     }
     public static Operations GetRandomSubOperation()
     {
@@ -135,22 +135,11 @@ public class MassRoom
         if (collisonX1 > collisonX2 || collisonY1 > collisonY2)
             return false;
 
-        Vector2Int offset = Vector2Int.Min(massRoomPos, other.massRoomPos);
         for (int y = collisonY1; y < collisonY2; y++)
             for (int x = collisonX1; x < collisonX2; x++)
             {
-                try
-                {
-                    if (tiles[y - massRoomPos.y, x - massRoomPos.x] * other.tiles[y - offset.y, x - offset.x] == 1)
+                    if (tiles[y - massRoomPos.y, x - massRoomPos.x] * other.tiles[y - other.massRoomPos.y, x - other.massRoomPos.x] == 1)
                         return true;
-                }
-                catch (System.IndexOutOfRangeException ex)
-                {
-                    Debug.LogError($"y - massRoomPos.y: {y - massRoomPos.y}| x - massRoomPos.x: {x - massRoomPos.x}| y - offset.y: {y - offset.y}| x - offset.x: {x - offset.x}. Error: {ex.Message}");
-                    Debug.LogError($"y 1: {sizeY}| x 1: {sizeX}| y 2: {other.sizeY}| x 2: {other.sizeY}. Error: {ex.Message}");
-                    return false;
-                }
-                
             }
 
         return false;
@@ -179,11 +168,10 @@ public class MassRoom
         int sizeYNew = collisonY2 - collisonY1 + 1;
         int[,] tilesNew = new int[sizeYNew, sizeXNew];
 
-        Vector2Int offset = Vector2Int.Min(massRoomPos, other.massRoomPos);
         for (int y = collisonY1; y < collisonY2; y++)
             for (int x = collisonX1; x < collisonX2; x++)
             {
-                if (tiles[y - massRoomPos.y, x - massRoomPos.x] * other.tiles[y - offset.y, x - offset.x] == 1)
+                if (tiles[y - massRoomPos.y, x - massRoomPos.x] * other.tiles[y - other.massRoomPos.y, x - other.massRoomPos.x] == 1)
                     tilesNew[y, x] = 1;
                 else
                     tilesNew[y, x] = 0;
@@ -207,24 +195,22 @@ public class MassRoom
 
         int[,] tilesNew = new int[sizeNewY, sizeNewX];
       
-        Vector2Int offsetOther = Vector2Int.Min(RoomPosNew, other.massRoomPos);
         for (int y = other.massRoomPos.y; y < other.massRoomPos.y + other.sizeY; y++)
             for (int x = other.massRoomPos.x; x < other.massRoomPos.x + other.sizeX; x++)
             {
                 if (other.tiles[y - other.massRoomPos.y, x - other.massRoomPos.x] == 1)
-                    tilesNew[y - offsetOther.y, x - offsetOther.x] = 1;
+                    tilesNew[y - RoomPosNew.y, x - RoomPosNew.x] = 1;
                 else
-                    tilesNew[y - offsetOther.y, x - offsetOther.x] = 0;
+                    tilesNew[y - RoomPosNew.y, x - RoomPosNew.x] = 0;
 
             }
-        Vector2Int offset = Vector2Int.Min(RoomPosNew, massRoomPos);
         for (int y = massRoomPos.y; y < massRoomPos.y + sizeY; y++)
             for (int x = massRoomPos.x; x < massRoomPos.x + sizeX; x++)
             {
                 if (tiles[y - massRoomPos.y, x - massRoomPos.x] == 1)
-                    tilesNew[y - offset.y, x - offset.x] = 1;
+                    tilesNew[y - RoomPosNew.y, x - RoomPosNew.x] = 1;
                 else
-                    tilesNew[y - offset.y, x - offset.x] = 0;
+                    tilesNew[y - RoomPosNew.y, x - RoomPosNew.x] = 0;
 
             }
 
@@ -241,11 +227,10 @@ public class MassRoom
         int collisonX2 = Mathf.Min(massRoomPos.x + sizeX, other.massRoomPos.x + other.sizeX);
         int collisonY2 = Mathf.Min(massRoomPos.y + sizeY, other.massRoomPos.y + other.sizeY);
 
-        Vector2Int offset = Vector2Int.Min(massRoomPos, other.massRoomPos);
         for (int y = collisonY1; y < collisonY2; y++)
             for (int x = collisonX1; x < collisonX2; x++)
             {
-                if (tiles[y - massRoomPos.y, x - massRoomPos.x] * other.tiles[y - offset.y, x - offset.x] == 1)
+                if (tiles[y - massRoomPos.y, x - massRoomPos.x] * other.tiles[y -  other.massRoomPos.y, x -  other.massRoomPos.x] == 1)
                     tiles[y, x] = 0;
             }
 
