@@ -84,7 +84,7 @@ public class RoomGenerator : DungeonGeneratorBase
                             if (!room.TryOperation(roomsValidated[i], operation))
                             {
                                 operation = room.TryAllSubOperations(roomsValidated[i]);
-                                if (operation == SetOperations.Operations.None)
+                                if (operation == SetOperations.Operations.None && roomsValidated.Count + 1 < roomNumber)
                                 {
                                     roomsGenerated.Add(GenerateRandomRoom());
                                 }
@@ -108,12 +108,8 @@ public class RoomGenerator : DungeonGeneratorBase
                             if (!room.TryOperation(roomsValidated[i], operation))
                             {
                                 operation = room.TryAllOperations(roomsValidated[i]);
-<<<<<<< Updated upstream
-                                if (operation == SetOperations.Operations.None)
-=======
 
                                 if (operation == SetOperations.Operations.None && roomsValidated.Count + 1 < roomNumber)
->>>>>>> Stashed changes
                                 {
                                     roomsGenerated.Add(GenerateRandomRoom());
                                 }
