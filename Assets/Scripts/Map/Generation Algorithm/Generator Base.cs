@@ -25,7 +25,7 @@ public abstract class DungeonGeneratorBase : MonoBehaviour
         //строку преобразовываем в хешкод
         return ((text == "") ? 0 : text.GetHashCode());
     }
-    //Хешсет в котором валяются все плитки (а вернее их координаты)
+    //массив в котором валяются все плитки (а вернее их координаты)
     protected int[,] resultPositions;
 
     //Функция создания данжа которая вызывается по нажатию кнопки

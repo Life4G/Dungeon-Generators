@@ -128,7 +128,7 @@ public class GridManager : MonoBehaviour
         SetRandomRoomStyle();
 
         Clear();
-        var floorPositions = generator.CreateDungeon();
+        var floorPositions = generator.CreateDungeon(-1877953954);
         //Генерирует позиции стен на основе позиций пола
         var wallPositions = wallsGenerator.CreateWalls(floorPositions);
         PaintTiles(floorPositions, wallPositions);

@@ -6,8 +6,6 @@ using UnityEngine;
 
 public class PreGenCircleRoom : MassRoom
 {
-
     public int radiusMin = 4;
     public int radiusMax = 8;
-
 }
