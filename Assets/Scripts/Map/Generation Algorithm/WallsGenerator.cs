@@ -1,34 +1,20 @@
 using UnityEngine;
 
-public class WallsGenerator : GeneratorBase
+public class WallsGenerator : MonoBehaviour
 {
     private static readonly Vector2Int[] AllDirections = {
-        new Vector2Int(0, 1),
-        new Vector2Int(1, 1),
-        new Vector2Int(1, 0),
-        new Vector2Int(1, -1),
-        new Vector2Int(0, -1),
-        new Vector2Int(-1, -1),
-        new Vector2Int(-1, 0),
-        new Vector2Int(-1, 1)
+        new Vector2Int(0, 1),   // вверх
+        new Vector2Int(1, 1),   // вверх-вправо
+        new Vector2Int(1, 0),   // вправо
+        new Vector2Int(1, -1),  // вниз-вправо
+        new Vector2Int(0, -1),  // вниз
+        new Vector2Int(-1, -1), // вниз-влево
+        new Vector2Int(-1, 0),  // влево
+        new Vector2Int(-1, 1)   // вверх-влево 
     };
 
-<<<<<<< Updated upstream
-    protected override HashSet<Vector2Int> GenerateDungeon()
-    {
-        throw new System.NotImplementedException();
-    }
-
-    /// <summary>
-    /// Генерирует набор позиций для стен на основе позиций пола.
-    /// </summary>
-    /// <param name="floorPositions">Набор позиций пола, вокруг которых необходимо создать стены.</param>
-    /// <returns>Набор позиций стен, созданных вокруг каждой позиции пола.</returns>
-    public HashSet<Vector2Int> CreateWalls(HashSet<Vector2Int> floorPositions)
-=======
     // генерирует двумерный массив позиций для стен на основе двумерного массива позиций пола
     public int[,] GenerateWallsFromFloor(int[,] floorArray)
->>>>>>> Stashed changes
     {
         int width = floorArray.GetLength(0);
         int height = floorArray.GetLength(1);

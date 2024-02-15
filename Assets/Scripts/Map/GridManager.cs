@@ -7,20 +7,12 @@ public class GridManager : MonoBehaviour
     [SerializeField]
     private RoomStyleManager roomStyleManager;
     private RoomStyle currentRoomStyle;
-<<<<<<< Updated upstream
-    
-    //Генератор данжей который юзаем
-    [SerializeField]
-    public GeneratorBase generator;
-    //Генератор стен
-=======
 
     private DungeonRoomManager roomManager;
 
     [SerializeField]
     public DungeonGeneratorBase generator;
 
->>>>>>> Stashed changes
     [SerializeField]
     public WallsGenerator wallsGenerator;
 
@@ -85,63 +77,15 @@ public class GridManager : MonoBehaviour
         return null;
     }
 
-<<<<<<< Updated upstream
-    //Передаем позиции
-    public void PaintTiles(IEnumerable<Vector2Int> floorPositions, IEnumerable<Vector2Int> wallPositions)
-    {
-        PaintTiles(floorPositions, currentRoomStyle.styleTilemap, currentRoomStyle.floorTile);
-        PaintWalls(wallPositions);
-    }
-
-    //Закрашиваем каждый тайл
-    private void PaintTiles(IEnumerable<Vector2Int> positions, Tilemap tilemap, TileBase tile)
-    {
-        foreach (var position in positions)
-        {
-            PaintSingleTile(tilemap, tile, position);
-        }
-    }
-    //Закраска
-    private void PaintSingleTile(Tilemap tilemap, TileBase tile, Vector2Int position)
-    {
-        //Вектор3 т.к. по факту мир 3D хоть у нас и 2D (живите с этим :| )
-        var tilePosition = tilemap.WorldToCell((Vector3Int)position);
-        tilemap.SetTile(tilePosition, tile);
-    }
-
-    //Очистка тайлов
-    public void Clear()
-    {
-        currentRoomStyle.styleTilemap.ClearAllTiles();
-    }
-
-    //Генерим карту заново
-    public void Reload(int seed)
-    {
-        SetRandomRoomStyle();
-
-        Clear();
-        var floorPositions = generator.CreateDungeon(seed);
-        //Генерирует позиции стен на основе позиций пола
-        var wallPositions = wallsGenerator.CreateWalls(floorPositions);
-        PaintTiles(floorPositions, wallPositions);
-    }
-=======
     public void Clear()
     {
         tilemap.ClearAllTiles();
     }
 
->>>>>>> Stashed changes
     public void Reload()
     {
         Clear();
-<<<<<<< Updated upstream
-        var floorPositions = generator.CreateDungeon();
-        //Генерирует позиции стен на основе позиций пола
-        var wallPositions = wallsGenerator.CreateWalls(floorPositions);
-        PaintTiles(floorPositions, wallPositions);
-=======
+
         int[,] floorArray = generator.CreateDungeon();
         int[,] wallArray = wallsGenerator.GenerateWallsFromFloor(floorArray);
 
@@ -151,18 +95,12 @@ public class GridManager : MonoBehaviour
 
         PaintFromArray(floorArray, false);
         PaintFromArray(wallArray, true);
->>>>>>> Stashed changes
     }
 
     public void Reload(int seed)
     {
         Clear();
-<<<<<<< Updated upstream
-        var floorPositions = generator.CreateDungeon();
-        //Генерирует позиции стен на основе позиций пола
-        var wallPositions = wallsGenerator.CreateWalls(floorPositions);
-        PaintTiles(floorPositions, wallPositions);
-=======
+
         int[,] floorArray = generator.CreateDungeon(seed);
         int[,] wallArray = wallsGenerator.GenerateWallsFromFloor(floorArray);
 
@@ -172,7 +110,6 @@ public class GridManager : MonoBehaviour
 
         PaintFromArray(floorArray, false);
         PaintFromArray(wallArray, true);
->>>>>>> Stashed changes
     }
 
     void Start()
