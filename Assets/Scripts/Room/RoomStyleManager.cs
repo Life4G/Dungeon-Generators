@@ -10,12 +10,12 @@ using Random = UnityEngine.Random;
 namespace Assets.Scripts.Room
 {
 
-    internal class RoomStyleManager : MonoBehaviour
+    public class RoomStyleManager : MonoBehaviour
     {
         [SerializeField]
         private List<RoomStyle> roomStyles;
 
-        // Получить стиль по названию
+        // получить стиль по названию
         public RoomStyle GetRoomStyle(string name)
         {
             try
@@ -34,7 +34,8 @@ namespace Assets.Scripts.Room
                 return null;
             }
         }
-        // Получить стиль по индексу
+
+        // получить стиль по индексу
         public RoomStyle GetRoomStyle(int index)
         {
             try
@@ -47,13 +48,15 @@ namespace Assets.Scripts.Room
                 return null;
             }
         }
-        // Количество стилей
+
+        // вернуть количество стилей
         public int GetStylesCount()
         {
             Debug.Log("Всего стилей: " + roomStyles.Count);
             return roomStyles.Count;
         }
-        // Случайный индекс стиля
+
+        // cлучайный индекс стиля
         public int GetRandomStyleIndex()
         {
             if (roomStyles.Count == 0)
@@ -65,7 +68,8 @@ namespace Assets.Scripts.Room
             Debug.Log("Случайный индекс стиля: " + index);
             return index;
         }
-        // Случайное название стиля
+
+        // cлучайное название стиля
         public string GetRandomStyleName()
         {
             if (roomStyles.Count == 0)
@@ -78,5 +82,17 @@ namespace Assets.Scripts.Room
             Debug.Log("Случайное название стиля: " + styleName);
             return styleName;
         }
+
+        // название стиля по индексу
+        public string GetStyleNameByIndex(int index)
+        {
+            if (index >= 0 && index < roomStyles.Count)
+            {
+                return roomStyles[index].styleName;
+            }
+            Debug.LogError($"Индекс {index} вне диапазона.");
+            return "";
+        }
+
     }
 }

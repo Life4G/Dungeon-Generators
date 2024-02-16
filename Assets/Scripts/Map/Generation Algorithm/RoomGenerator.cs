@@ -10,15 +10,16 @@ using Random = UnityEngine.Random;
 
 public class RoomGenerator : DungeonGeneratorBase
 {
-    //Радиус для выбора рандомной точки на окружности
 
     [SerializeField]
-    private int radius = 120;
+    private int radiusOfRoomSpawn = 120;
     //Мин и макс комнат которое может быть нагенерено
     [SerializeField]
     private int roomNumberMin = 16;
     [SerializeField]
     private int roomNumberMax = 64;
+    [SerializeField]
+    int roomSizeMax = 16;
     [SerializeField]
     bool checkConnection = true;
     [SerializeField]
@@ -27,12 +28,12 @@ public class RoomGenerator : DungeonGeneratorBase
     public static int mapMaxWidth = 512;
     private int[,] map;
 
-    private List<MassRoom> roomsGenerated;
-    public List<MassRoom> roomsValidated;
+    private List<Room> roomsGenerated;
+    public List<Room> roomsValidated;
 
     protected override int[,] GenerateDungeon()
     {
-        if(presetLoad)
+        if (presetLoad)
         {
             string fileContents = File.ReadAllText(Application.persistentDataPath + "/gamedata.json");
             map = JsonUtility.FromJson<int[,]>(fileContents);
@@ -44,20 +45,20 @@ public class RoomGenerator : DungeonGeneratorBase
     protected int[,] Run()
     {
         map = new int[mapMaxWidth, mapMaxHeight];
-        roomsValidated = new List<MassRoom>();
-        roomsGenerated = new List<MassRoom>();
-        //Генерируем несколько комнат разных форм
+        roomsValidated = new List<Room>();
+        roomsGenerated = new List<Room>();
+
         int roomNumber = Random.Range(roomNumberMin, roomNumberMax);
         for (int i = 0; i < roomNumber; i++)
         {
             roomsGenerated.Add(GenerateRandomRoom());
         }
-        //Проводим операции над комнатами (гугли теорию по операциям на множестве если что)
+       
         bool roomNotIntersect = true;
         do
         {
-            List<MassRoom> roomsValidatedNew = new List<MassRoom>();
-            MassRoom room = null;
+            List<Room> roomsValidatedNew = new List<Room>();
+            Room room = null;
             if (roomsGenerated.Count != 0)
             {
                 room = roomsGenerated.First();
@@ -178,14 +179,10 @@ public class RoomGenerator : DungeonGeneratorBase
         return map;
     }
 
-    protected PreGenSquareRoom GenerateSquareRoom()
+    protected Room GenerateSquareRoom()
     {
-        PreGenSquareRoom room = new PreGenSquareRoom();
-        Vector2Int roomCenterPos = CalculateRoomPos();
-        room.SetPos(roomCenterPos);
-
-        int roomWidth = Random.Range(6, 16);
-        int roomHeight = Random.Range(6, 16);
+        int roomWidth = Random.Range(6, roomSizeMax + 1);
+        int roomHeight = Random.Range(6, roomSizeMax + 1);
 
         int[,] tilePositions = new int[roomHeight, roomWidth];
 
@@ -196,74 +193,188 @@ public class RoomGenerator : DungeonGeneratorBase
                 tilePositions[y, x] = 1;
                 tilesNum++;
             }
-        room.SetTiles(tilePositions);
-        room.SetSize(roomWidth, roomHeight);
-        room.SetStyle(Styles.Style1);
-        return room;
+        return new Room(CalculateRoomPos(), roomWidth, roomHeight, tilePositions);
     }
-    //Создаем круглую комнату
-    protected PreGenCircleRoom GenerateCircleRoom()
+    protected Room GenerateCircleRoom()
     {
-        PreGenCircleRoom room = new PreGenCircleRoom();
-        room.SetPos(CalculateRoomPos());
+        int roomRadius = Random.Range(4, roomSizeMax / 2 + 1);
+        int sizeX = roomRadius * 2; int sizeY = sizeX;
+        int[,] tiles = new int[sizeY, sizeX];
 
-        int roomRadius = Random.Range(4, 8);
+        int x = 0;
+        int y = roomRadius;
+        int d = 1 - roomRadius;
+        int incrE = 3;
+        int incrSE = 5 - 2 * roomRadius;
+        int cx = sizeX / 2;
+        int cy = sizeY / 2;
 
-        int[,] tilePositions = new int[roomRadius * 2 + 1, roomRadius * 2 + 1];
-        int x = 0, y = roomRadius, f = 1 - roomRadius, incrE = 3, incrSE = 5 - 2 * roomRadius;
-        //tilePositions.Add(new Vector2Int(roomCenterPos.x, roomCenterPos.y + roomRadius));
-        //tilePositions.Add(new Vector2Int(roomCenterPos.x + x, roomCenterPos.y - roomRadius));
-        tilePositions[roomRadius, roomRadius * 2 - 1] = 1;
-        tilePositions[roomRadius * 2, 0] = 1;
 
-        for (int i = 0; i <= roomRadius * 2; i++)
-        {
-            //tilePositions.Add(new Vector2Int(i, roomCenterPos.y));
-            tilePositions[i, roomRadius] = 1;
-        }
         while (x <= y)
         {
-            if (f > 0)
+            if (d > 0)
             {
                 y--;
-                f += incrSE;
+                d += incrSE;
                 incrSE += 4;
             }
             else
             {
-                f += incrE;
+                d += incrE;
                 incrSE += 2;
             }
+
             incrE += 2;
             x++;
-            for (int i = roomRadius - x; i <= roomRadius + x; i++)
-            {
-                //tilePositions.Add(new Vector2Int(i, roomCenterPos.y + y));
-                tilePositions[i, roomRadius + y] = 1;
-            }
-            for (int i = roomRadius - x; i <= roomRadius + x; i++)
-            {
-                //tilePositions.Add(new Vector2Int(i, roomCenterPos.y - y));
-                tilePositions[i, roomRadius - y] = 1;
-            }
-            for (int i = roomRadius - y; i <= roomRadius + y; i++)
-            {
-                //tilePositions.Add(new Vector2Int(i, roomCenterPos.y + x));
-                tilePositions[i, roomRadius + x] = 1;
-            }
-            for (int i = roomRadius - y; i <= roomRadius + y; i++)
-            {
-                //tilePositions.Add(new Vector2Int(i, roomCenterPos.y - x));
-                tilePositions[i, roomRadius - x] = 1;
-            }
+            for (int i = cy - y; i < cy + y; i++)
+                for (int j = cx - x; j < cx + x; j++)
+                {
+                    tiles[i, j] = 1;
+                }
+            for (int i = cy - x; i < cy + x; i++)
+                for (int j = cx - y; j < cx + y; j++)
+                {
+                    tiles[i, j] = 1;
+                }
 
         }
-        room.SetSize(roomRadius * 2);
-        room.SetTiles(tilePositions);
-        room.SetStyle(Styles.Style1); //Temp Shit just let it be there
-        return room;
+        return new Room(CalculateRoomPos(), sizeX, sizeY, tiles);
     }
-    //Функция выбора случайной точки на окружности (если нужно будет мат обоснование то я найду и переведу то откуда спер)
+    protected Room GenerateRombusRoom()
+    {
+        int roomRadius = Random.Range(6, roomSizeMax / 2 + 1);
+        int sizeX = roomRadius * 2; int sizeY = sizeX;
+        int[,] tiles = new int[sizeY, sizeX];
+
+        for (int i = 0; i < roomRadius; i++)
+            for (int j = 0; j < roomRadius; j++)
+            {
+                if (j >= roomRadius - i && j <= roomRadius + i)
+                {
+                    tiles[i, j] = 1;
+                    tiles[i, sizeX-j-1] = 1;
+                    tiles[sizeY-j-1, i] = 1;
+                    tiles[sizeY - j - 1, sizeX - i - 1] = 1;
+                }
+            }
+        return new Room(CalculateRoomPos(), sizeX, sizeY, tiles);
+    }
+    //protected Room GenerateCornerRoom()
+    //{
+    //    int roomRadius = Random.Range(6, roomSizeMax + 1);
+    //    int sizeX = roomRadius; int sizeY = sizeX;
+    //    int[,] tiles = new int[sizeY, sizeX];
+
+
+    //    switch (Random.Range(0, 4))
+    //    {
+    //        case 0:
+    //            for (int i = 0; i < roomRadius; i++)
+    //                for (int j = 0; j < roomRadius; j++)
+    //                {
+    //                    if (j >= roomRadius - i && j <= roomRadius + i)
+    //                    {
+    //                        tiles[i, j] = 1;
+    //                    }
+    //                }
+    //            break;
+    //        case 1:
+    //            for (int i = 0; i < roomRadius; i++)
+    //                for (int j = 0; j < roomRadius; j++)
+    //                {
+    //                    if (j >= roomRadius - i && j <= roomRadius + i)
+    //                    {
+    //                        tiles[i, sizeX - j - 1] = 1;
+    //                    }
+    //                }
+    //            break;
+    //        case 2:
+    //            for (int i = 0; i < roomRadius; i++)
+    //                for (int j = 0; j < roomRadius; j++)
+    //                {
+    //                    if (j >= roomRadius - i && j <= roomRadius + i)
+    //                    {
+    //                        tiles[sizeX - j - 1, i] = 1;
+    //                    }
+    //                }
+    //            break;
+    //        case 3:
+    //            for (int i = 0; i < roomRadius; i++)
+    //                for (int j = 0; j < roomRadius; j++)
+    //                {
+    //                    if (j >= roomRadius - i && j <= roomRadius + i)
+    //                    {
+    //                        tiles[sizeX - j - 1, sizeX - i - 1] = 1;
+    //                    }
+    //                }
+    //            break;
+    //    }
+    //    return new Room(CalculateRoomPos(), sizeX, sizeY, tiles);
+    //}
+
+    //protected Room GenerateTriangleRoom()
+    //{
+    //    int roomRadius = Random.Range(6, roomSizeMax/2 + 1);
+    //    int sizeX = 0; int sizeY = 0;
+    //    int[,] tiles = null;
+
+
+    //    switch (Random.Range(0, 4))
+    //    {
+    //        case 0:
+    //            sizeX = roomRadius * 2; 
+    //            sizeY = roomRadius;
+    //            tiles = new int[sizeY, sizeX];
+    //            for (int i = 0; i < roomRadius; i++)
+    //                for (int j = 0; j < roomRadius; j++)
+    //                {
+    //                    if (j >= roomRadius - i && j <= roomRadius + i)
+    //                    {
+    //                        tiles[i, j] = 1;
+    //                        tiles[i, sizeX - j - 1] = 1;
+    //                    }
+    //                }
+    //            break;
+    //        case 1:
+    //            sizeX = roomRadius * 2;
+    //            sizeY = roomRadius;
+    //            tiles = new int[sizeY, sizeX];
+    //            for (int i = 0; i < roomRadius; i++)
+    //                for (int j = 0; j < roomRadius; j++)
+    //                {
+    //                    if (j >= roomRadius - i && j <= roomRadius + i)
+    //                    {
+    //                        tiles[i, sizeX - j - 1] = 1;
+    //                        tiles[sizeY - j - 1, sizeX - i - 1] = 1;
+    //                    }
+    //                }
+    //            break;
+    //        case 2:
+    //            for (int i = 0; i < roomRadius; i++)
+    //                for (int j = 0; j < roomRadius; j++)
+    //                {
+    //                    if (j >= roomRadius - i && j <= roomRadius + i)
+    //                    {
+    //                        tiles[sizeX - j - 1, sizeX - i - 1] = 1;
+    //                        tiles[sizeY - j - 1, i] = 1;
+    //                    }
+    //                }
+    //            break;
+    //        case 3:
+    //            for (int i = 0; i < roomRadius; i++)
+    //                for (int j = 0; j < roomRadius; j++)
+    //                {
+    //                    if (j >= roomRadius - i && j <= roomRadius + i)
+    //                    {
+    //                        tiles[sizeY - j - 1, i] = 1;
+    //                        tiles[i, j] = 1;
+    //                    }
+    //                }
+    //            break;
+    //    }
+    //    return new Room(CalculateRoomPos(), sizeX, sizeY, tiles);
+    //}
+
     private Vector2Int CalculateRoomPos()
     {
         float t = 2 * Mathf.PI * Random.Range(0f, 0.9f);
@@ -273,13 +384,13 @@ public class RoomGenerator : DungeonGeneratorBase
             r = 2 - u;
         else
             r = u;
-        return new Vector2Int(Mathf.RoundToInt(radius * r * Mathf.Cos(t)) + radius, Mathf.RoundToInt(radius * r * Mathf.Sin(t)) + radius);
+        return new Vector2Int(Mathf.RoundToInt(radiusOfRoomSpawn * r * Mathf.Cos(t)) + radiusOfRoomSpawn, Mathf.RoundToInt(radiusOfRoomSpawn * r * Mathf.Sin(t)) + radiusOfRoomSpawn);
     }
 
-    private MassRoom GenerateRandomRoom()
+    private Room GenerateRandomRoom()
     {
-        MassRoom room = null;
-        switch (Random.Range(0, 2))
+        Room room = null;
+        switch (Random.Range(0, 3))
         {
             case 0:
                 room = GenerateSquareRoom();
@@ -287,6 +398,15 @@ public class RoomGenerator : DungeonGeneratorBase
             case 1:
                 room = GenerateCircleRoom();
                 break;
+            case 2:
+                room = GenerateRombusRoom();
+                break;
+            //case 3:
+            //    room = GenerateCornerRoom();
+            //    break;
+            //case 4:
+            //    room = GenerateTriangleRoom();
+            //    break;
 
         }
         return room;

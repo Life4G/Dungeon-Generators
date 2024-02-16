@@ -1,156 +1,119 @@
 using Assets.Scripts.Room;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
 public class GridManager : MonoBehaviour
 {
-    //Управление текущим стилем
     [SerializeField]
     private RoomStyleManager roomStyleManager;
     private RoomStyle currentRoomStyle;
-    public Tilemap styleTilemap;
 
-    //Генератор данжей который юзаем
+    private DungeonRoomManager roomManager;
+
     [SerializeField]
     public DungeonGeneratorBase generator;
-    //Генератор стен
+
     [SerializeField]
     public WallsGenerator wallsGenerator;
+
+    [SerializeField]
+    public Tilemap tilemap;
 
     public void SetRoomStyle(string styleName)
     {
         currentRoomStyle = roomStyleManager.GetRoomStyle(styleName);
     }
+
     public void SetRoomStyle(int styleIndex)
     {
         currentRoomStyle = roomStyleManager.GetRoomStyle(styleIndex);
     }
+
     public void SetRandomRoomStyle()
     {
         SetRoomStyle(roomStyleManager.GetRandomStyleIndex());
     }
+
     public int GetStylesCount()
     {
         return roomStyleManager.GetStylesCount();
     }
 
-    public void PaintWalls(IEnumerable<Vector2Int> wallPositionsEnumerable)
+    private void PaintFromArray(int[,] array, bool isWall)
     {
-        HashSet<Vector2Int> wallPositions = new HashSet<Vector2Int>(wallPositionsEnumerable);
-        foreach (Vector2Int pos in wallPositions)
+        for (int y = 0; y < array.GetLength(1); y++)
         {
-            Vector3Int tilePosition = new Vector3Int(pos.x, pos.y, 0);
-            TileBase tileToUse = DetermineTiles(pos, wallPositions);
-            if (tileToUse != null)
+            for (int x = 0; x < array.GetLength(0); x++)
             {
-                currentRoomStyle.styleTilemap.SetTile(tilePosition, tileToUse);
+                int roomIndex = array[x, y];
+                if (roomIndex != -1)
+                {
+                    currentRoomStyle = roomStyleManager.GetRoomStyle(roomManager.GetRoomStyleId(roomIndex));    // определение стиля плитки/комнаты (текущего стиля отрисовки)
+                    Vector3Int tilePosition = new Vector3Int(x, y, 0);
+                    TileBase tileToUse = isWall ? DetermineWallTile(x, y, array) : currentRoomStyle.floorTile;
+                    tilemap.SetTile(tilePosition, tileToUse);
+                }
             }
         }
     }
 
-    private TileBase DetermineTiles(Vector2Int position, HashSet<Vector2Int> wallPositions)
+    private TileBase DetermineWallTile(int x, int y, int[,] array)
     {
-        bool top = wallPositions.Contains(position + Vector2Int.up);
-        bool bottom = wallPositions.Contains(position + Vector2Int.down);
-        bool left = wallPositions.Contains(position + Vector2Int.left);
-        bool right = wallPositions.Contains(position + Vector2Int.right);
+        bool top = y + 1 < array.GetLength(1) && array[x, y + 1] != -1;
+        bool bottom = y - 1 >= 0 && array[x, y - 1] != -1;
+        bool left = x - 1 >= 0 && array[x - 1, y] != -1;
+        bool right = x + 1 < array.GetLength(0) && array[x + 1, y] != -1;
 
-        // Углы
         if (!top && !left) return currentRoomStyle.topLeftCornerTile;
         if (!top && !right) return currentRoomStyle.topRightCornerTile;
         if (!bottom && !left) return currentRoomStyle.bottomLeftCornerTile;
         if (!bottom && !right) return currentRoomStyle.bottomRightCornerTile;
 
-        // Стороны
         if (top && bottom && !left) return currentRoomStyle.leftWallTile;
         if (top && bottom && !right) return currentRoomStyle.rightWallTile;
         if (left && right && !top) return currentRoomStyle.topWallTile;
         if (left && right && !bottom) return currentRoomStyle.bottomWallTile;
 
-        // По умолчанию
-        return currentRoomStyle.floorTile;
+        return null;
     }
 
-    //Передаем позиции
-    public void PaintTiles(IEnumerable<Vector2Int> floorPositions, IEnumerable<Vector2Int> wallPositions)
-    {
-        PaintTiles(floorPositions, currentRoomStyle.styleTilemap, currentRoomStyle.floorTile);
-        PaintWalls(wallPositions);
-    }
-
-    //Передаем позиции
-    public void PaintTiles(int[,] floorPositions, IEnumerable<Vector2Int> wallPositions)
-    {
-        PaintTiles(floorPositions, currentRoomStyle.styleTilemap, currentRoomStyle.floorTile);
-    }
-    //Закрашиваем каждый тайл
-    private void PaintTiles(int[,] positions, Tilemap tilemap, TileBase tile)
-    {
-        for (int i = 0; i < positions.GetLength(0); i++)
-            for (int j = 0; j < positions.GetLength(1); j++)
-            {
-                if (positions[i, j] != -1)
-                    PaintSingleTile(tilemap, tile, new Vector2Int(i, j));
-            }
-    }
-
-    //Закрашиваем каждый тайл
-    private void PaintTiles(IEnumerable<Vector2Int> positions, Tilemap tilemap, TileBase tile)
-    {
-        foreach (var position in positions)
-        {
-            PaintSingleTile(tilemap, tile, position);
-        }
-    }
-    //Закраска
-    private void PaintSingleTile(Tilemap tilemap, TileBase tile, Vector2Int position)
-    {
-        //Вектор3 т.к. по факту мир 3D хоть у нас и 2D (живите с этим :| )
-        var tilePosition = tilemap.WorldToCell((Vector3Int)position);
-        tilemap.SetTile(tilePosition, tile);
-    }
-
-    //Очистка тайлов
     public void Clear()
     {
-        styleTilemap.ClearAllTiles();
+        tilemap.ClearAllTiles();
     }
 
-    //Генерим карту заново
-    public void Reload(int seed)
-    {
-        SetRandomRoomStyle();
-
-        Clear();
-        var floorPositions = generator.CreateDungeon(seed);
-        //Генерирует позиции стен на основе позиций пола
-        //var wallPositions = wallsGenerator.CreateWalls(floorPositions);
-        PaintTiles(floorPositions, styleTilemap, currentRoomStyle.floorTile);
-    }
     public void Reload()
     {
-        SetRandomRoomStyle();
-
         Clear();
-        var floorPositions = generator.CreateDungeon();
-        //Генерирует позиции стен на основе позиций пола
-        //var wallPositions = wallsGenerator.CreateWalls(floorPositions);
-        //PaintTiles(floorPositions, wallPositions);
-        PaintTiles(floorPositions, styleTilemap, currentRoomStyle.floorTile);
+
+        int[,] floorArray = generator.CreateDungeon();
+        int[,] wallArray = wallsGenerator.GenerateWallsFromFloor(floorArray);
+
+        roomManager = new DungeonRoomManager(floorArray);
+        roomManager.AssignRandomStylesToRooms(roomStyleManager);
+        roomManager.PrintRoomsInfo();
+
+        PaintFromArray(floorArray, false);
+        PaintFromArray(wallArray, true);
     }
 
-    //Генерим карту первый раз
-    public void Start()
+    public void Reload(int seed)
     {
-        SetRandomRoomStyle();
-
         Clear();
-        var floorPositions = generator.CreateDungeon(-1877953954);
-        //Генерирует позиции стен на основе позиций пола
-        //var wallPositions = wallsGenerator.CreateWalls(floorPositions);
-        //PaintTiles(floorPositions, wallPositions);
-        PaintTiles(floorPositions, styleTilemap, currentRoomStyle.floorTile);
+
+        int[,] floorArray = generator.CreateDungeon(seed);
+        int[,] wallArray = wallsGenerator.GenerateWallsFromFloor(floorArray);
+
+        roomManager = new DungeonRoomManager(floorArray);
+        roomManager.AssignRandomStylesToRooms(roomStyleManager);
+        roomManager.PrintRoomsInfo();
+
+        PaintFromArray(floorArray, false);
+        PaintFromArray(wallArray, true);
     }
 
+    void Start()
+    {
+        Reload();
+    }
 }
