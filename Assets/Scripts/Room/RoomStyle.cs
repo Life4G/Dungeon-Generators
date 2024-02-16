@@ -7,20 +7,20 @@ using UnityEngine.Tilemaps;
 [System.Serializable]
 public class RoomStyle : MonoBehaviour
 {
-    public string   styleName;                  // имя стиля комнаты 
+    public string   styleName;                        // имя стиля комнаты 
     public Tilemap  styleTilemap;
-    public TileBase floorTile;                  // тайл пола
-    public TileBase leftWallTile;               // тайл левой стены
-    public TileBase rightWallTile;              // тайл правой стены
-    public TileBase bottomWallTile;             // тайл нижней стены
-    public TileBase topWallTile;                // тайл верхней стены
-    public TileBase topLeftCornerTile;          // тайл левого верхнего угла
-    public TileBase topRightCornerTile;         // тайл правого верхнего угла
-    public TileBase bottomLeftCornerTile;       // тайл левого нижнего угла
-    public TileBase bottomRightCornerTile;      // тайл правого нижнего угла
+    public List<TileBase> floorTile;                  // тайл пола
+    public List<TileBase> leftWallTile;               // тайл левой стены
+    public List<TileBase> rightWallTile;              // тайл правой стены
+    public List<TileBase> bottomWallTile;             // тайл нижней стены
+    public List<TileBase> topWallTile;                // тайл верхней стены
+    public List<TileBase> topLeftCornerTile;          // тайл левого верхнего угла
+    public List<TileBase> topRightCornerTile;         // тайл правого верхнего угла
+    public List<TileBase> bottomLeftCornerTile;       // тайл левого нижнего угла
+    public List<TileBase> bottomRightCornerTile;      // тайл правого нижнего угла
 
     // конструктор присваивания
-    public RoomStyle(string name, Tilemap tilemap, TileBase floor, TileBase leftWall, TileBase rightWall, TileBase bottomWall, TileBase topWall, TileBase topLeftCorner, TileBase topRightCorner, TileBase bottomLeftCorner, TileBase bottomRightCorner)
+    public RoomStyle(string name, Tilemap tilemap, List<TileBase> floor, List<TileBase> leftWall, List<TileBase> rightWall, List<TileBase> bottomWall, List<TileBase> topWall, List<TileBase> topLeftCorner, List<TileBase> topRightCorner, List<TileBase> bottomLeftCorner, List<TileBase> bottomRightCorner)
     {
         styleName = name;
         styleTilemap = tilemap;
