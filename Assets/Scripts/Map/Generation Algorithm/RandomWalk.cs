@@ -35,7 +35,7 @@ public class RandomWalk : DungeonGeneratorBase
                 do
                 {
                     newPosition += Direction2D.GetRandomCardinalDirection();
-                } while (newPosition.x < 0 && newPosition.y < 0 && newPosition.x>mapMaxWidth && newPosition.y> mapMaxHeight);
+                } while (newPosition.x < 0 && newPosition.y < 0 && newPosition.x>=mapMaxWidth && newPosition.y>= mapMaxHeight);
                 floorPositions[newPosition.y, newPosition.x] = 0;
                 previousPosition = newPosition;
             }

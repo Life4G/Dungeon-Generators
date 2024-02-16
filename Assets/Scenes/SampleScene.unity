@@ -345,9 +345,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   roomStyleManager: {fileID: 228170479}
-  styleTilemap: {fileID: 1975189474}
   generator: {fileID: 2087062189}
   wallsGenerator: {fileID: 1874707296}
+  tilemap: {fileID: 1975189474}
 --- !u!156049354 &809028530
 Grid:
   m_ObjectHideFlags: 0
@@ -725,7 +725,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   grid: {fileID: 809028529}
   seed: -117438325
-  isNew: 0
+  isNew: 1
 --- !u!1 &1588477589
 GameObject:
   m_ObjectHideFlags: 0
@@ -1348,9 +1348,10 @@ MonoBehaviour:
   startPosition: {x: 0, y: 0}
   seed: -117438325
   wallsGenerator: {fileID: 0}
-  radius: 50
+  radiusOfRoomSpawn: 120
   roomNumberMin: 4
   roomNumberMax: 16
+  roomSizeMax: 16
   checkConnection: 1
   presetLoad: 0
 --- !u!4 &2087062190

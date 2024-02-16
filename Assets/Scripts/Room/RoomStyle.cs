@@ -19,6 +19,7 @@ public class RoomStyle : MonoBehaviour
     public TileBase bottomLeftCornerTile;       // тайл левого нижнего угла
     public TileBase bottomRightCornerTile;      // тайл правого нижнего угла
 
+    // конструктор присваивания
     public RoomStyle(string name, Tilemap tilemap, TileBase floor, TileBase leftWall, TileBase rightWall, TileBase bottomWall, TileBase topWall, TileBase topLeftCorner, TileBase topRightCorner, TileBase bottomLeftCorner, TileBase bottomRightCorner)
     {
         styleName = name;
@@ -32,18 +33,5 @@ public class RoomStyle : MonoBehaviour
         topRightCornerTile = topRightCorner;
         bottomLeftCornerTile = bottomLeftCorner;
         bottomRightCornerTile = bottomRightCorner;
-    }
-
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }
