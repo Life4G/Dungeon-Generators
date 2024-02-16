@@ -254,67 +254,65 @@ public class Room
 
     public bool Validate()
     {
-        int[,] tilesToValidate = new int[sizeY, sizeX];
-        bool run = true;
-        int startY = 0, startX = 0;
-        int step = 0;
-        int tilesTotalNum = 0;
-
+        Vector2Int start = new Vector2Int();
+        int tilesSum = 0;
+        int[,] tilesToCheck = new int[sizeY, sizeX];
         for (int y = 0; y < sizeY; y++)
             for (int x = 0; x < sizeX; x++)
-            {
                 if (tiles[y, x] == 0)
-                    tilesToValidate[y, x] = -2;
+                    tilesToCheck[y, x] = -1;
                 else
                 {
-                    tilesToValidate[y, x] = -1;
-                    startY = y; startX = x;
-                    tilesTotalNum++;
+                    tilesToCheck[y, x] = 0;
+                    start.y = y;
+                    start.x = x;
+                    tilesSum++;
                 }
-            }
-
-        if (tilesTotalNum == 0)
+        if (start.x < 0 || start.y < 0)
             return false;
-        tilesToValidate[startY, startX] = 0;
 
-        int tilesNum = 0;
-        while (run == true)
+
+        Stack<Vector2Int> stack = new Stack<Vector2Int>();
+        stack.Push(start);
+        int tilesCheckedSum = 0;
+        while (stack.Count > 0)
         {
-            run = false;
-            for (int y = 0; y < sizeY; y++)
-                for (int x = 0; x < sizeX; x++)
-                {
-                    if (tilesToValidate[y, x] == step)
-                    {
-                        if (y - 1 >= 0 && tilesToValidate[y - 1, x] == -1)
-                        {
-                            tilesToValidate[y - 1, x] = step + 1;
-                            tilesNum++; run = true;
-                        }
-                        if (x - 1 >= 0 && tilesToValidate[y, x - 1] == -1)
-                        {
-                            tilesToValidate[y, x - 1] = step + 1;
-                            tilesNum++; run = true;
-                        }
-                        if (y + 1 < sizeY && tilesToValidate[y + 1, x] == -1)
-                        {
-                            tilesToValidate[y + 1, x] = step + 1;
-                            tilesNum++; run = true;
-                        }
-
-                        if (x + 1 < sizeX && tilesToValidate[y, x + 1] == -1)
-                        {
-                            tilesToValidate[y, x + 1] = step + 1;
-                            tilesNum++; run = true;
-                        }
-                    }
-                }
-
-            if (tilesNum == tilesTotalNum)
-                return true;
+            Vector2Int l = stack.Pop();
+            int lx = l.x;
+            while (tilesToCheck[l.y, lx] == 0)
+            {
+                tilesToCheck[l.y, lx - 1] = 1;
+                lx--;
+                tilesCheckedSum++;
+            }
+            while (tilesToCheck[l.y, l.x] == 0)
+            {
+                tilesToCheck[l.y, l.x] = 1;
+                l.x++;
+                tilesCheckedSum++;
+            }
+            FindPoints(lx, l.x - 1, l.y + 1, tilesToCheck, stack);
+            FindPoints(lx, l.x - 1, l.y - 1, tilesToCheck, stack);
 
         }
+        if (tilesSum == tilesCheckedSum)
+            return true;
         return false;
+    }
+
+    private void FindPoints(int lx, int rx, int y, int[,] tilesToCheck, Stack<Vector2Int> stack)
+    {
+        bool isAdded = false;
+        for (int x = lx; x < rx; x++)
+        {
+            if (tilesToCheck[y, x] != 0)
+                isAdded = false;
+            else if (!isAdded)
+            {
+                stack.Push(new Vector2Int(x, y));
+                isAdded = true;
+            }
+        }
     }
 
     public bool CheckConnection(Room other)
@@ -326,11 +324,11 @@ public class Room
         int sizeNewX = maxX - RoomPosNew.x + 1;
         int sizeNewY = maxY - RoomPosNew.y + 1;
 
-        int tilesTotalNum = 0;
+        int tilesSum = 0;
         int startX = 0; int startY = 0;
 
 
-        int[,] tilesToValidate = new int[sizeNewY, sizeNewX];
+        int[,] tilesToCheck = new int[sizeNewY, sizeNewX];
 
         Vector2Int offsetOther = Vector2Int.Min(RoomPosNew, other.massRoomPos);
         for (int y = other.massRoomPos.y; y < other.massRoomPos.y + other.sizeY; y++)
@@ -338,11 +336,11 @@ public class Room
             {
                 if (other.tiles[y - other.massRoomPos.y, x - other.massRoomPos.x] == 1)
                 {
-                    tilesToValidate[y - offsetOther.y, x - offsetOther.x] = 1;
-                    tilesTotalNum++;
+                    tilesToCheck[y - offsetOther.y, x - offsetOther.x] = 1;
+                    tilesSum++;
                 }
                 else
-                    tilesToValidate[y - offsetOther.y, x - offsetOther.x] = 0;
+                    tilesToCheck[y - offsetOther.y, x - offsetOther.x] = 0;
 
             }
         Vector2Int offset = Vector2Int.Min(RoomPosNew, massRoomPos);
@@ -351,57 +349,47 @@ public class Room
             {
                 if (tiles[y - massRoomPos.y, x - massRoomPos.x] == 1)
                 {
-                    tilesToValidate[y - offset.y, x - offset.x] = 1;
-                    tilesTotalNum++;
+                    tilesToCheck[y - offset.y, x - offset.x] = 1;
+                    tilesSum++;
                     startY = y - offset.y;
                     startX = x - offset.x;
                 }
                 else
-                    tilesToValidate[y - offset.y, x - offset.x] = 0;
+                    tilesToCheck[y - offset.y, x - offset.x] = 0;
 
             }
 
-        if (tilesTotalNum == 0)
+        if (tilesSum == 0)
             return false;
 
-        tilesToValidate[startY, startX] = 0;
-        int tilesNum = 0;
-        bool run = true;
-        int step = 0;
-        while (run == true)
+        if (startX < 0 || startY < 0)
+            return false;
+
+
+        Stack<Vector2Int> stack = new Stack<Vector2Int>();
+        stack.Push(new Vector2Int(startX,startY));
+        int tilesCheckedSum = 0;
+        while (stack.Count > 0)
         {
-            run = false;
-            for (int y = 0; y < sizeY; y++)
-                for (int x = 0; x < sizeX; x++)
-                {
-                    if (tilesToValidate[y, x] == step)
-                    {
+            Vector2Int l = stack.Pop();
+            int lx = l.x;
+            while (tilesToCheck[l.y, lx] == 0)
+            {
+                tilesToCheck[l.y, lx - 1] = 1;
+                lx--;
+                tilesCheckedSum++;
+            }
+            while (tilesToCheck[l.y, l.x] == 0)
+            {
+                tilesToCheck[l.y, l.x] = 1;
+                l.x++;
+                tilesCheckedSum++;
+            }
+            FindPoints(lx, l.x - 1, l.y + 1, tilesToCheck, stack);
+            FindPoints(lx, l.x - 1, l.y - 1, tilesToCheck, stack);
 
-                        if (y - 1 >= 0 && tilesToValidate[y - 1, x] == -1)
-                        {
-                            tilesToValidate[y - 1, x] = step + 1;
-                            tilesNum++; run = true;
-                        }
-                        if (x - 1 >= 0 && tilesToValidate[y, x - 1] == -1)
-                        {
-                            tilesToValidate[y, x - 1] = step + 1;
-                            tilesNum++; run = true;
-                        }
-                        if (y + 1 < sizeY && tilesToValidate[y + 1, x] == -1)
-                        {
-                            tilesToValidate[y + 1, x] = step + 1;
-                            tilesNum++; run = true;
-                        }
-
-                        if (x + 1 < sizeX && tilesToValidate[y, x + 1] == -1)
-                        {
-                            tilesToValidate[y, x + 1] = step + 1;
-                            tilesNum++; run = true;
-                        }
-                    }
-                }
         }
-        if (tilesNum == tilesTotalNum)
+        if (tilesSum == tilesCheckedSum)
             return true;
         return false;
     }
