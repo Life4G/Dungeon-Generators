@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //Базовый класс для генераторов от которого наследуются все остальные
-public abstract class GeneratorBase : MonoBehaviour 
+public abstract class DungeonGeneratorBase : MonoBehaviour 
 {
     //Стартовая позиция равная 0 (можно поменять из редактора)
     [SerializeField]
@@ -10,6 +10,8 @@ public abstract class GeneratorBase : MonoBehaviour
     //Сид
     [SerializeField]
     protected int seed = 0;
+    [SerializeField]
+    public WallsGenerator wallsGenerator;
 
     //Функция по генерации сида
     protected int GenerateSeed()
@@ -23,11 +25,11 @@ public abstract class GeneratorBase : MonoBehaviour
         //строку преобразовываем в хешкод
         return ((text == "") ? 0 : text.GetHashCode());
     }
-    //Хешсет в котором валяются все плитки (а вернее их координаты)
-    protected HashSet<Vector2Int> resultPositions;
+    //массив в котором валяются все плитки (а вернее их координаты)
+    protected int[,] resultPositions;
 
     //Функция создания данжа которая вызывается по нажатию кнопки
-    public HashSet<Vector2Int> CreateDungeon()
+    public int[,] CreateDungeon()
     {
         seed = GenerateSeed();
         //Эта штука нужно чтобы запомнить состояние рандома до вызова генерации
@@ -44,7 +46,7 @@ public abstract class GeneratorBase : MonoBehaviour
     }
 
     //Функция создания данжа которая вызывается по нажатию кнопки (на этот раз есть сид)
-    public HashSet<Vector2Int> CreateDungeon(int seed)
+    public int[,] CreateDungeon(int seed)
     {
         this.seed = seed;
         //Эта штука нужно чтобы запомнить состояние рандома до вызова генерации
@@ -61,7 +63,12 @@ public abstract class GeneratorBase : MonoBehaviour
     }
 
     //Обстрактная функция которая создана другими объектами (наследники обязаны overridить эту функцию иначе жопа генерации ведь всё вкусное там)
-    protected abstract HashSet<Vector2Int> GenerateDungeon();
+    protected abstract int[,] GenerateDungeon();
+
+    public virtual int GetRoomStyle(int id)
+    {
+        return 1;
+    }
 
     public int GetSeed()
     {
@@ -85,4 +92,14 @@ public static class Direction2D
     {
         return cardinalDirectionsList[UnityEngine.Random.Range(0, cardinalDirectionsList.Count)];
     }
+    public static List<Vector2Int> GetNewCardinalPosesFromPos(Vector2Int pos)
+    {
+        List<Vector2Int> newPoses = new List<Vector2Int>();
+        foreach (Vector2Int direction in cardinalDirectionsList) 
+        { 
+            newPoses.Add(pos + direction);
+        }
+        return newPoses;
+    }
+
 }

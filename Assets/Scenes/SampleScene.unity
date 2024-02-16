@@ -345,11 +345,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   roomStyleManager: {fileID: 228170479}
-<<<<<<< Updated upstream
-  generator: {fileID: 1145150985}
-=======
   generator: {fileID: 2087062189}
->>>>>>> Stashed changes
   wallsGenerator: {fileID: 1874707296}
   tilemap: {fileID: 1975189474}
 --- !u!156049354 &809028530
@@ -395,15 +391,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26ca316ddbbff7c4ea436ddfc209341f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-<<<<<<< Updated upstream
   grid: {fileID: 0}
-  seed: 0
-  isNew: 1
-=======
-  grid: {fileID: 809028529}
   seed: -117438325
   isNew: 0
->>>>>>> Stashed changes
 --- !u!1 &887072148
 GameObject:
   m_ObjectHideFlags: 0
@@ -446,7 +436,7 @@ GameObject:
   - component: {fileID: 932313199}
   - component: {fileID: 932313200}
   m_Layer: 0
-  m_Name: Inversion
+  m_Name: InversionRoomStyle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -479,7 +469,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dbaa51fae2321dc498c234a82ce622b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  styleName: Inversion
+  styleName: InversionRoomStyle
   styleTilemap: {fileID: 1975189474}
   floorTile: {fileID: 11400000, guid: ad66817b31ebae146b8ce81a46bdb193, type: 2}
   leftWallTile: {fileID: 11400000, guid: 8766b0593a2f59941940bda8e1122d98, type: 2}
@@ -536,10 +526,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startPosition: {x: 0, y: 0}
   seed: 0
-<<<<<<< Updated upstream
-=======
-  wallsGenerator: {fileID: 1874707296}
->>>>>>> Stashed changes
+  wallsGenerator: {fileID: 0}
   iterations: 50
   length: 20
 --- !u!1 &1154309153
@@ -588,6 +575,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startPosition: {x: 0, y: 0}
   seed: 0
+  wallsGenerator: {fileID: 0}
   iterations: 10
   length: 10
 --- !u!1 &1479519703
@@ -885,7 +873,7 @@ GameObject:
   - component: {fileID: 1648166056}
   - component: {fileID: 1648166057}
   m_Layer: 0
-  m_Name: Normal
+  m_Name: NormalRoomStyle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -918,7 +906,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dbaa51fae2321dc498c234a82ce622b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  styleName: Normal
+  styleName: NormalRoomStyle
   styleTilemap: {fileID: 1975189474}
   floorTile: {fileID: 11400000, guid: 1a2cac622686eae4aab3bd97154adac5, type: 2}
   leftWallTile: {fileID: 11400000, guid: 1b18e70986b36c042907752f50e415ed, type: 2}
@@ -1093,8 +1081,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9988fca3fcdd33345a63664af2e902c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startPosition: {x: 0, y: 0}
-  seed: 0
 --- !u!4 &1874707297
 Transform:
   m_ObjectHideFlags: 0
@@ -1256,7 +1242,7 @@ Transform:
   m_GameObject: {fileID: 1975189473}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -256, y: -256, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1361,14 +1347,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startPosition: {x: 0, y: 0}
   seed: -117438325
-<<<<<<< Updated upstream
-  radius: 15
-=======
-  wallsGenerator: {fileID: 1874707296}
-  radius: 50
->>>>>>> Stashed changes
+  wallsGenerator: {fileID: 0}
+  radiusOfRoomSpawn: 120
   roomNumberMin: 4
   roomNumberMax: 16
+  roomSizeMax: 16
+  checkConnection: 1
+  presetLoad: 0
 --- !u!4 &2087062190
 Transform:
   m_ObjectHideFlags: 0
