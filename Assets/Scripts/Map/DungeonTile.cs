@@ -21,9 +21,9 @@ namespace Assets.Scripts.Map
             roomIndex = -1;
             hasAdjacentWall = false;
             isCorner = false;
-            isPassable = true;
+            isPassable = false;
             content = null;
-            passageCost = 1;
+            passageCost = 999;
         }
 
         // конструктор присваивания
