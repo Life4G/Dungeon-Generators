@@ -42,19 +42,12 @@ public static class SetOperations
 
 }
 
-//Возможные стили
-public enum Styles
-{
-    None, Style1,
-}
-
 public class Room
 {
     public Vector2Int massRoomPos;
     private int sizeX, sizeY;
     private int[,] tiles;
     private bool valid;
-    private Styles style;
 
     public Room(Vector2Int massRoomPos, int sizeX, int sizeY, int[,] tiles)
     {
@@ -72,7 +65,6 @@ public class Room
         sizeY = room.sizeY;
         tiles = room.tiles.Clone() as int[,];
         this.valid = false;
-        this.style = Styles.Style1;
     }
     public Vector2Int GetPos()
     {
@@ -89,14 +81,6 @@ public class Room
     public void SetPos(Vector2Int pos)
     {
         massRoomPos = pos;
-    }
-    public Styles GetStyle()
-    {
-        return style;
-    }
-    public void SetStyle(Styles style)
-    {
-        this.style = style;
     }
     public int[,] GetTiles()
     {
@@ -128,12 +112,9 @@ public class Room
 
         if (collisonX1 > collisonX2 || collisonY1 > collisonY2)
             return false;
-        int y = 0;
-        int x = 0;
 
-
-        for (y = collisonY1; y < collisonY2; y++)
-            for (x = collisonX1; x < collisonX2; x++)
+        for (int y = collisonY1; y < collisonY2; y++)
+            for (int x = collisonX1; x < collisonX2; x++)
             {
                 if (tiles[y - massRoomPos.y, x - massRoomPos.x] * other.tiles[y - other.massRoomPos.y, x - other.massRoomPos.x] == 1)
                     return true;
@@ -164,14 +145,13 @@ public class Room
         int sizeYNew = collisonY2 - collisonY1 + 1;
         int[,] tilesNew = new int[sizeYNew, sizeXNew];
 
-        Vector2Int offset = Vector2Int.Min(massRoomPos, other.massRoomPos);
         for (int y = collisonY1; y < collisonY2; y++)
             for (int x = collisonX1; x < collisonX2; x++)
             {
-                if (tiles[y - massRoomPos.y, x - massRoomPos.x] * other.tiles[y - offset.y, x - offset.x] == 1)
-                    tilesNew[y, x] = 1;
+                if (tiles[y - massRoomPos.y, x - massRoomPos.x] * other.tiles[y - other.massRoomPos.y, x - other.massRoomPos.x] == 1)
+                    tilesNew[y - massRoomPos.y, x - massRoomPos.x] = 1;
                 else
-                    tilesNew[y, x] = 0;
+                    tilesNew[y - massRoomPos.y, x - massRoomPos.x] = 0;
             }
         tiles = tilesNew;
         massRoomPos = new Vector2Int(collisonX1, collisonY1);
@@ -181,12 +161,12 @@ public class Room
     //Операция объединения с другой комнатой
     public void Union(Room other)
     {
-        Vector2Int RoomPosNew = Vector2Int.Min(massRoomPos, other.massRoomPos);
+        Vector2Int roomPosNew = Vector2Int.Min(massRoomPos, other.massRoomPos);
         int maxX = Mathf.Max(massRoomPos.x + sizeX, other.massRoomPos.x + other.sizeX);
         int maxY = Mathf.Max(massRoomPos.y + sizeY, other.massRoomPos.y + other.sizeY);
 
-        int sizeNewX = maxX - RoomPosNew.x + 1;
-        int sizeNewY = maxY - RoomPosNew.y + 1;
+        int sizeNewX = maxX - roomPosNew.x + 1;
+        int sizeNewY = maxY - roomPosNew.y + 1;
 
 
         int[,] tilesNew = new int[sizeNewY, sizeNewX];
@@ -195,40 +175,39 @@ public class Room
             for (int x = other.massRoomPos.x; x < other.massRoomPos.x + other.sizeX; x++)
             {
                 if (other.tiles[y - other.massRoomPos.y, x - other.massRoomPos.x] == 1)
-                    tilesNew[y - RoomPosNew.y, x - RoomPosNew.x] = 1;
+                    tilesNew[y - roomPosNew.y, x - roomPosNew.x] = 1;
                 else
-                    tilesNew[y - RoomPosNew.y, x - RoomPosNew.x] = 0;
+                    tilesNew[y - roomPosNew.y, x - roomPosNew.x] = 0;
 
             }
         for (int y = massRoomPos.y; y < massRoomPos.y + sizeY; y++)
             for (int x = massRoomPos.x; x < massRoomPos.x + sizeX; x++)
             {
                 if (tiles[y - massRoomPos.y, x - massRoomPos.x] == 1)
-                    tilesNew[y - RoomPosNew.y, x - RoomPosNew.x] = 1;
+                    tilesNew[y - roomPosNew.y, x - roomPosNew.x] = 1;
                 else
-                    tilesNew[y - RoomPosNew.y, x - RoomPosNew.x] = 0;
+                    tilesNew[y - roomPosNew.y, x - roomPosNew.x] = 0;
 
             }
 
         tiles = tilesNew;
         sizeX = sizeNewX;
         sizeY = sizeNewY;
-        massRoomPos = RoomPosNew;
+        massRoomPos = roomPosNew;
     }
     //Операция разности с другой комнатой
-    public void DifferenceAB(Room other)
+    public void Difference(Room other)
     {
         int collisonX1 = Mathf.Max(massRoomPos.x, other.massRoomPos.x);
         int collisonY1 = Mathf.Max(massRoomPos.y, other.massRoomPos.y);
         int collisonX2 = Mathf.Min(massRoomPos.x + sizeX, other.massRoomPos.x + other.sizeX);
         int collisonY2 = Mathf.Min(massRoomPos.y + sizeY, other.massRoomPos.y + other.sizeY);
 
-        Vector2Int offset = Vector2Int.Min(massRoomPos, other.massRoomPos);
         for (int y = collisonY1; y < collisonY2; y++)
             for (int x = collisonX1; x < collisonX2; x++)
             {
-                if (tiles[y - massRoomPos.y, x - massRoomPos.x] * other.tiles[y - offset.y, x - offset.x] == 1)
-                    tiles[y, x] = 0;
+                if (tiles[y - massRoomPos.y, x - massRoomPos.x] * other.tiles[y - other.massRoomPos.y, x - other.massRoomPos.x] == 1)
+                    tiles[y - massRoomPos.y, x - massRoomPos.x] = 0;
             }
 
     }
@@ -240,14 +219,13 @@ public class Room
         int collisonX2 = Mathf.Min(massRoomPos.x + sizeX, other.massRoomPos.x + other.sizeX);
         int collisonY2 = Mathf.Min(massRoomPos.y + sizeY, other.massRoomPos.y + other.sizeY);
 
-        Vector2Int offset = Vector2Int.Min(massRoomPos, other.massRoomPos);
         for (int y = collisonY1; y < collisonY2; y++)
             for (int x = collisonX1; x < collisonX2; x++)
             {
-                if (tiles[y - massRoomPos.y, x - massRoomPos.x] * other.tiles[y - offset.y, x - offset.x] == 1)
+                if (tiles[y - massRoomPos.y, x - massRoomPos.x] * other.tiles[y - other.massRoomPos.y, x - other.massRoomPos.x] == 1)
                 {
                     tiles[y - massRoomPos.y, x - massRoomPos.x] = 0;
-                    other.tiles[y - offset.y, x - offset.x] = 0;
+                    other.tiles[y - other.massRoomPos.y, x - other.massRoomPos.x] = 0;
                 }
             }
     }
@@ -330,32 +308,30 @@ public class Room
 
         int[,] tilesToCheck = new int[sizeNewY, sizeNewX];
 
-        Vector2Int offsetOther = Vector2Int.Min(RoomPosNew, other.massRoomPos);
         for (int y = other.massRoomPos.y; y < other.massRoomPos.y + other.sizeY; y++)
             for (int x = other.massRoomPos.x; x < other.massRoomPos.x + other.sizeX; x++)
             {
                 if (other.tiles[y - other.massRoomPos.y, x - other.massRoomPos.x] == 1)
                 {
-                    tilesToCheck[y - offsetOther.y, x - offsetOther.x] = 1;
+                    tilesToCheck[y - other.massRoomPos.y, x - other.massRoomPos.x] = 1;
                     tilesSum++;
                 }
                 else
-                    tilesToCheck[y - offsetOther.y, x - offsetOther.x] = 0;
+                    tilesToCheck[y - other.massRoomPos.y, x - other.massRoomPos.x] = 0;
 
             }
-        Vector2Int offset = Vector2Int.Min(RoomPosNew, massRoomPos);
         for (int y = massRoomPos.y; y < massRoomPos.y + sizeY; y++)
             for (int x = massRoomPos.x; x < massRoomPos.x + sizeX; x++)
             {
                 if (tiles[y - massRoomPos.y, x - massRoomPos.x] == 1)
                 {
-                    tilesToCheck[y - offset.y, x - offset.x] = 1;
+                    tilesToCheck[y - massRoomPos.y, x - massRoomPos.x] = 1;
                     tilesSum++;
-                    startY = y - offset.y;
-                    startX = x - offset.x;
+                    startY = y - massRoomPos.y;
+                    startX = x - massRoomPos.x;
                 }
                 else
-                    tilesToCheck[y - offset.y, x - offset.x] = 0;
+                    tilesToCheck[y - massRoomPos.y, x - massRoomPos.x] = 0;
 
             }
 
@@ -393,65 +369,5 @@ public class Room
             return true;
         return false;
     }
-
-    public void DoOperation(Room other, SetOperations.Operations operation)
-    {
-        switch (operation)
-        {
-            case SetOperations.Operations.Intersect:
-                Intersect(other);
-                break;
-            case SetOperations.Operations.Union:
-                Union(other);
-                break;
-            case SetOperations.Operations.DifferenceAB:
-                DifferenceAB(other);
-                break;
-                case SetOperations.Operations.SymmetricDifference:
-                    SymmetricDifference(other);
-                    break;
-        }
-    }
-    public bool TryOperation(Room other, SetOperations.Operations operation)
-    {
-        Room roomTest = new Room(other);
-        switch (operation)
-        {
-            case SetOperations.Operations.Intersect:
-                roomTest.Intersect(other);
-                break;
-            case SetOperations.Operations.Union:
-                roomTest.Union(other);
-                break;
-            case SetOperations.Operations.DifferenceAB:
-                roomTest.DifferenceAB(other);
-                break;
-            case SetOperations.Operations.SymmetricDifference:
-                roomTest.SymmetricDifference(other);
-                break;
-        }
-        return roomTest.Validate();
-    }
-    public SetOperations.Operations TryAllOperations(Room other)
-    {
-        foreach (SetOperations.Operations op in GetOperationsList)
-        {
-            if (TryOperation(other, op))
-            {
-                return op;
-            }
-        }
-        return Operations.None;
-    }
-    public SetOperations.Operations TryAllSubOperations(Room other)
-    {
-        foreach (SetOperations.Operations op in GetSubOperationsList)
-        {
-            if (TryOperation(other, op))
-            {
-                return op;
-            }
-        }
-        return Operations.None;
-    }
+    
 }

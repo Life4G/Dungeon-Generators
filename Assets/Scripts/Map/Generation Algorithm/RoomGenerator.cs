@@ -7,10 +7,8 @@ using Unity.Mathematics;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-
 public class RoomGenerator : DungeonGeneratorBase
 {
-
     [SerializeField]
     private int radiusOfRoomSpawn = 120;
     //Мин и макс комнат которое может быть нагенерено
@@ -22,122 +20,73 @@ public class RoomGenerator : DungeonGeneratorBase
     int roomSizeMax = 16;
     [SerializeField]
     bool checkConnection = true;
-    [SerializeField]
-    bool presetLoad = false;
     public static int mapMaxHeight = 512;
     public static int mapMaxWidth = 512;
     private int[,] map;
 
-    private List<Room> roomsGenerated;
-    public List<Room> roomsValidated;
+    private List<Room> rooms;
 
     protected override int[,] GenerateDungeon()
     {
-        if (presetLoad)
-        {
-            string fileContents = File.ReadAllText(Application.persistentDataPath + "/gamedata.json");
-            map = JsonUtility.FromJson<int[,]>(fileContents);
-            return map;
-        }
         return Run();
     }
 
     protected int[,] Run()
     {
         map = new int[mapMaxWidth, mapMaxHeight];
-        roomsValidated = new List<Room>();
-        roomsGenerated = new List<Room>();
+        rooms = new List<Room>();
 
         int roomNumber = Random.Range(roomNumberMin, roomNumberMax);
         for (int i = 0; i < roomNumber; i++)
         {
-            roomsGenerated.Add(GenerateRandomRoom());
+            rooms.Add(GenerateRandomRoom());
         }
-       
+
         bool roomNotIntersect = true;
         do
         {
-            List<Room> roomsValidatedNew = new List<Room>();
-            Room room = null;
-            if (roomsGenerated.Count != 0)
-            {
-                room = roomsGenerated.First();
-                roomsGenerated.Remove(room);
-            }
-            else
-            {
-                room = roomsValidated.First();
-                roomsValidated.Remove(room);
-            }
+            List<Room> roomList = null;
             roomNotIntersect = true;
-            if (roomsValidated.Count != 0)
-                for (int i = 0; i < roomsValidated.Count; i++)
+            for (int i = 0; i < rooms.Count; i++)
+                for (int j = i + 1; j < rooms.Count; j++)
                 {
-
-                    if (room.CheckIntersection(roomsValidated[i]))
+                    if (rooms[i].CheckIntersection(rooms[j]))
                     {
                         roomNotIntersect = false;
-                        if (room.IsProperSubsetOf(roomsValidated[i]))
+                        SetOperations.Operations operation;
+                        operation = TryOperations(rooms[i], rooms[j], rooms[i].IsProperSubsetOf(rooms[j]));
+                        switch (operation)
                         {
-                            List<SetOperations.Operations> operations = SetOperations.GetSubOperationsList;
-                            SetOperations.Operations operation = SetOperations.GetRandomSubOperation();
-                            operations.Remove(operation);
-                            if (!room.TryOperation(roomsValidated[i], operation))
-                            {
-                                operation = room.TryAllSubOperations(roomsValidated[i]);
-                                if (operation == SetOperations.Operations.None && roomsValidated.Count + 1 < roomNumber)
-                                {
-                                    roomsGenerated.Add(GenerateRandomRoom());
-                                }
-                                else
-                                {
-                                    room.DoOperation(roomsValidated[i], operation);
-                                    roomsValidatedNew.Add(room);
-                                }
-                            }
-                            else
-                            {
-                                room.DoOperation(roomsValidated[i], operation);
-                                roomsValidatedNew.Add(room);
-                            }
-                        }
-                        else
-                        {
-                            List<SetOperations.Operations> operations = SetOperations.GetOperationsList;
-                            SetOperations.Operations operation = SetOperations.GetRandomOperation();
-                            operations.Remove(operation);
-                            if (!room.TryOperation(roomsValidated[i], operation))
-                            {
-                                operation = room.TryAllOperations(roomsValidated[i]);
-
-                                if (operation == SetOperations.Operations.None && roomsValidated.Count + 1 < roomNumber)
-                                {
-                                    roomsGenerated.Add(GenerateRandomRoom());
-                                }
-                                else
-                                {
-                                    room.DoOperation(roomsValidated[i], operation);
-                                    roomsValidatedNew.Add(room);
-                                }
-                            }
-                            else
-                            {
-                                room.DoOperation(roomsValidated[i], operation);
-                                roomsValidatedNew.Add(room);
+                            case SetOperations.Operations.Intersect:
+                                rooms[i].Intersect(rooms[j]);
                                 break;
-                            }
+
+                            case SetOperations.Operations.Union:
+                                rooms[i].Union(rooms[j]);
+                                break;
+
+                            case SetOperations.Operations.DifferenceAB:
+                                rooms[i].Difference(rooms[j]);
+                                break;
+
+                            case SetOperations.Operations.DifferenceBA:
+                                rooms[j].Difference(rooms[i]);
+                                break;
+
+                            case SetOperations.Operations.SymmetricDifference:
+                                rooms[i].SymmetricDifference(rooms[j]);
+                                break;
                         }
                     }
                     else
                     {
-                        if (checkConnection && room.CheckConnection(roomsValidated[i]))
+                        if (checkConnection && room.CheckConnection(rooms[i]))
                         {
-                            room.Union(roomsValidated[i]);
+                            room.Union(rooms[i]);
                             roomsValidatedNew.Add(room);
                         }
                         else
                         {
-
                             roomsValidatedNew.Add(roomsValidated[i]);
                         }
 
@@ -155,7 +104,7 @@ public class RoomGenerator : DungeonGeneratorBase
             //    for (int i = roomsValidated.Count; i < roomNumber; i++)
             //        roomsGenerated.Add(GenerateRandomRoom());
 
-        } while (roomsGenerated.Count > 0 || !roomNotIntersect);
+        } while (!roomNotIntersect);
 
         for (int i = 0; i < mapMaxWidth; i++)
             for (int j = 0; j < mapMaxHeight; j++)
@@ -163,11 +112,11 @@ public class RoomGenerator : DungeonGeneratorBase
                 map[i, j] = -1;
             }
 
-        for (int i = 0; i < roomsValidated.Count; i++)
+        for (int i = 0; i < rooms.Count; i++)
         {
-            int[,] roomTiles = roomsValidated[i].GetTiles();
-            Vector2Int roomPos = roomsValidated[i].GetPos();
-            Size roomSize = roomsValidated[i].GetSize();
+            int[,] roomTiles = rooms[i].GetTiles();
+            Vector2Int roomPos = rooms[i].GetPos();
+            Size roomSize = rooms[i].GetSize();
 
             for (int y = 0; y < roomSize.Height && y + roomPos.y < mapMaxHeight; y++)
                 for (int x = 0; x < roomSize.Width && x + roomPos.x < mapMaxWidth; x++)
@@ -179,7 +128,31 @@ public class RoomGenerator : DungeonGeneratorBase
         return map;
     }
 
-    protected Room GenerateSquareRoom()
+    private Room GenerateRandomRoom()
+    {
+        Room room = null;
+        switch (Random.Range(0, 3))
+        {
+            case 0:
+                room = GenerateSquareRoom();
+                break;
+            case 1:
+                room = GenerateCircleRoom();
+                break;
+            case 2:
+                room = GenerateRombusRoom();
+                break;
+                //case 3:
+                //    room = GenerateCornerRoom();
+                //    break;
+                //case 4:
+                //    room = GenerateTriangleRoom();
+                //    break;
+
+        }
+        return room;
+    }
+    private Room GenerateSquareRoom()
     {
         int roomWidth = Random.Range(6, roomSizeMax + 1);
         int roomHeight = Random.Range(6, roomSizeMax + 1);
@@ -195,7 +168,7 @@ public class RoomGenerator : DungeonGeneratorBase
             }
         return new Room(CalculateRoomPos(), roomWidth, roomHeight, tilePositions);
     }
-    protected Room GenerateCircleRoom()
+    private Room GenerateCircleRoom()
     {
         int roomRadius = Random.Range(4, roomSizeMax / 2 + 1);
         int sizeX = roomRadius * 2; int sizeY = sizeX;
@@ -240,7 +213,7 @@ public class RoomGenerator : DungeonGeneratorBase
         }
         return new Room(CalculateRoomPos(), sizeX, sizeY, tiles);
     }
-    protected Room GenerateRombusRoom()
+    private Room GenerateRombusRoom()
     {
         int roomRadius = Random.Range(6, roomSizeMax / 2 + 1);
         int sizeX = roomRadius * 2; int sizeY = sizeX;
@@ -252,8 +225,8 @@ public class RoomGenerator : DungeonGeneratorBase
                 if (j >= roomRadius - i && j <= roomRadius + i)
                 {
                     tiles[i, j] = 1;
-                    tiles[i, sizeX-j-1] = 1;
-                    tiles[sizeY-j-1, i] = 1;
+                    tiles[i, sizeX - j - 1] = 1;
+                    tiles[sizeY - j - 1, i] = 1;
                     tiles[sizeY - j - 1, sizeX - i - 1] = 1;
                 }
             }
@@ -374,7 +347,6 @@ public class RoomGenerator : DungeonGeneratorBase
     //    }
     //    return new Room(CalculateRoomPos(), sizeX, sizeY, tiles);
     //}
-
     private Vector2Int CalculateRoomPos()
     {
         float t = 2 * Mathf.PI * Random.Range(0f, 0.9f);
@@ -386,35 +358,56 @@ public class RoomGenerator : DungeonGeneratorBase
             r = u;
         return new Vector2Int(Mathf.RoundToInt(radiusOfRoomSpawn * r * Mathf.Cos(t)) + radiusOfRoomSpawn, Mathf.RoundToInt(radiusOfRoomSpawn * r * Mathf.Sin(t)) + radiusOfRoomSpawn);
     }
-
-    private Room GenerateRandomRoom()
+    private SetOperations.Operations TryOperations(Room room, Room roomOther, bool isSub)
     {
-        Room room = null;
-        switch (Random.Range(0, 3))
+        SetOperations.Operations op = SetOperations.Operations.None;
+        List<SetOperations.Operations> operations = isSub ? SetOperations.GetSubOperationsList : SetOperations.GetOperationsList;
+        while (operations.Count > 0)
         {
-            case 0:
-                room = GenerateSquareRoom();
-                break;
-            case 1:
-                room = GenerateCircleRoom();
-                break;
-            case 2:
-                room = GenerateRombusRoom();
-                break;
-            //case 3:
-            //    room = GenerateCornerRoom();
-            //    break;
-            //case 4:
-            //    room = GenerateTriangleRoom();
-            //    break;
+            int index = Random.Range(0, operations.Count);
+            op = operations[index];
+            operations.RemoveAt(index);
+            Room roomTest;
+            switch (op)
+            {
+                case SetOperations.Operations.Intersect:
+                    roomTest = new Room(room);
+                    roomTest.Intersect(roomOther);
+                    if (roomTest.Validate())
+                        return op;
+                    break;
 
+                case SetOperations.Operations.Union:
+                    roomTest = new Room(room);
+                    roomTest.Union(roomOther);
+                    if (roomTest.Validate())
+                        return op;
+                    break;
+
+                case SetOperations.Operations.DifferenceAB:
+                    roomTest = new Room(room);
+                    roomTest.Difference(new Room(roomOther));
+                    if (roomTest.Validate())
+                        return op;
+                    break;
+
+                case SetOperations.Operations.DifferenceBA:
+                    roomTest = new Room(roomOther);
+                    roomTest.Difference(new Room(room));
+                    if (roomTest.Validate())
+                        return op;
+                    break;
+
+                case SetOperations.Operations.SymmetricDifference:
+                    roomTest = new Room(room);
+                    Room roomOtherTest = new Room(roomOther);
+                    roomTest.SymmetricDifference(new Room(roomOtherTest));
+                    if (roomTest.Validate() && roomOtherTest.Validate())
+                        return op;
+                    break;
+            }
         }
-        return room;
-    }
-
-    public override int GetRoomStyle(int id)
-    {
-        return ((int)roomsValidated[id].GetStyle());
+        return op;
     }
 
 }
