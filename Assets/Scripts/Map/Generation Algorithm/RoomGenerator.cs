@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
 using Random = UnityEngine.Random;
+using static SetOperations;
 
 public class RoomGenerator : DungeonGeneratorBase
 {
@@ -35,79 +37,91 @@ public class RoomGenerator : DungeonGeneratorBase
     {
         map = new int[mapMaxWidth, mapMaxHeight];
         rooms = new List<Room>();
-
+        List<Room> roomList = new List<Room>();
         int roomNumber = Random.Range(roomNumberMin, roomNumberMax);
         for (int i = 0; i < roomNumber; i++)
         {
-            rooms.Add(GenerateRandomRoom());
+            roomList.Add(GenerateRandomRoom());
         }
 
-        bool roomNotIntersect = true;
+        bool roomsValidated;
         do
         {
-            List<Room> roomList = null;
-            roomNotIntersect = true;
-            for (int i = 0; i < rooms.Count; i++)
-                for (int j = i + 1; j < rooms.Count; j++)
+            roomsValidated = true;
+            bool roomNotIntersect = true;
+            Room room = null;
+            for (int i = 0; i < roomList.Count && room == null; i++)
+            {
+                if (roomList[i] != null && !roomList[i].GetValidation())
                 {
-                    if (rooms[i].CheckIntersection(rooms[j]))
+                    room = roomList[i];
+                    roomsValidated = false;
+                }
+            }
+            for (int i = 0; i < roomList.Count; i++)
+            {
+                if (roomList[i] != null && room != null && roomList[i] != room)
+                {
+
+                    if (room.CheckIntersection(roomList[i]))
                     {
                         roomNotIntersect = false;
-                        SetOperations.Operations operation;
-                        operation = TryOperations(rooms[i], rooms[j], rooms[i].IsProperSubsetOf(rooms[j]));
+                        Operations operation;
+                        operation = TryOperations(room, roomList[i], room.IsProperSubsetOf(roomList[i]));
                         switch (operation)
                         {
-                            case SetOperations.Operations.Intersect:
-                                rooms[i].Intersect(rooms[j]);
+                            case Operations.Intersect:
+                                room.Intersect(roomList[i]);
+                                roomList[i] = null;
                                 break;
 
-                            case SetOperations.Operations.Union:
-                                rooms[i].Union(rooms[j]);
+                            case Operations.Union:
+                                room.Union(roomList[i]);
+                                roomList[i] = null;
                                 break;
 
-                            case SetOperations.Operations.DifferenceAB:
-                                rooms[i].Difference(rooms[j]);
+                            case Operations.DifferenceAB:
+                                room.Difference(roomList[i]);
+                                roomList[i] = null;
                                 break;
 
-                            case SetOperations.Operations.DifferenceBA:
-                                rooms[j].Difference(rooms[i]);
+                            case Operations.DifferenceBA:
+                                roomList[i].Difference(room);
+                                room = null;
                                 break;
 
-                            case SetOperations.Operations.SymmetricDifference:
-                                rooms[i].SymmetricDifference(rooms[j]);
+                            case Operations.SymmetricDifference:
+                                room.SymmetricDifference(roomList[i]);
                                 break;
                         }
                     }
                     else
                     {
-                        if (checkConnection && room.CheckConnection(rooms[i]))
+                        if (checkConnection && room.CheckConnection(roomList[i]))
                         {
                             room.Union(rooms[i]);
-                            roomsValidatedNew.Add(room);
-                        }
-                        else
-                        {
-                            roomsValidatedNew.Add(roomsValidated[i]);
+                            rooms[i] = null;
                         }
 
                     }
-                }
-            else
-            {
-                roomsValidatedNew.Add(room);
-            }
-            if (roomNotIntersect)
-                roomsValidatedNew.Add(room);
-            roomsValidated = roomsValidatedNew;
 
+                }
+            }
+            if (room != null && roomNotIntersect)
+            {
+                room.SetValidation(true);
+            }
             //if (roomsGenerated.Count == 0 && roomsValidated.Count < roomNumber / 2)
             //    for (int i = roomsValidated.Count; i < roomNumber; i++)
             //        roomsGenerated.Add(GenerateRandomRoom());
 
-        } while (!roomNotIntersect);
+        } while (!roomsValidated);
+        for (int i = 0; i < roomList.Count; i++)
+            if (roomList[i] != null)
+                rooms.Add(roomList[i]);
 
-        for (int i = 0; i < mapMaxWidth; i++)
-            for (int j = 0; j < mapMaxHeight; j++)
+        for (int i = 0; i < mapMaxHeight; i++)
+            for (int j = 0; j < mapMaxWidth; j++)
             {
                 map[i, j] = -1;
             }
@@ -358,10 +372,10 @@ public class RoomGenerator : DungeonGeneratorBase
             r = u;
         return new Vector2Int(Mathf.RoundToInt(radiusOfRoomSpawn * r * Mathf.Cos(t)) + radiusOfRoomSpawn, Mathf.RoundToInt(radiusOfRoomSpawn * r * Mathf.Sin(t)) + radiusOfRoomSpawn);
     }
-    private SetOperations.Operations TryOperations(Room room, Room roomOther, bool isSub)
+    private Operations TryOperations(Room room, Room roomOther, bool isSub)
     {
-        SetOperations.Operations op = SetOperations.Operations.None;
-        List<SetOperations.Operations> operations = isSub ? SetOperations.GetSubOperationsList : SetOperations.GetOperationsList;
+        Operations op = Operations.None;
+        List<Operations> operations = isSub ? new List<Operations>(GetSubOperationsList) : new List<Operations>(GetOperationsList);
         while (operations.Count > 0)
         {
             int index = Random.Range(0, operations.Count);
@@ -370,35 +384,35 @@ public class RoomGenerator : DungeonGeneratorBase
             Room roomTest;
             switch (op)
             {
-                case SetOperations.Operations.Intersect:
+                case Operations.Intersect:
                     roomTest = new Room(room);
                     roomTest.Intersect(roomOther);
                     if (roomTest.Validate())
                         return op;
                     break;
 
-                case SetOperations.Operations.Union:
+                case Operations.Union:
                     roomTest = new Room(room);
                     roomTest.Union(roomOther);
                     if (roomTest.Validate())
                         return op;
                     break;
 
-                case SetOperations.Operations.DifferenceAB:
+                case Operations.DifferenceAB:
                     roomTest = new Room(room);
                     roomTest.Difference(new Room(roomOther));
                     if (roomTest.Validate())
                         return op;
                     break;
 
-                case SetOperations.Operations.DifferenceBA:
+                case Operations.DifferenceBA:
                     roomTest = new Room(roomOther);
                     roomTest.Difference(new Room(room));
                     if (roomTest.Validate())
                         return op;
                     break;
 
-                case SetOperations.Operations.SymmetricDifference:
+                case Operations.SymmetricDifference:
                     roomTest = new Room(room);
                     Room roomOtherTest = new Room(roomOther);
                     roomTest.SymmetricDifference(new Room(roomOtherTest));

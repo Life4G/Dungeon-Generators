@@ -90,6 +90,14 @@ public class Room
     {
         tiles = positions;
     }
+    public bool GetValidation()
+    {
+        return valid;
+    }
+    public void SetValidation(bool validation)
+    {
+        valid = validation;
+    }
     public void SetSize(int width, int height)
     {
         sizeX = width;
@@ -104,6 +112,9 @@ public class Room
     //Функция проверки пересечения
     public bool CheckIntersection(Room other)
     {
+        if (this == null || other == null)
+            return false;
+
         int collisonX1 = Mathf.Max(massRoomPos.x, other.massRoomPos.x);
         int collisonY1 = Mathf.Max(massRoomPos.y, other.massRoomPos.y);
 
@@ -232,6 +243,8 @@ public class Room
 
     public bool Validate()
     {
+        if (this == null)
+            return false;
         Vector2Int start = new Vector2Int();
         int tilesSum = 0;
         int[,] tilesToCheck = new int[sizeY, sizeX];
@@ -257,13 +270,13 @@ public class Room
         {
             Vector2Int l = stack.Pop();
             int lx = l.x;
-            while (tilesToCheck[l.y, lx] == 0)
+            while (IsInside(lx - 1, l.y, tilesToCheck))
             {
                 tilesToCheck[l.y, lx - 1] = 1;
                 lx--;
                 tilesCheckedSum++;
             }
-            while (tilesToCheck[l.y, l.x] == 0)
+            while (IsInside(l.x, l.y, tilesToCheck))
             {
                 tilesToCheck[l.y, l.x] = 1;
                 l.x++;
@@ -283,7 +296,7 @@ public class Room
         bool isAdded = false;
         for (int x = lx; x < rx; x++)
         {
-            if (tilesToCheck[y, x] != 0)
+            if (!IsInside(lx - 1, y, tilesToCheck))
                 isAdded = false;
             else if (!isAdded)
             {
@@ -293,8 +306,17 @@ public class Room
         }
     }
 
+    private bool IsInside(int x, int y, int[,] tilesToCheck)
+    {
+        if (x >= 0 && y >= 0 && x < sizeX && y < sizeY && tilesToCheck[y, x] == 0)
+            return true;
+        return false;
+    }
+
     public bool CheckConnection(Room other)
     {
+        if (this == null || other == null)
+            return false;
         Vector2Int RoomPosNew = new Vector2Int(Mathf.Min(massRoomPos.x, other.massRoomPos.x), Mathf.Min(massRoomPos.y, other.massRoomPos.y));
         int maxX = Mathf.Max(massRoomPos.x + sizeX, other.massRoomPos.x + other.sizeX);
         int maxY = Mathf.Max(massRoomPos.y + sizeY, other.massRoomPos.y + other.sizeY);
@@ -343,19 +365,19 @@ public class Room
 
 
         Stack<Vector2Int> stack = new Stack<Vector2Int>();
-        stack.Push(new Vector2Int(startX,startY));
+        stack.Push(new Vector2Int(startX, startY));
         int tilesCheckedSum = 0;
         while (stack.Count > 0)
         {
             Vector2Int l = stack.Pop();
             int lx = l.x;
-            while (tilesToCheck[l.y, lx] == 0)
+            while (IsInside(lx - 1, l.y, tilesToCheck))
             {
                 tilesToCheck[l.y, lx - 1] = 1;
                 lx--;
                 tilesCheckedSum++;
             }
-            while (tilesToCheck[l.y, l.x] == 0)
+            while (IsInside(l.x, l.y, tilesToCheck))
             {
                 tilesToCheck[l.y, l.x] = 1;
                 l.x++;
@@ -369,5 +391,5 @@ public class Room
             return true;
         return false;
     }
-    
+
 }

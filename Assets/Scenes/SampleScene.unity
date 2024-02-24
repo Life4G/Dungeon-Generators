@@ -1348,12 +1348,11 @@ MonoBehaviour:
   startPosition: {x: 0, y: 0}
   seed: -117438325
   wallsGenerator: {fileID: 0}
-  radiusOfRoomSpawn: 40
+  radiusOfRoomSpawn: 120
   roomNumberMin: 4
   roomNumberMax: 16
   roomSizeMax: 16
   checkConnection: 1
-  presetLoad: 0
 --- !u!4 &2087062190
 Transform:
   m_ObjectHideFlags: 0

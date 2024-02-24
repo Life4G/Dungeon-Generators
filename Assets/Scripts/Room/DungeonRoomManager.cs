@@ -21,7 +21,7 @@ namespace Assets.Scripts.Room
                 for (int x = 0; x < floorMap.GetLength(0); x++)
                 {
                     int roomId = floorMap[x, y];
-                    if (roomId > 0)
+                    if (roomId >= 0)
                     {
                         if (!roomTiles.ContainsKey(roomId))
                         {
