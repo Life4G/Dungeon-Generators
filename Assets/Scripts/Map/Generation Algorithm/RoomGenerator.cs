@@ -8,6 +8,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using static SetOperations;
+using UnityEditor.PackageManager;
 
 public class RoomGenerator : DungeonGeneratorBase
 {
@@ -27,6 +28,7 @@ public class RoomGenerator : DungeonGeneratorBase
     private int[,] map;
 
     private List<Room> rooms;
+    private List<RoomConnection> connections;
 
     protected override int[,] GenerateDungeon()
     {
@@ -38,6 +40,7 @@ public class RoomGenerator : DungeonGeneratorBase
         map = new int[mapMaxWidth, mapMaxHeight];
         rooms = new List<Room>();
         List<Room> roomList = new List<Room>();
+        connections = new List<RoomConnection>();
         int roomNumber = Random.Range(roomNumberMin, roomNumberMax);
         for (int i = 0; i < roomNumber; i++)
         {
@@ -120,6 +123,9 @@ public class RoomGenerator : DungeonGeneratorBase
             if (roomList[i] != null)
                 rooms.Add(roomList[i]);
 
+        for (int i = 0; i < rooms.Count - 1; i++)
+            connections.Add(new RoomConnection(i, i + 1, rooms[i].GetPosCenter(), rooms[i + 1].GetPosCenter()));
+
         for (int i = 0; i < mapMaxHeight; i++)
             for (int j = 0; j < mapMaxWidth; j++)
             {
@@ -139,6 +145,44 @@ public class RoomGenerator : DungeonGeneratorBase
                         map[y + roomPos.y, x + roomPos.x] = i;
                 }
         }
+        for (int i = 0; i < connections.Count; i++)
+        {
+            int dx = Mathf.Abs(connections[i].posSecond.x - connections[i].posFirst.x);
+            int sx = connections[i].posFirst.x < connections[i].posSecond.x ? 1 : -1;
+            int dy = -Mathf.Abs(connections[i].posSecond.y - connections[i].posFirst.y);
+            int sy = connections[i].posFirst.y < connections[i].posSecond.y ? 1 : -1;
+            int error = dx + dy;
+            int x = connections[i].posFirst.x;
+            int y = connections[i].posFirst.y;
+            while (true)
+            {
+                if (map[y, x] == -1)
+                {
+                    map[y, x+1] = rooms.Count;
+                    map[y, x] = rooms.Count;
+                    map[y+1, x] = rooms.Count;
+                }
+                if (x == connections[i].posSecond.x && y == connections[i].posSecond.y)
+                    break;
+                int e2 = 2 * error;
+                if (e2 >= dy)
+                {
+                    if (x == connections[i].posSecond.x)
+                        break;
+                    error = error + dy;
+                    x += sx;
+                };
+                if (e2 <= dx)
+                {
+                    if (y == connections[i].posSecond.y)
+                        break;
+                    error = error + dx;
+                    y += sy;
+                };
+
+            }
+        }
+
         return map;
     }
 
@@ -424,4 +468,21 @@ public class RoomGenerator : DungeonGeneratorBase
         return op;
     }
 
+}
+
+public class RoomConnection
+{
+    public int roomFirst,
+        roomSecond;
+    public Vector2Int posFirst,
+        posSecond;
+
+    public RoomConnection(int roomFirstID, int roomSecondID, Vector2Int firstPos, Vector2Int secondPos)
+    {
+        roomFirst = roomFirstID;
+        roomSecond = roomSecondID;
+        posFirst = firstPos;
+        posSecond = secondPos;
+
+    }
 }

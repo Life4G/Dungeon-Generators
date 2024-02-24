@@ -70,6 +70,11 @@ public class Room
     {
         return massRoomPos;
     }
+
+    public Vector2Int GetPosCenter()
+    {
+        return new Vector2Int(massRoomPos.x + sizeX / 2, massRoomPos.y + sizeY / 2); ;
+    }
     public Size GetSize()
     {
         return new Size(sizeX, sizeY);
