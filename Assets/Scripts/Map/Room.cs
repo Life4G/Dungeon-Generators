@@ -24,7 +24,7 @@ public static class SetOperations
     {
         return (Operations)Random.Range(2, 4);
     }
-    public static List<Operations> GetOperationsList = new List<Operations>
+    public static readonly List<Operations> GetOperationsList = new List<Operations>
     {
         Operations.Intersect,
         Operations.Union,
@@ -33,7 +33,7 @@ public static class SetOperations
         Operations.SymmetricDifference
 
     };
-    public static List<Operations> GetSubOperationsList = new List<Operations>
+    public static readonly List<Operations> GetSubOperationsList = new List<Operations>
     {
         Operations.Union,
         Operations.DifferenceAB,
