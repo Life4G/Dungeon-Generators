@@ -10,7 +10,6 @@ public class RoomGenerator : DungeonGeneratorBase
 {
     [SerializeField]
     private int radiusOfRoomSpawn = 120;
-    //Мин и макс комнат которое может быть нагенерено
     [SerializeField]
     private int roomNumberMin = 16;
     [SerializeField]
@@ -120,6 +119,8 @@ public class RoomGenerator : DungeonGeneratorBase
 
         //for (int i = 0; i < rooms.Count - 1; i++)
         //    roomConnections.Add(new RoomConnection(i, i + 1, rooms[i].GetPosCenter(), rooms[i + 1].GetPosCenter()));
+        // Graph
+        graph = new Graph(rooms, roomConnections);
         roomConnections = Triangulation(rooms, mapMaxWidth, mapMaxHeight);
 
         for (int i = 0; i < mapMaxHeight; i++)
@@ -155,7 +156,7 @@ public class RoomGenerator : DungeonGeneratorBase
                 if (map[y, x] == -1)
                 {
 
-                    map[y, x] = rooms.Count;
+                    map[y, x] = rooms.Count+i;
                 }
                 if (x == roomConnections[i].posSecond.x && y == roomConnections[i].posSecond.y)
                     break;
@@ -898,4 +899,5 @@ public class RoomConnection
     {
         return posFirst.GetHashCode() ^ (posSecond.GetHashCode() << 2);
     }
+
 }
