@@ -1342,15 +1342,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 2087062188}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 19157d3c3b7835543b452a78a4c88723, type: 3}
+  m_Script: {fileID: 11500000, guid: 55e3b8f8402c2f04495a38ebf3bbd254, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   startPosition: {x: 0, y: 0}
-  seed: 1019924855
-  wallsGenerator: {fileID: 0}
+  seed: 0
+  wallsGenerator: {fileID: 1874707296}
   radiusOfRoomSpawn: 120
-  roomNumberMin: 4
-  roomNumberMax: 16
+  roomNumberMin: 16
+  roomNumberMax: 64
   roomSizeMax: 16
   checkConnection: 1
 --- !u!4 &2087062190

@@ -8,6 +8,8 @@ public class Graph
 
     public Graph(List<Room> rooms, List<RoomConnection> connections)
     {
+        vertices = new List<Room>();
+        edges = new List<GraphEdge>();
         foreach (Room room in rooms)
             vertices.Add(room);
         foreach (RoomConnection connection in connections)

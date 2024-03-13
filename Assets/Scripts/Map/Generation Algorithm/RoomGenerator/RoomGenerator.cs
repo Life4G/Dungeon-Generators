@@ -745,18 +745,6 @@ public class Triangle
     }
     public static Triangle SuperTriangle(List<Vector2> pointsList, int maxWidth, int maxHeigth)
     {
-        //int minX = 512, minY = 512;
-        //int maxX = -1, maxY = -1;
-        //foreach (Vector2Int point in pointsList)
-        //{
-        //    minX = Math.Min(minX, point.x);
-        //    minY = Math.Min(minY, point.y);
-        //    maxX = Math.Max(maxX, point.x);
-        //    maxY = Math.Max(maxY, point.y);
-        //}
-        //int dx = (maxX - minX) * 100;
-        //int dy = (maxY - minY) * 100;
-        //return new Triangle(new Vector2Int(minX - dx, minY - dy * 3), new Vector2Int(minX - dx, minY + dy), new Vector2Int(minX + dx * 3, minY + dy), new int[3] { -1, -2, -3 });
         int offsetX = maxWidth * 4;
         int offsetY = maxHeigth * 4;
         return new Triangle(new Vector2(0 - offsetX, 0 - offsetY), new Vector2(maxWidth + offsetX, 0 - offsetY), new Vector2(maxWidth + offsetX, maxHeigth + offsetY), new int[3] { -1, -2, -3 });
@@ -799,19 +787,19 @@ public class Triangle
             float deltaYThirdSecond = Math.Abs(posPointThird.y - posPointSecond.y);
             float deltaXThirdSecond = Math.Abs(posPointThird.x - posPointSecond.x);
             //The points are pependicular and parallel to x-y axis
-            if (deltaXSecondFirst <= 0 && deltaYThirdSecond <= 0)
+            if (deltaXSecondFirst <= 0.0000001f && deltaYThirdSecond <= 0.0000001f)
                 return false;
             //A line of two point are perpendicular to x - axis
-            if (deltaYSecondFirst <= 0)
+            if (deltaYSecondFirst <= 0.0000001f)
                 return true;
             //A line of two point are perpendicular to x - axis
-            else if (deltaYThirdSecond <= 0)
+            else if (deltaYThirdSecond <= 0.0000001f)
                 return true;
             //A line of two point are perpendicular to y - axis
-            else if (deltaXSecondFirst <= 0)
+            else if (deltaXSecondFirst <= 0.0000001f)
                 return true;
             //A line of two point are perpendicular to y - axis
-            else if (deltaXThirdSecond <= 0)
+            else if (deltaXThirdSecond <= 0.0000001f)
                 return true;
             return false;
         }
@@ -822,7 +810,7 @@ public class Triangle
             float deltaXSecondFirst = Math.Abs(posPointSecond.x - posPointFirst.x);
             float deltaYThirdSecond = Math.Abs(posPointThird.y - posPointSecond.y);
             float deltaXThirdSecond = Math.Abs(posPointThird.x - posPointSecond.x);
-            if (deltaXSecondFirst <= 0 && deltaYThirdSecond <= 0)
+            if (deltaXSecondFirst <= 0.0000001f && deltaYThirdSecond <= 0.0000001f)
             {
                 center = new Vector2(posPointSecond.x + posPointThird.x, posPointFirst.y + posPointSecond.y) * 0.5f;
                 radius = Math.Max(Math.Max(Vector2.Distance(center, posPointFirst), Vector2.Distance(center, posPointSecond)), Vector2.Distance(center, posPointThird));
@@ -830,7 +818,7 @@ public class Triangle
             }
             float slopeFirst = deltaYSecondFirst / deltaXSecondFirst;
             float slopeSecond = deltaYThirdSecond / deltaXThirdSecond;
-            if (Math.Abs(slopeFirst - slopeSecond) <= 0)
+            if (Math.Abs(slopeFirst - slopeSecond) <= 0.0000001f)
             {
                 radius = -1;
                 return;
@@ -840,19 +828,6 @@ public class Triangle
             float y = -1 * (x - (posPointFirst.x + posPointSecond.x) / 2) / slopeFirst + (posPointFirst.y + posPointSecond.y) / 2;
             center = new Vector2(x, y);
             radius = Math.Max(Math.Max(Vector2.Distance(center, posPointFirst), Vector2.Distance(center, posPointSecond)), Vector2.Distance(center, posPointThird));
-
-            //float ox = (Math.Min(Math.Min(posPointFirst.x, posPointSecond.x), posPointThird.x) + Math.Max(Math.Max(posPointFirst.x, posPointSecond.x), posPointThird.x)) / 2;
-            //float oy = (Math.Min(Math.Min(posPointFirst.y, posPointSecond.y), posPointThird.y) + Math.Max(Math.Max(posPointFirst.y, posPointSecond.y), posPointThird.y)) / 2;
-            //float ax = posPointFirst.x - ox, ay = posPointFirst.y - oy;
-            //float bx = posPointSecond.x - ox, by = posPointSecond.y - oy;
-            //float cx = posPointThird.x - ox, cy = posPointThird.y - oy;
-            //float d = (ax * (by - cy) + bx * (cy - ay) + cx * (ay - by)) * 2;
-            //if (d == 0)
-            //    radius = -1;
-            //float x = ((ax * ax + ay * ay) * (by - cy) + (bx * bx + by * by) * (cy - ay) + (cx * cx + cy * cy) * (ay - by)) / d;
-            //float y = ((ax * ax + ay * ay) * (cx - bx) + (bx * bx + by * by) * (ax - cx) + (cx * cx + cy * cy) * (bx - ax)) / d;
-            //center = new Vector2(x, y);
-            //radius = Math.Max(Math.Max(Vector2.Distance(center,posPointFirst), Vector2.Distance(center, posPointSecond)), Vector2.Distance(center, posPointThird));
         }
     }
 }
