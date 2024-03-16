@@ -152,18 +152,19 @@ public class Graph
             {
                 if (triangles[i].InCircle(vertex))
                 {
-                    edges.Add(new GraphEdge(triangles[i].edges[0], triangles[i].edges[1], triangles[i].posPointFirst, triangles[i].posPointSecond));
-                    edges.Add(new GraphEdge(triangles[i].edges[1], triangles[i].edges[2], triangles[i].posPointSecond, triangles[i].posPointThird));
-                    edges.Add(new GraphEdge(triangles[i].edges[2], triangles[i].edges[0], triangles[i].posPointThird, triangles[i].posPointFirst));
                     badTriangles.Add(triangles[i]);
                 }
             }
         }
         foreach (Triangle badTriangle in badTriangles)
         {
+            edges.Add(new GraphEdge(badTriangle.edges[0], badTriangle.edges[1], badTriangle.posPointFirst, badTriangle.posPointSecond));
+            edges.Add(new GraphEdge(badTriangle.edges[1], badTriangle.edges[2], badTriangle.posPointSecond, badTriangle.posPointThird));
+            edges.Add(new GraphEdge(badTriangle.edges[2], badTriangle.edges[0], badTriangle.posPointThird, badTriangle.posPointFirst));
             triangles.Remove(badTriangle);
         }
         List<GraphEdge> uniqueEdges = new List<GraphEdge>();
+
         for (int i = 0; i < edges.Count; i++)
         {
             bool isUnique = true;
@@ -263,7 +264,6 @@ public class GraphEdge
     {
         this.posPointFirst = posPointFirst;
         this.posPointSecond = posPointSecond;
-
     }
 }
 
@@ -287,7 +287,7 @@ public class Triangle
     {
         int offsetX = maxWidth * 4;
         int offsetY = maxHeigth * 4;
-        return new Triangle(new Vector2(0 - offsetX*2, 0 - offsetY*2), new Vector2(maxWidth + offsetX, 0 - offsetY * 2), new Vector2(maxWidth + offsetX, maxHeigth + offsetY), new int[3] { -1, -2, -3 });
+        return new Triangle(new Vector2(0 - offsetX * 2, 0 - offsetY * 2), new Vector2(maxWidth + offsetX, 0 - offsetY * 2), new Vector2(maxWidth + offsetX, maxHeigth + offsetY), new int[3] { -1, -2, -3 });
     }
     public bool InCircle(Vector2 vertex)
     {

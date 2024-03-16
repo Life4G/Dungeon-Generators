@@ -92,8 +92,8 @@ public class RoomGenerator : DungeonGeneratorBase
                     {
                         if (checkConnection && room.CheckConnection(roomList[i]))
                         {
-                            room.Union(rooms[i]);
-                            rooms[i] = null;
+                            room.Union(roomList[i]);
+                            roomList[i] = null;
                         }
 
                     }
@@ -174,7 +174,6 @@ public class RoomGenerator : DungeonGeneratorBase
 
             }
         }
-
         return map;
     }
 
@@ -458,6 +457,7 @@ public class RoomGenerator : DungeonGeneratorBase
         }
         return op;
     }
+
 }
 //private Room OperationApplication(Room room, Room roomOther)
 //{
@@ -604,3 +604,39 @@ public class RoomGenerator : DungeonGeneratorBase
 //    return roomCollison;
 //}
 
+public static class SetOperations
+{
+    public enum Operations
+    {
+        None,
+        Intersect,
+        Union,
+        DifferenceAB,
+        DifferenceBA,
+        SymmetricDifference,
+    }
+    public static Operations GetRandomOperation()
+    {
+        return (Operations)Random.Range(1, 4);
+    }
+    public static Operations GetRandomSubOperation()
+    {
+        return (Operations)Random.Range(2, 4);
+    }
+    public static readonly List<Operations> GetOperationsList = new List<Operations>
+    {
+        Operations.Intersect,
+        Operations.Union,
+        Operations.DifferenceAB,
+        Operations.DifferenceBA,
+        Operations.SymmetricDifference
+
+    };
+    public static readonly List<Operations> GetSubOperationsList = new List<Operations>
+    {
+        Operations.Union,
+        Operations.DifferenceAB,
+        Operations.DifferenceBA,
+    };
+
+}

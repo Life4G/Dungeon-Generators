@@ -1,46 +1,8 @@
-using static SetOperations;
 using System.Collections.Generic;
 using System.Drawing;
 using UnityEngine;
 using System;
-using Random = UnityEngine.Random;
-
-public static class SetOperations
-{
-    public enum Operations
-    {
-        None,
-        Intersect,
-        Union,
-        DifferenceAB,
-        DifferenceBA,
-        SymmetricDifference,
-    }
-    public static Operations GetRandomOperation()
-    {
-        return (Operations)Random.Range(1, 4);
-    }
-    public static Operations GetRandomSubOperation()
-    {
-        return (Operations)Random.Range(2, 4);
-    }
-    public static readonly List<Operations> GetOperationsList = new List<Operations>
-    {
-        Operations.Intersect,
-        Operations.Union,
-        Operations.DifferenceAB,
-        Operations.DifferenceBA,
-        Operations.SymmetricDifference
-
-    };
-    public static readonly List<Operations> GetSubOperationsList = new List<Operations>
-    {
-        Operations.Union,
-        Operations.DifferenceAB,
-        Operations.DifferenceBA,
-    };
-
-}
+using System.Text;
 
 public class Room
 {
@@ -48,6 +10,7 @@ public class Room
     private int sizeX, sizeY;
     private int[,] tiles;
     private bool valid;
+    private static readonly int tilesMin = 8;
 
     public Room(Vector2Int massRoomPos, int sizeX, int sizeY, int[,] tiles)
     {
@@ -250,21 +213,23 @@ public class Room
     {
         if (this == null)
             return false;
+
         Vector2Int start = new Vector2Int();
         int tilesSum = 0;
+
         int[,] tilesToCheck = new int[sizeY, sizeX];
         for (int y = 0; y < sizeY; y++)
             for (int x = 0; x < sizeX; x++)
-                if (tiles[y, x] == 0)
-                    tilesToCheck[y, x] = -1;
-                else
+                if (tiles[y, x] != 0)
                 {
-                    tilesToCheck[y, x] = 0;
+                    tilesToCheck[y, x] = 1;
                     start.y = y;
                     start.x = x;
                     tilesSum++;
                 }
-        if (start.x < 0 || start.y < 0)
+
+
+        if (start.x < 0 || start.y < 0 || tilesSum < tilesMin)
             return false;
 
 
@@ -275,45 +240,37 @@ public class Room
         {
             Vector2Int l = stack.Pop();
             int lx = l.x;
-            while (IsInside(lx - 1, l.y, tilesToCheck))
-            {
-                tilesToCheck[l.y, lx - 1] = 1;
-                lx--;
-                tilesCheckedSum++;
-            }
-            while (IsInside(l.x, l.y, tilesToCheck))
-            {
-                tilesToCheck[l.y, l.x] = 1;
-                l.x++;
-                tilesCheckedSum++;
-            }
-            FindPoints(lx, l.x - 1, l.y + 1, tilesToCheck, stack);
-            FindPoints(lx, l.x - 1, l.y - 1, tilesToCheck, stack);
 
+            while (IsInside(lx, l.y, tilesToCheck))
+            {
+                tilesToCheck[l.y, lx] = 2;
+                tilesCheckedSum++;
+                lx--;
+            }
+            int rx = l.x + 1;
+
+            while (IsInside(rx, l.y, tilesToCheck))
+            {
+                tilesToCheck[l.y, rx] = 2;
+                tilesCheckedSum++;
+                rx++;
+            }
+
+            for (int i = lx; i < rx; i++)
+                if (IsInside(i, l.y + 1, tilesToCheck))
+                    stack.Push(new Vector2Int(i, l.y + 1));
+            for (int i = lx; i < rx; i++)
+                if (IsInside(i, l.y - 1, tilesToCheck))
+                    stack.Push(new Vector2Int(i, l.y - 1));
         }
         if (tilesSum == tilesCheckedSum)
             return true;
         return false;
     }
 
-    private void FindPoints(int lx, int rx, int y, int[,] tilesToCheck, Stack<Vector2Int> stack)
-    {
-        bool isAdded = false;
-        for (int x = lx; x < rx; x++)
-        {
-            if (!IsInside(lx - 1, y, tilesToCheck))
-                isAdded = false;
-            else if (!isAdded)
-            {
-                stack.Push(new Vector2Int(x, y));
-                isAdded = true;
-            }
-        }
-    }
-
     private bool IsInside(int x, int y, int[,] tilesToCheck)
     {
-        if (x >= 0 && y >= 0 && x < sizeX && y < sizeY && tilesToCheck[y, x] == 0)
+        if (x >= 0 && y >= 0 && x < tilesToCheck.GetLength(1) && y < tilesToCheck.GetLength(0) && tilesToCheck[y, x] == 1)
             return true;
         return false;
     }
@@ -322,7 +279,7 @@ public class Room
     {
         if (this == null || other == null)
             return false;
-        Vector2Int RoomPosNew = new Vector2Int(Mathf.Min(massRoomPos.x, other.massRoomPos.x), Mathf.Min(massRoomPos.y, other.massRoomPos.y));
+        Vector2Int RoomPosNew = Vector2Int.Min(massRoomPos, other.massRoomPos);
         int maxX = Mathf.Max(massRoomPos.x + sizeX, other.massRoomPos.x + other.sizeX);
         int maxY = Mathf.Max(massRoomPos.y + sizeY, other.massRoomPos.y + other.sizeY);
 
@@ -330,7 +287,7 @@ public class Room
         int sizeNewY = maxY - RoomPosNew.y + 1;
 
         int tilesSum = 0;
-        int startX = 0; int startY = 0;
+        Vector2Int start = new Vector2Int();
 
 
         int[,] tilesToCheck = new int[sizeNewY, sizeNewX];
@@ -338,60 +295,73 @@ public class Room
         for (int y = other.massRoomPos.y; y < other.massRoomPos.y + other.sizeY; y++)
             for (int x = other.massRoomPos.x; x < other.massRoomPos.x + other.sizeX; x++)
             {
-                if (other.tiles[y - other.massRoomPos.y, x - other.massRoomPos.x] == 1)
+                if (other.tiles[y - other.massRoomPos.y, x - other.massRoomPos.x] != 0)
                 {
-                    tilesToCheck[y - other.massRoomPos.y, x - other.massRoomPos.x] = 1;
+                    tilesToCheck[y - RoomPosNew.y, x - RoomPosNew.x] = 1;
                     tilesSum++;
+                    start.y = y - RoomPosNew.y;
+                    start.x = x - RoomPosNew.x;
                 }
-                else
-                    tilesToCheck[y - other.massRoomPos.y, x - other.massRoomPos.x] = 0;
 
             }
         for (int y = massRoomPos.y; y < massRoomPos.y + sizeY; y++)
             for (int x = massRoomPos.x; x < massRoomPos.x + sizeX; x++)
             {
-                if (tiles[y - massRoomPos.y, x - massRoomPos.x] == 1)
+                if (tiles[y - massRoomPos.y, x - massRoomPos.x] != 0 && tilesToCheck[y - RoomPosNew.y, x - RoomPosNew.x] != 1)
                 {
-                    tilesToCheck[y - massRoomPos.y, x - massRoomPos.x] = 1;
+                    tilesToCheck[y - RoomPosNew.y, x - RoomPosNew.x] = 1;
                     tilesSum++;
-                    startY = y - massRoomPos.y;
-                    startX = x - massRoomPos.x;
+                    start.y = y - RoomPosNew.y;
+                    start.x = x - RoomPosNew.x;
                 }
-                else
-                    tilesToCheck[y - massRoomPos.y, x - massRoomPos.x] = 0;
-
             }
 
-        if (tilesSum == 0)
+        if (start.x < 0 || start.y < 0 || tilesSum < tilesMin)
             return false;
-
-        if (startX < 0 || startY < 0)
-            return false;
-
 
         Stack<Vector2Int> stack = new Stack<Vector2Int>();
-        stack.Push(new Vector2Int(startX, startY));
+        stack.Push(start);
         int tilesCheckedSum = 0;
         while (stack.Count > 0)
         {
             Vector2Int l = stack.Pop();
             int lx = l.x;
-            while (IsInside(lx - 1, l.y, tilesToCheck))
-            {
-                tilesToCheck[l.y, lx - 1] = 1;
-                lx--;
-                tilesCheckedSum++;
-            }
-            while (IsInside(l.x, l.y, tilesToCheck))
-            {
-                tilesToCheck[l.y, l.x] = 1;
-                l.x++;
-                tilesCheckedSum++;
-            }
-            FindPoints(lx, l.x - 1, l.y + 1, tilesToCheck, stack);
-            FindPoints(lx, l.x - 1, l.y - 1, tilesToCheck, stack);
 
+            while (IsInside(lx, l.y, tilesToCheck))
+            {
+                tilesToCheck[l.y, lx] = 2;
+                tilesCheckedSum++;
+                lx--;
+            }
+            int rx = l.x + 1;
+
+            while (IsInside(rx, l.y, tilesToCheck))
+            {
+                tilesToCheck[l.y, rx] = 2;
+                tilesCheckedSum++;
+                rx++;
+            }
+
+            for (int i = lx; i < rx - 1; i++)
+                if (IsInside(i, l.y + 1, tilesToCheck))
+                    stack.Push(new Vector2Int(i, l.y + 1));
+
+            for (int i = lx; i < rx - 1; i++)
+                if (IsInside(i, l.y - 1, tilesToCheck))
+                    stack.Push(new Vector2Int(i, l.y - 1));
         }
+        
+        //for (int y = 0; y < sizeNewY; y++)
+        //{
+        //    StringBuilder sb = new StringBuilder();
+        //    for (int x = 0; x < sizeNewX; x++)
+        //    {
+        //        sb.Append(tilesToCheck[y, x]);
+        //    }
+        //    Debug.Log(sb.ToString());
+        //}
+        //Debug.Log("---------------------------------------------------------------------------------------*>");
+        
         if (tilesSum == tilesCheckedSum)
             return true;
         return false;
