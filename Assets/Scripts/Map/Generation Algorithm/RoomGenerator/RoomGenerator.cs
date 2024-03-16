@@ -4,16 +4,15 @@ using System.Drawing;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using static SetOperations;
-using UnityEngine.AI;
 
 public class RoomGenerator : DungeonGeneratorBase
 {
     [SerializeField]
-    private int radiusOfRoomSpawn = 120;
+    private int radiusOfRoomSpawn = 40;
     [SerializeField]
-    private int roomNumberMin = 16;
+    private int roomNumberMin = 4;
     [SerializeField]
-    private int roomNumberMax = 64;
+    private int roomNumberMax = 6;
     [SerializeField]
     int roomSizeMax = 16;
     [SerializeField]
@@ -23,7 +22,6 @@ public class RoomGenerator : DungeonGeneratorBase
     private int[,] map;
 
     private List<Room> rooms;
-    private List<RoomConnection> roomConnections;
 
     protected override int[,] GenerateDungeon()
     {
@@ -35,7 +33,6 @@ public class RoomGenerator : DungeonGeneratorBase
         map = new int[mapMaxWidth, mapMaxHeight];
         rooms = new List<Room>();
         List<Room> roomList = new List<Room>();
-        roomConnections = new List<RoomConnection>();
         int roomNumber = Random.Range(roomNumberMin, roomNumberMax);
         for (int i = 0; i < roomNumber; i++)
         {
@@ -120,8 +117,7 @@ public class RoomGenerator : DungeonGeneratorBase
         //for (int i = 0; i < rooms.Count - 1; i++)
         //    roomConnections.Add(new RoomConnection(i, i + 1, rooms[i].GetPosCenter(), rooms[i + 1].GetPosCenter()));
         // Graph
-        graph = new Graph(rooms, roomConnections);
-        roomConnections = Triangulation(rooms, mapMaxWidth, mapMaxHeight);
+        graph = new Graph(rooms, mapMaxWidth, mapMaxHeight);
 
         for (int i = 0; i < mapMaxHeight; i++)
             for (int j = 0; j < mapMaxWidth; j++)
@@ -142,35 +138,35 @@ public class RoomGenerator : DungeonGeneratorBase
                         map[y + roomPos.y, x + roomPos.x] = i;
                 }
         }
-        for (int i = 0; i < roomConnections.Count; i++)
+        for (int i = 0; i < graph.edges.Count; i++)
         {
-            int dx = Mathf.Abs(roomConnections[i].posSecond.x - roomConnections[i].posFirst.x);
-            int sx = roomConnections[i].posFirst.x < roomConnections[i].posSecond.x ? 1 : -1;
-            int dy = -Mathf.Abs(roomConnections[i].posSecond.y - roomConnections[i].posFirst.y);
-            int sy = roomConnections[i].posFirst.y < roomConnections[i].posSecond.y ? 1 : -1;
+            int dx = (int)Mathf.Abs(graph.edges[i].posPointSecond.x - graph.edges[i].posPointFirst.x);
+            int sx = (int)graph.edges[i].posPointFirst.x < graph.edges[i].posPointSecond.x ? 1 : -1;
+            int dy = (int)-Mathf.Abs(graph.edges[i].posPointSecond.y - graph.edges[i].posPointFirst.y);
+            int sy = (int)graph.edges[i].posPointFirst.y < graph.edges[i].posPointSecond.y ? 1 : -1;
             int error = dx + dy;
-            int x = roomConnections[i].posFirst.x;
-            int y = roomConnections[i].posFirst.y;
+            int x = (int)graph.edges[i].posPointFirst.x;
+            int y = (int)graph.edges[i].posPointFirst.y;
             while (true)
             {
                 if (map[y, x] == -1)
                 {
 
-                    map[y, x] = rooms.Count+i;
+                    map[y, x] = rooms.Count + i;
                 }
-                if (x == roomConnections[i].posSecond.x && y == roomConnections[i].posSecond.y)
+                if (x == (int)graph.edges[i].posPointSecond.x && y == (int)graph.edges[i].posPointSecond.y)
                     break;
                 int e2 = 2 * error;
                 if (e2 >= dy)
                 {
-                    if (x == roomConnections[i].posSecond.x)
+                    if (x == (int)graph.edges[i].posPointSecond.x)
                         break;
                     error = error + dy;
                     x += sx;
                 };
                 if (e2 <= dx)
                 {
-                    if (y == roomConnections[i].posSecond.y)
+                    if (y == (int)graph.edges[i].posPointSecond.y)
                         break;
                     error = error + dx;
                     y += sy;
@@ -286,58 +282,58 @@ public class RoomGenerator : DungeonGeneratorBase
             }
         return new Room(CalculateRoomPos(), sizeX, sizeY, tiles);
     }
-    //protected Room GenerateCornerRoom()
-    //{
-    //    int roomRadius = Random.Range(6, roomSizeMax + 1);
-    //    int sizeX = roomRadius; int sizeY = sizeX;
-    //    int[,] tiles = new int[sizeY, sizeX];
+    protected Room GenerateCornerRoom()
+    {
+        int roomRadius = Random.Range(6, roomSizeMax + 1);
+        int sizeX = roomRadius; int sizeY = sizeX;
+        int[,] tiles = new int[sizeY, sizeX];
 
 
-    //    switch (Random.Range(0, 4))
-    //    {
-    //        case 0:
-    //            for (int i = 0; i < roomRadius; i++)
-    //                for (int j = 0; j < roomRadius; j++)
-    //                {
-    //                    if (j >= roomRadius - i && j <= roomRadius + i)
-    //                    {
-    //                        tiles[i, j] = 1;
-    //                    }
-    //                }
-    //            break;
-    //        case 1:
-    //            for (int i = 0; i < roomRadius; i++)
-    //                for (int j = 0; j < roomRadius; j++)
-    //                {
-    //                    if (j >= roomRadius - i && j <= roomRadius + i)
-    //                    {
-    //                        tiles[i, sizeX - j - 1] = 1;
-    //                    }
-    //                }
-    //            break;
-    //        case 2:
-    //            for (int i = 0; i < roomRadius; i++)
-    //                for (int j = 0; j < roomRadius; j++)
-    //                {
-    //                    if (j >= roomRadius - i && j <= roomRadius + i)
-    //                    {
-    //                        tiles[sizeX - j - 1, i] = 1;
-    //                    }
-    //                }
-    //            break;
-    //        case 3:
-    //            for (int i = 0; i < roomRadius; i++)
-    //                for (int j = 0; j < roomRadius; j++)
-    //                {
-    //                    if (j >= roomRadius - i && j <= roomRadius + i)
-    //                    {
-    //                        tiles[sizeX - j - 1, sizeX - i - 1] = 1;
-    //                    }
-    //                }
-    //            break;
-    //    }
-    //    return new Room(CalculateRoomPos(), sizeX, sizeY, tiles);
-    //}
+        switch (Random.Range(0, 4))
+        {
+            case 0:
+                for (int i = 0; i < roomRadius; i++)
+                    for (int j = 0; j < roomRadius; j++)
+                    {
+                        if (j >= roomRadius - i && j <= roomRadius + i)
+                        {
+                            tiles[i, j] = 1;
+                        }
+                    }
+                break;
+            case 1:
+                for (int i = 0; i < roomRadius; i++)
+                    for (int j = 0; j < roomRadius; j++)
+                    {
+                        if (j >= roomRadius - i && j <= roomRadius + i)
+                        {
+                            tiles[i, sizeX - j - 1] = 1;
+                        }
+                    }
+                break;
+            case 2:
+                for (int i = 0; i < roomRadius; i++)
+                    for (int j = 0; j < roomRadius; j++)
+                    {
+                        if (j >= roomRadius - i && j <= roomRadius + i)
+                        {
+                            tiles[sizeX - j - 1, i] = 1;
+                        }
+                    }
+                break;
+            case 3:
+                for (int i = 0; i < roomRadius; i++)
+                    for (int j = 0; j < roomRadius; j++)
+                    {
+                        if (j >= roomRadius - i && j <= roomRadius + i)
+                        {
+                            tiles[sizeX - j - 1, sizeX - i - 1] = 1;
+                        }
+                    }
+                break;
+        }
+        return new Room(CalculateRoomPos(), sizeX, sizeY, tiles);
+    }
     protected Room GenerateTriangleRoom()
     {
         int roomRadius = Random.Range(6, roomSizeMax / 2 + 1);
@@ -462,417 +458,149 @@ public class RoomGenerator : DungeonGeneratorBase
         }
         return op;
     }
-    //private Room OperationApplication(Room room, Room roomOther)
-    //{
-    //    Room result = null;
-    //    Operations operation;
-    //    operation = TryOperations(room, roomOther, room.IsProperSubsetOf(roomOther));
-    //    switch (operation)
-    //    {
-    //        case Operations.Intersect:
-    //            room.Intersect(roomOther);
-    //            break;
-
-    //        case Operations.Union:
-    //            room.Union(roomOther);
-    //            break;
-
-    //        case Operations.DifferenceAB:
-    //            room.Difference(roomOther);
-    //            break;
-
-    //        case Operations.DifferenceBA:
-    //            roomOther.Difference(room);
-    //            break;
-
-    //        case Operations.SymmetricDifference:
-    //            room.SymmetricDifference(roomOther);
-    //            break;
-    //    }
-    //    return result;
-    //}
-
-    //private List<Room> RoomCollison()
-    //{
-    //    int Ymax = mapMaxHeight / (roomSizeMax * 2);
-    //    int Xmax = mapMaxWidth / (roomSizeMax * 2);
-    //    int[,] collisionMap = new int[Ymax, Xmax];
-
-    //    Dictionary<int,Vector2Int> roomsCentres = new Dictionary<int, Vector2Int>();
-    //    bool roomsValidated;
-    //    for (int y = 0; y < Ymax; y++)
-    //        for (int x = 0; x < Xmax; x++)
-    //            collisionMap[y, x] = -1;
-    //    do
-    //    {
-    //        roomsValidated = true;
-
-    //        for (int i = 0; i < rooms.Count; i++)
-    //        {
-    //            if (rooms[i] != null)
-    //            {
-    //                if (roomsCentres.ContainsValue(rooms[i].GetPosCenter() / (roomSizeMax * 2)))
-    //                {
-
-    //                    Operations operation;
-    //                    operation = TryOperations(rooms[i], rooms[collisionMap[y, x]], rooms[i].IsProperSubsetOf(rooms[collisionMap[y, x]]));
-    //                    switch (operation)
-    //                    {
-    //                        case Operations.Intersect:
-    //                            rooms[i].Intersect(rooms[collisionMap[y, x]]);
-    //                            rooms[collisionMap[y, x]] = null;
-    //                            break;
-
-    //                        case Operations.Union:
-    //                            rooms[i].Union(rooms[collisionMap[y, x]]);
-    //                            rooms[collisionMap[y, x]] = null;
-    //                            break;
-
-    //                        case Operations.DifferenceAB:
-    //                            rooms[i].Difference(rooms[collisionMap[y, x]]);
-    //                            rooms[collisionMap[y, x]] = null;
-    //                            break;
-
-    //                        case Operations.DifferenceBA:
-    //                            rooms[collisionMap[y, x]].Difference(rooms[i]);
-    //                            rooms[i] = null;
-    //                            break;
-
-    //                        case Operations.SymmetricDifference:
-    //                            rooms[i].SymmetricDifference(rooms[collisionMap[y, x]]);
-    //                            break;
-    //                    }
-    //                }
-    //                else
-    //                    roomsCentres.Add(i,rooms[i].GetPosCenter() / (roomSizeMax * 2));
-
-    //                if (!rooms[i].GetValidation())
-    //                    roomsValidated = false;
-    //            }
-
-    //            collisionMap[roomsCentres[i].y, roomsCentres[i].x] = i;
-    //        }
-    //        for (int i = 0; rooms[i] != null && i < rooms.Count; i++)
-    //        {
-    //            for (int y = roomsCentres[i].y - 1; y < roomsCentres[i].y + 1; y++)
-    //                for (int x = roomsCentres[i].x - 1; y < roomsCentres[i].x + 1; x++)
-    //                    if (collisionMap[y, x] != -1 && collisionMap[y, x] != i && rooms[i].CheckIntersection(rooms[collisionMap[y, x]]))
-    //                    {
-    //                        Operations operation;
-    //                        operation = TryOperations(rooms[i], rooms[collisionMap[y, x]], rooms[i].IsProperSubsetOf(rooms[collisionMap[y, x]]));
-    //                        switch (operation)
-    //                        {
-    //                            case Operations.Intersect:
-    //                                rooms[i].Intersect(rooms[collisionMap[y, x]]);
-    //                                rooms[collisionMap[y, x]] = null;
-    //                                break;
-
-    //                            case Operations.Union:
-    //                                rooms[i].Union(rooms[collisionMap[y, x]]);
-    //                                rooms[collisionMap[y, x]] = null;
-    //                                break;
-
-    //                            case Operations.DifferenceAB:
-    //                                rooms[i].Difference(rooms[collisionMap[y, x]]);
-    //                                rooms[collisionMap[y, x]] = null;
-    //                                break;
-
-    //                            case Operations.DifferenceBA:
-    //                                rooms[collisionMap[y, x]].Difference(rooms[i]);
-    //                                rooms[i] = null;
-    //                                break;
-
-    //                            case Operations.SymmetricDifference:
-    //                                rooms[i].SymmetricDifference(rooms[collisionMap[y, x]]);
-    //                                break;
-    //                        }
-    //                    }
-    //                    else
-    //                    {
-    //                        if (checkConnection && rooms[i].CheckConnection(rooms[collisionMap[y, x]]))
-    //                        {
-    //                            rooms[i].Union(rooms[i]);
-    //                            rooms[i] = null;
-    //                        }
-    //                        else
-    //                            rooms[i].SetValidation(true);
-    //                    }
-    //        }
-    //    }
-    //    while (!roomsValidated);
-    //    List<Room> roomCollison = new List<Room>();
-    //    for (int i = 0; i < rooms.Count; i++)
-    //        if (rooms[i] != null)
-    //            roomCollison.Add(rooms[i]);
-    //    return roomCollison;
-    //}
-    private List<RoomConnection> Triangulation(List<Room> rooms, int maxWidth, int maxHeigth)
-    {
-        List<Vector2> points = new List<Vector2>();
-        for (int i = 0; i < rooms.Count; i++)
-            points.Add(rooms[i].GetPosCenter());
-        Triangle superTriangle = Triangle.SuperTriangle(points, maxWidth, maxHeigth);
-        List<Triangle> triangles = new List<Triangle> { superTriangle };
-
-        for (int i = 0; i < points.Count; i++)
-        {
-            triangles = AddVertex(points[i], i, triangles);
-        }
-        List<RoomConnection> roomConnections = new List<RoomConnection>();
-        for (int i = 0; i < triangles.Count; i++)
-        {
-
-            RoomConnection connection1 = new RoomConnection(triangles[i].edges[0], triangles[i].edges[1], Vector2Int.RoundToInt(triangles[i].posPointFirst), Vector2Int.RoundToInt(triangles[i].posPointSecond));
-            RoomConnection connection2 = new RoomConnection(triangles[i].edges[1], triangles[i].edges[2], Vector2Int.RoundToInt(triangles[i].posPointSecond), Vector2Int.RoundToInt(triangles[i].posPointThird));
-            RoomConnection connection3 = new RoomConnection(triangles[i].edges[2], triangles[i].edges[0], Vector2Int.RoundToInt(triangles[i].posPointThird), Vector2Int.RoundToInt(triangles[i].posPointFirst));
-
-            if (connection1.roomFirst > -1 && connection1.roomSecond > -1 )
-                roomConnections.Add(connection1);
-            if (connection2.roomFirst > -1 && connection2.roomSecond > -1 )
-                roomConnections.Add(connection2);
-            if (connection3.roomFirst > -1 && connection3.roomSecond > -1 )
-                roomConnections.Add(connection3);
-
-        };
-        return roomConnections;
-    }
-    private List<Triangle> AddVertex(Vector2 vertex, int roomId, List<Triangle> triangles)
-    {
-        List<Edge> edges = new List<Edge>();
-        List<Triangle> badTriangles = new List<Triangle>();
-        for (int i = 0; i < triangles.Count; i++)
-        {
-            if (triangles[i].circle.radius != -1)
-            {
-                if (triangles[i].InCircle(vertex))
-                {
-                    edges.Add(new Edge(triangles[i].posPointFirst, triangles[i].posPointSecond, triangles[i].edges[0], triangles[i].edges[1]));
-                    edges.Add(new Edge(triangles[i].posPointSecond, triangles[i].posPointThird, triangles[i].edges[1], triangles[i].edges[2]));
-                    edges.Add(new Edge(triangles[i].posPointThird, triangles[i].posPointFirst, triangles[i].edges[2], triangles[i].edges[0]));
-                    badTriangles.Add(triangles[i]);
-                }
-            }
-        }
-        foreach (Triangle triangle in badTriangles)
-        {
-            triangles.Remove(triangle);
-        }
-        List<Edge> uniqueEdges = new List<Edge>();
-        for (int i = 0; i < edges.Count; i++)
-        {
-            bool isUnique = true;
-            for (int j = 0; j < edges.Count; j++)
-            {
-                if (i != j && edges[i] == edges[j])
-                {
-                    isUnique = false;
-                    break;
-                }
-            }
-            if (isUnique)
-                uniqueEdges.Add(edges[i]);
-        }
-
-        foreach (Edge edge in uniqueEdges)
-        {
-                triangles.Add(new Triangle(edge.posPointFirst, edge.posPointSecond, vertex, new int[3] { edge.idFirst, edge.idSecond, roomId }));
-        }
-        return triangles;
-    }
-
 }
+//private Room OperationApplication(Room room, Room roomOther)
+//{
+//    Room result = null;
+//    Operations operation;
+//    operation = TryOperations(room, roomOther, room.IsProperSubsetOf(roomOther));
+//    switch (operation)
+//    {
+//        case Operations.Intersect:
+//            room.Intersect(roomOther);
+//            break;
 
-public class Edge
-{
-    public int idFirst;
-    public int idSecond;
-    public Vector2 posPointFirst;
-    public Vector2 posPointSecond;
-    public bool isUnque;
+//        case Operations.Union:
+//            room.Union(roomOther);
+//            break;
 
-    public Edge(Vector2 posPointFirst, Vector2 posPointSecond, int idFirst, int idSecond)
-    {
-        this.posPointFirst = posPointFirst;
-        this.posPointSecond = posPointSecond;
-        this.idFirst = idFirst;
-        this.idSecond = idSecond;
-        isUnque = true;
-    }
-    public static bool operator ==(Edge first, Edge second)
-    {
-        return first.posPointFirst == second.posPointFirst && first.posPointSecond == second.posPointSecond
-            || first.posPointFirst == second.posPointSecond && first.posPointSecond == second.posPointFirst;
-    }
-    public static bool operator !=(Edge first, Edge second)
-    {
-        return !(first == second);
-    }
-    public override bool Equals(object other)
-    {
-        if (!(other is Edge))
-        {
-            return false;
-        }
+//        case Operations.DifferenceAB:
+//            room.Difference(roomOther);
+//            break;
 
-        return Equals((Edge)other);
-    }
-    public bool Equals(Edge other)
-    {
-        return posPointFirst == other.posPointFirst && posPointSecond == other.posPointSecond
-        || posPointFirst == other.posPointSecond && posPointSecond == other.posPointFirst;
-    }
-    public override int GetHashCode()
-    {
-        return posPointFirst.GetHashCode() ^ (posPointSecond.GetHashCode() << 2);
-    }
+//        case Operations.DifferenceBA:
+//            roomOther.Difference(room);
+//            break;
 
-}
-public class Triangle
-{
-    public int[] edges;
-    public Vector2 posPointFirst;
-    public Vector2 posPointSecond;
-    public Vector2 posPointThird;
-    public CircumCircle circle;
+//        case Operations.SymmetricDifference:
+//            room.SymmetricDifference(roomOther);
+//            break;
+//    }
+//    return result;
+//}
 
-    public Triangle(Vector2 posPointFirst, Vector2 posPointSecond, Vector2 posPointThird, int[] edgesId)
-    {
-        this.posPointFirst = posPointFirst;
-        this.posPointSecond = posPointSecond;
-        this.posPointThird = posPointThird;
-        circle = new CircumCircle(posPointFirst, posPointSecond, posPointThird);
-        edges = edgesId;
-    }
-    public static Triangle SuperTriangle(List<Vector2> pointsList, int maxWidth, int maxHeigth)
-    {
-        int offsetX = maxWidth * 4;
-        int offsetY = maxHeigth * 4;
-        return new Triangle(new Vector2(0 - offsetX, 0 - offsetY), new Vector2(maxWidth + offsetX, 0 - offsetY), new Vector2(maxWidth + offsetX, maxHeigth + offsetY), new int[3] { -1, -2, -3 });
-    }
-    public bool InCircle(Vector2 vertex)
-    {
-        if ((vertex.x - circle.center.x) * (vertex.x - circle.center.x)  + (vertex.y - circle.center.y) * (vertex.y - circle.center.y) <= circle.radius * circle.radius)
-            return true;
-        else
-            return false;
-    }
-    public class CircumCircle
-    {
-        public Vector2 center;
-        public float radius;
-        public CircumCircle(Vector2 posPointFirst, Vector2 posPointSecond, Vector2 posPointThird)
-        {
-            if (!IsPerpendicular(posPointFirst, posPointSecond, posPointThird))
-                getCircumCircle(posPointFirst, posPointSecond, posPointThird);
-            else if (!IsPerpendicular(posPointFirst, posPointThird, posPointSecond))
-                getCircumCircle(posPointFirst, posPointThird, posPointSecond);
-            else if (!IsPerpendicular(posPointSecond, posPointFirst, posPointThird))
-                getCircumCircle(posPointSecond, posPointFirst, posPointThird);
-            else if (!IsPerpendicular(posPointSecond, posPointThird, posPointFirst))
-                getCircumCircle(posPointSecond, posPointThird, posPointFirst);
-            else if (!IsPerpendicular(posPointThird, posPointSecond, posPointFirst))
-                getCircumCircle(posPointThird, posPointSecond, posPointFirst);
-            else if (!IsPerpendicular(posPointThird, posPointFirst, posPointSecond))
-                getCircumCircle(posPointThird, posPointFirst, posPointSecond);
-            else
-            {
-                //The three points are perpendicular to axis
-                radius = -1;
-            }
-        }
-        private bool IsPerpendicular(Vector2 posPointFirst, Vector2 posPointSecond, Vector2 posPointThird)
-        {
-            float deltaYSecondFirst = Math.Abs(posPointSecond.y - posPointFirst.y);
-            float deltaXSecondFirst = Math.Abs(posPointSecond.x - posPointFirst.x);
-            float deltaYThirdSecond = Math.Abs(posPointThird.y - posPointSecond.y);
-            float deltaXThirdSecond = Math.Abs(posPointThird.x - posPointSecond.x);
-            //The points are pependicular and parallel to x-y axis
-            if (deltaXSecondFirst <= 0.0000001f && deltaYThirdSecond <= 0.0000001f)
-                return false;
-            //A line of two point are perpendicular to x - axis
-            if (deltaYSecondFirst <= 0.0000001f)
-                return true;
-            //A line of two point are perpendicular to x - axis
-            else if (deltaYThirdSecond <= 0.0000001f)
-                return true;
-            //A line of two point are perpendicular to y - axis
-            else if (deltaXSecondFirst <= 0.0000001f)
-                return true;
-            //A line of two point are perpendicular to y - axis
-            else if (deltaXThirdSecond <= 0.0000001f)
-                return true;
-            return false;
-        }
+//private List<Room> RoomCollison()
+//{
+//    int Ymax = mapMaxHeight / (roomSizeMax * 2);
+//    int Xmax = mapMaxWidth / (roomSizeMax * 2);
+//    int[,] collisionMap = new int[Ymax, Xmax];
 
-        private void getCircumCircle(Vector2 posPointFirst, Vector2 posPointSecond, Vector2 posPointThird)
-        {
-            float deltaYSecondFirst = Math.Abs(posPointSecond.y - posPointFirst.y);
-            float deltaXSecondFirst = Math.Abs(posPointSecond.x - posPointFirst.x);
-            float deltaYThirdSecond = Math.Abs(posPointThird.y - posPointSecond.y);
-            float deltaXThirdSecond = Math.Abs(posPointThird.x - posPointSecond.x);
-            if (deltaXSecondFirst <= 0.0000001f && deltaYThirdSecond <= 0.0000001f)
-            {
-                center = new Vector2(posPointSecond.x + posPointThird.x, posPointFirst.y + posPointSecond.y) * 0.5f;
-                radius = Math.Max(Math.Max(Vector2.Distance(center, posPointFirst), Vector2.Distance(center, posPointSecond)), Vector2.Distance(center, posPointThird));
-                return;
-            }
-            float slopeFirst = deltaYSecondFirst / deltaXSecondFirst;
-            float slopeSecond = deltaYThirdSecond / deltaXThirdSecond;
-            if (Math.Abs(slopeFirst - slopeSecond) <= 0.0000001f)
-            {
-                radius = -1;
-                return;
-            }
-            float x = (slopeFirst * slopeSecond * (posPointFirst.y - posPointThird.y) + slopeSecond * (posPointFirst.x + posPointSecond.x) - slopeFirst * (posPointSecond.x + posPointThird.x))
-                / (2 * (slopeSecond - slopeFirst));
-            float y = -1 * (x - (posPointFirst.x + posPointSecond.x) / 2) / slopeFirst + (posPointFirst.y + posPointSecond.y) / 2;
-            center = new Vector2(x, y);
-            radius = Math.Max(Math.Max(Vector2.Distance(center, posPointFirst), Vector2.Distance(center, posPointSecond)), Vector2.Distance(center, posPointThird));
-        }
-    }
-}
-public class RoomConnection
-{
-    public int roomFirst,
-        roomSecond;
-    public Vector2Int posFirst,
-        posSecond;
+//    Dictionary<int,Vector2Int> roomsCentres = new Dictionary<int, Vector2Int>();
+//    bool roomsValidated;
+//    for (int y = 0; y < Ymax; y++)
+//        for (int x = 0; x < Xmax; x++)
+//            collisionMap[y, x] = -1;
+//    do
+//    {
+//        roomsValidated = true;
 
-    public RoomConnection(int roomFirstID, int roomSecondID, Vector2Int firstPos, Vector2Int secondPos)
-    {
-        roomFirst = roomFirstID;
-        roomSecond = roomSecondID;
-        posFirst = firstPos;
-        posSecond = secondPos;
+//        for (int i = 0; i < rooms.Count; i++)
+//        {
+//            if (rooms[i] != null)
+//            {
+//                if (roomsCentres.ContainsValue(rooms[i].GetPosCenter() / (roomSizeMax * 2)))
+//                {
 
-    }
+//                    Operations operation;
+//                    operation = TryOperations(rooms[i], rooms[collisionMap[y, x]], rooms[i].IsProperSubsetOf(rooms[collisionMap[y, x]]));
+//                    switch (operation)
+//                    {
+//                        case Operations.Intersect:
+//                            rooms[i].Intersect(rooms[collisionMap[y, x]]);
+//                            rooms[collisionMap[y, x]] = null;
+//                            break;
 
-    public static bool operator ==(RoomConnection first, RoomConnection second)
-    {
-        return first.posFirst == second.posFirst && first.posSecond == second.posSecond
-            || first.posFirst == second.posSecond && first.posSecond == second.posFirst;
-    }
-    public static bool operator !=(RoomConnection first, RoomConnection second)
-    {
-        return !(first == second);
-    }
-    public override bool Equals(object other)
-    {
-        if (!(other is RoomConnection))
-        {
-            return false;
-        }
+//                        case Operations.Union:
+//                            rooms[i].Union(rooms[collisionMap[y, x]]);
+//                            rooms[collisionMap[y, x]] = null;
+//                            break;
 
-        return Equals((RoomConnection)other);
-    }
-    public bool Equals(RoomConnection other)
-    {
-        return posFirst == other.posFirst && posSecond == other.posSecond
-        || posFirst == other.posSecond && posSecond == other.posFirst;
-    }
-    public override int GetHashCode()
-    {
-        return posFirst.GetHashCode() ^ (posSecond.GetHashCode() << 2);
-    }
+//                        case Operations.DifferenceAB:
+//                            rooms[i].Difference(rooms[collisionMap[y, x]]);
+//                            rooms[collisionMap[y, x]] = null;
+//                            break;
 
-}
+//                        case Operations.DifferenceBA:
+//                            rooms[collisionMap[y, x]].Difference(rooms[i]);
+//                            rooms[i] = null;
+//                            break;
+
+//                        case Operations.SymmetricDifference:
+//                            rooms[i].SymmetricDifference(rooms[collisionMap[y, x]]);
+//                            break;
+//                    }
+//                }
+//                else
+//                    roomsCentres.Add(i,rooms[i].GetPosCenter() / (roomSizeMax * 2));
+
+//                if (!rooms[i].GetValidation())
+//                    roomsValidated = false;
+//            }
+
+//            collisionMap[roomsCentres[i].y, roomsCentres[i].x] = i;
+//        }
+//        for (int i = 0; rooms[i] != null && i < rooms.Count; i++)
+//        {
+//            for (int y = roomsCentres[i].y - 1; y < roomsCentres[i].y + 1; y++)
+//                for (int x = roomsCentres[i].x - 1; y < roomsCentres[i].x + 1; x++)
+//                    if (collisionMap[y, x] != -1 && collisionMap[y, x] != i && rooms[i].CheckIntersection(rooms[collisionMap[y, x]]))
+//                    {
+//                        Operations operation;
+//                        operation = TryOperations(rooms[i], rooms[collisionMap[y, x]], rooms[i].IsProperSubsetOf(rooms[collisionMap[y, x]]));
+//                        switch (operation)
+//                        {
+//                            case Operations.Intersect:
+//                                rooms[i].Intersect(rooms[collisionMap[y, x]]);
+//                                rooms[collisionMap[y, x]] = null;
+//                                break;
+
+//                            case Operations.Union:
+//                                rooms[i].Union(rooms[collisionMap[y, x]]);
+//                                rooms[collisionMap[y, x]] = null;
+//                                break;
+
+//                            case Operations.DifferenceAB:
+//                                rooms[i].Difference(rooms[collisionMap[y, x]]);
+//                                rooms[collisionMap[y, x]] = null;
+//                                break;
+
+//                            case Operations.DifferenceBA:
+//                                rooms[collisionMap[y, x]].Difference(rooms[i]);
+//                                rooms[i] = null;
+//                                break;
+
+//                            case Operations.SymmetricDifference:
+//                                rooms[i].SymmetricDifference(rooms[collisionMap[y, x]]);
+//                                break;
+//                        }
+//                    }
+//                    else
+//                    {
+//                        if (checkConnection && rooms[i].CheckConnection(rooms[collisionMap[y, x]]))
+//                        {
+//                            rooms[i].Union(rooms[i]);
+//                            rooms[i] = null;
+//                        }
+//                        else
+//                            rooms[i].SetValidation(true);
+//                    }
+//        }
+//    }
+//    while (!roomsValidated);
+//    List<Room> roomCollison = new List<Room>();
+//    for (int i = 0; i < rooms.Count; i++)
+//        if (rooms[i] != null)
+//            roomCollison.Add(rooms[i]);
+//    return roomCollison;
+//}
+

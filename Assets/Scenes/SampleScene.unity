@@ -1348,9 +1348,9 @@ MonoBehaviour:
   startPosition: {x: 0, y: 0}
   seed: 0
   wallsGenerator: {fileID: 1874707296}
-  radiusOfRoomSpawn: 120
-  roomNumberMin: 16
-  roomNumberMax: 64
+  radiusOfRoomSpawn: 20
+  roomNumberMin: 4
+  roomNumberMax: 6
   roomSizeMax: 16
   checkConnection: 1
 --- !u!4 &2087062190
