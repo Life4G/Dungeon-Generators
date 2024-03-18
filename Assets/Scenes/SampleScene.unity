@@ -471,15 +471,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   styleName: Inversion
   styleTilemap: {fileID: 1975189474}
-  floorTile: {fileID: 11400000, guid: ecf75e7f874b13f4792d2d94e41dfc7b, type: 2}
-  leftWallTile: {fileID: 0}
-  rightWallTile: {fileID: 0}
-  bottomWallTile: {fileID: 0}
-  topWallTile: {fileID: 0}
-  topLeftCornerTile: {fileID: 0}
-  topRightCornerTile: {fileID: 0}
-  bottomLeftCornerTile: {fileID: 0}
-  bottomRightCornerTile: {fileID: 0}
+  floorTile: {fileID: 11400000, guid: 39ff40a176af8df47832be92cecdb59b, type: 2}
+  leftWallTile: {fileID: 11400000, guid: 8766b0593a2f59941940bda8e1122d98, type: 2}
+  rightWallTile: {fileID: 11400000, guid: 8766b0593a2f59941940bda8e1122d98, type: 2}
+  bottomWallTile: {fileID: 11400000, guid: 1371cbb55d4838342ba37f0e93375093, type: 2}
+  topWallTile: {fileID: 11400000, guid: 1371cbb55d4838342ba37f0e93375093, type: 2}
+  topLeftCornerTile: {fileID: 11400000, guid: 79f87c6bfb4a1de4b8d08b445795b13d, type: 2}
+  topRightCornerTile: {fileID: 11400000, guid: a46ac8fd56904b644971c49f46c56b83, type: 2}
+  bottomLeftCornerTile: {fileID: 11400000, guid: dd92f516d98d19b4e805e96c5e132d50, type: 2}
+  bottomRightCornerTile: {fileID: 11400000, guid: 5ed6a16687cb95c4f9c5d8b727c1adc2, type: 2}
 --- !u!1 &1145150982
 GameObject:
   m_ObjectHideFlags: 0
@@ -724,7 +724,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   grid: {fileID: 809028529}
-  seed: 1019924855
+  seed: -1189784670
   isNew: 0
 --- !u!1 &1588477589
 GameObject:
@@ -908,15 +908,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   styleName: Normal
   styleTilemap: {fileID: 1975189474}
-  floorTile: {fileID: 11400000, guid: 9fa9eb31c46b8164bbfc0eb1bbb67871, type: 2}
-  leftWallTile: {fileID: 0}
-  rightWallTile: {fileID: 0}
-  bottomWallTile: {fileID: 0}
-  topWallTile: {fileID: 0}
-  topLeftCornerTile: {fileID: 0}
-  topRightCornerTile: {fileID: 0}
-  bottomLeftCornerTile: {fileID: 0}
-  bottomRightCornerTile: {fileID: 0}
+  floorTile: {fileID: 11400000, guid: 7aefbdc9511e076439e0013a4615f8d1, type: 2}
+  leftWallTile: {fileID: 11400000, guid: 1b18e70986b36c042907752f50e415ed, type: 2}
+  rightWallTile: {fileID: 11400000, guid: 1b18e70986b36c042907752f50e415ed, type: 2}
+  bottomWallTile: {fileID: 11400000, guid: 7b55e8ea480ba6e43b44ac53b81ea67d, type: 2}
+  topWallTile: {fileID: 11400000, guid: 7b55e8ea480ba6e43b44ac53b81ea67d, type: 2}
+  topLeftCornerTile: {fileID: 11400000, guid: 25c1cb5f186e9b24c809149a9363f21f, type: 2}
+  topRightCornerTile: {fileID: 11400000, guid: acf1073695e4dfc4a81b59b32af6ac0e, type: 2}
+  bottomLeftCornerTile: {fileID: 11400000, guid: 072c11bc4498c3e4d9432b8309a95cbe, type: 2}
+  bottomRightCornerTile: {fileID: 11400000, guid: 79918bb5ff9a9af47a8c4e28975826c7, type: 2}
 --- !u!1 &1653075063
 GameObject:
   m_ObjectHideFlags: 0
@@ -1348,9 +1348,9 @@ MonoBehaviour:
   startPosition: {x: 0, y: 0}
   seed: 0
   wallsGenerator: {fileID: 1874707296}
-  radiusOfRoomSpawn: 20
-  roomNumberMin: 4
-  roomNumberMax: 6
+  radiusOfRoomSpawn: 100
+  roomNumberMin: 10
+  roomNumberMax: 32
   roomSizeMax: 16
   checkConnection: 1
 --- !u!4 &2087062190

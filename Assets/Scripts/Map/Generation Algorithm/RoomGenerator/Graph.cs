@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using UnityEngine;
 using static UnityEngine.ParticleSystem;
@@ -13,6 +14,7 @@ public class Graph
     {
         vertices = rooms.ToList();
         edges = Triangulation(vertices, maxWidth, maxHeigth);
+        //edges = SpanningTree(vertices, edges);
     }
     public bool IsAdjucent(int room, int roomOther)
     {
@@ -41,9 +43,9 @@ public class Graph
         return neighbors;
 
     }
-    public List<GraphEdge> SpanningTree(List<GraphEdge> edges)
+    public List<GraphEdge> SpanningTree(List<Room> rooms, List<GraphEdge> edges)
     {
-        // Create an adjacency list representation of the graph
+
         List<List<int[]>> adj = new List<List<int[]>>();
         List<GraphEdge> edgesSpanned = new List<GraphEdge>();
         for (int i = 0; i < vertices.Count; i++)
@@ -51,7 +53,7 @@ public class Graph
             adj.Add(new List<int[]>());
         }
 
-        // Fill the adjacency list with edges and their weights
+
         for (int i = 0; i < edges.Count; i++)
         {
             int u = edges[i].idRoomFirst;
@@ -61,131 +63,177 @@ public class Graph
             adj[v].Add(new int[] { u, wt });
         }
 
-        // Create a priority queue to store edges with their weights
+
         PriorityQueue<(int, int)> pq = new PriorityQueue<(int, int)>();
 
-        // Create a visited array to keep track of visited vertices
+
         bool[] visited = new bool[vertices.Count];
 
-        // Variable to store the result (sum of edge weights)
+
         int res = 0;
 
-        // Start with vertex 0
+
         pq.Enqueue((0, 0));
         int prev = 0;
 
-        // Perform Prim's algorithm to find the Minimum Spanning Tree
+
         while (pq.Count > 0)
         {
             var p = pq.Dequeue();
-            int wt = p.Item1; // Weight of the edge
-            int u = p.Item2; // Vertex connected to the edge
+            int wt = p.Item1;
+            int u = p.Item2;
 
             if (visited[u])
             {
-                continue; // Skip if the vertex is already visited
+                continue;
             }
 
-            res += wt; // Add the edge weight to the result
-            edgesSpanned.Add(new GraphEdge(prev, u, wt));
-            visited[u] = true; // Mark the vertex as visited
+            res += wt;
+            edgesSpanned.Add(new GraphEdge(prev, u, rooms[prev].GetPosCenter(), rooms[u].GetPosCenter()));
+            prev = u;
+            visited[u] = true;
 
-            // Explore the adjacent vertices
             foreach (var v in adj[u])
             {
-                // v[0] represents the vertex and v[1] represents the edge weight
                 if (!visited[v[0]])
                 {
-                    pq.Enqueue((v[1], v[0])); // Add the adjacent edge to the priority queue
+                    pq.Enqueue((v[1], v[0]));
                 }
             }
         }
 
-        return edgesSpanned; // Return the sum of edge weights of the Minimum Spanning Tree
+        return edgesSpanned;
     }
     private List<GraphEdge> Triangulation(List<Room> rooms, int maxWidth, int maxHeigth)
     {
+        List<GraphEdge> edges = new List<GraphEdge>();
+
         List<Vector2> points = new List<Vector2>();
         for (int i = 0; i < rooms.Count; i++)
             points.Add(rooms[i].GetPosCenter());
 
-        List<Triangle> triangles = new List<Triangle> { Triangle.SuperTriangle(points, maxWidth, maxHeigth) };
-
-        for (int i = 0; i < points.Count; i++)
+        Triangle superTriangle = Triangle.SuperTriangle(maxWidth, maxHeigth);
+        List<Triangle> triangles = new List<Triangle> { superTriangle };
+        for (int vertId = 0; vertId < points.Count; vertId++)
         {
-            triangles = AddVertex(points[i], i, triangles);
-        }
-        List<GraphEdge> roomConnections = new List<GraphEdge>();
-        for (int i = 0; i < triangles.Count; i++)
-        {
-
-            GraphEdge connection1 = new GraphEdge(triangles[i].edges[0], triangles[i].edges[1]);
-            GraphEdge connection2 = new GraphEdge(triangles[i].edges[1], triangles[i].edges[2]);
-            GraphEdge connection3 = new GraphEdge(triangles[i].edges[2], triangles[i].edges[0]);
-
-            if (connection1.idRoomFirst > -1 && connection1.idRoomSecond > -1)
+            List<Triangle> badTriangles = new List<Triangle>();
+            List<GraphEdge> badEdges = new List<GraphEdge>();
+            foreach (Triangle triangle in triangles)
             {
-                connection1.SetPoses(vertices[connection1.idRoomFirst].GetPosCenter(), vertices[connection1.idRoomSecond].GetPosCenter());
-                roomConnections.Add(connection1);
-            }
-            if (connection2.idRoomFirst > -1 && connection2.idRoomSecond > -1)
-            {
-                connection2.SetPoses(vertices[connection2.idRoomFirst].GetPosCenter(), vertices[connection2.idRoomSecond].GetPosCenter());
-                roomConnections.Add(connection2);
-            }
-            if (connection3.idRoomFirst > -1 && connection3.idRoomSecond > -1)
-            {
-                connection3.SetPoses(vertices[connection3.idRoomFirst].GetPosCenter(), vertices[connection3.idRoomSecond].GetPosCenter());
-                roomConnections.Add(connection3);
-            }
-
-        };
-        return roomConnections;
-    }
-    private List<Triangle> AddVertex(Vector2 vertex, int roomId, List<Triangle> triangles)
-    {
-        List<GraphEdge> edges = new List<GraphEdge>();
-        List<Triangle> badTriangles = new List<Triangle>();
-        for (int i = 0; i < triangles.Count; i++)
-        {
-            if (triangles[i].circle.radius != -1)
-            {
-                if (triangles[i].InCircle(vertex))
+                if (triangle.ContainsPoint(points[vertId]))
                 {
-                    badTriangles.Add(triangles[i]);
+                    badTriangles.Add(triangle);
+                    foreach (GraphEdge badEdge in triangle.edges)
+                        badEdges.Add(badEdge);
                 }
             }
-        }
-        foreach (Triangle badTriangle in badTriangles)
-        {
-            edges.Add(new GraphEdge(badTriangle.edges[0], badTriangle.edges[1], badTriangle.posPointFirst, badTriangle.posPointSecond));
-            edges.Add(new GraphEdge(badTriangle.edges[1], badTriangle.edges[2], badTriangle.posPointSecond, badTriangle.posPointThird));
-            edges.Add(new GraphEdge(badTriangle.edges[2], badTriangle.edges[0], badTriangle.posPointThird, badTriangle.posPointFirst));
-            triangles.Remove(badTriangle);
-        }
-        List<GraphEdge> uniqueEdges = new List<GraphEdge>();
-
-        for (int i = 0; i < edges.Count; i++)
-        {
-            bool isUnique = true;
-            for (int j = 0; j < edges.Count; j++)
+            List<GraphEdge> polygon = new List<GraphEdge>();
+            for (int i = 0; i < badEdges.Count; i++)
             {
-                if (i != j && edges[i] == edges[j])
+                bool isUnique = true;
+                for (int j = 0; j < badEdges.Count; j++)
                 {
-                    isUnique = false;
-                    break;
+                    if (i != j && badEdges[i] == badEdges[j])
+                    {
+                        isUnique = false;
+                        break;
+                    }
                 }
+                if (isUnique)
+                    polygon.Add(badEdges[i]);
             }
-            if (isUnique)
-                uniqueEdges.Add(edges[i]);
+            foreach (Triangle badTriangle in badTriangles)
+            {
+                triangles.Remove(badTriangle);
+            }
+            foreach (GraphEdge edge in polygon)
+            {
+                triangles.Add(new Triangle(edge, points[vertId], vertId));
+            }
         }
+        foreach (Triangle triangle in triangles)
+            foreach (GraphEdge edge in triangle.edges)
+                if (!edge.Contains(-1) && !edge.Contains(-2) && !edge.Contains(-3) && !edges.Contains(edge))
+                    edges.Add(edge);
 
-        foreach (GraphEdge edge in uniqueEdges)
-        {
-            triangles.Add(new Triangle(edge.posPointFirst, edge.posPointSecond, vertex, new int[3] { edge.idRoomFirst, edge.idRoomSecond, roomId }));
-        }
-        return triangles;
+
+        return edges;
     }
+
+    //    List<Vector2> points = new List<Vector2>();
+    //    for (int i = 0; i < rooms.Count; i++)
+    //        points.Add(rooms[i].GetPosCenter());
+    //    List<Triangle> triangles = new List<Triangle> { Triangle.SuperTriangle(points, maxWidth, maxHeigth) };
+    //    for (int i = 0; i < points.Count; i++)
+    //    {
+    //        triangles = AddVertex(points[i], i, triangles);
+    //    }
+    //    List<GraphEdge> roomConnections = new List<GraphEdge>();
+    //    for (int i = 0; i < triangles.Count; i++)
+    //    {
+    //        GraphEdge connection1 = new GraphEdge(triangles[i].edges[0], triangles[i].edges[1]);
+    //        GraphEdge connection2 = new GraphEdge(triangles[i].edges[1], triangles[i].edges[2]);
+    //        GraphEdge connection3 = new GraphEdge(triangles[i].edges[2], triangles[i].edges[0]);
+    //        if (connection1.idRoomFirst > -1 && connection1.idRoomSecond > -1)
+    //        {
+    //            connection1.SetPoses(vertices[connection1.idRoomFirst].GetPosCenter(), vertices[connection1.idRoomSecond].GetPosCenter());
+    //            roomConnections.Add(connection1);
+    //        }
+    //        if (connection2.idRoomFirst > -1 && connection2.idRoomSecond > -1)
+    //        {
+    //            connection2.SetPoses(vertices[connection2.idRoomFirst].GetPosCenter(), vertices[connection2.idRoomSecond].GetPosCenter());
+    //            roomConnections.Add(connection2);
+    //        }
+    //        if (connection3.idRoomFirst > -1 && connection3.idRoomSecond > -1)
+    //        {
+    //            connection3.SetPoses(vertices[connection3.idRoomFirst].GetPosCenter(), vertices[connection3.idRoomSecond].GetPosCenter());
+    //            roomConnections.Add(connection3);
+    //        }
+    //    };
+    //    return roomConnections;
+    //}
+    //private List<Triangle> AddVertex(Vector2 vertex, int roomId, List<Triangle> triangles)
+    //{
+    //    List<GraphEdge> edges = new List<GraphEdge>();
+    //    List<Triangle> badTriangles = new List<Triangle>();
+    //    for (int i = 0; i < triangles.Count; i++)
+    //    {
+    //        if (triangles[i].circle.radius != -1)
+    //        {
+    //            if (triangles[i].InCircle(vertex))
+    //            {
+    //                badTriangles.Add(triangles[i]);
+    //            }
+    //        }
+    //    }
+    //    foreach (Triangle badTriangle in badTriangles)
+    //    {
+    //        edges.Add(new GraphEdge(badTriangle.edges[0], badTriangle.edges[1], badTriangle.posPointFirst, badTriangle.posPointSecond));
+    //        edges.Add(new GraphEdge(badTriangle.edges[1], badTriangle.edges[2], badTriangle.posPointSecond, badTriangle.posPointThird));
+    //        edges.Add(new GraphEdge(badTriangle.edges[2], badTriangle.edges[0], badTriangle.posPointThird, badTriangle.posPointFirst));
+    //        triangles.Remove(badTriangle);
+    //    }
+    //    List<GraphEdge> uniqueEdges = new List<GraphEdge>();
+    //    for (int i = 0; i < edges.Count; i++)
+    //    {
+    //        bool isUnique = true;
+    //        for (int j = 0; j < edges.Count; j++)
+    //        {
+    //            if (i != j && edges[i] == edges[j])
+    //            {
+    //                isUnique = false;
+    //                break;
+    //            }
+    //        }
+    //        if (isUnique)
+    //            uniqueEdges.Add(edges[i]);
+    //    }
+    //    foreach (GraphEdge edge in uniqueEdges)
+    //    {
+    //        triangles.Add(new Triangle(edge.posPointFirst, edge.posPointSecond, vertex, new int[3] { edge.idRoomFirst, edge.idRoomSecond, roomId }));
+    //    }
+    //    return triangles;
+    //}
 }
 
 public class GraphEdge
@@ -200,18 +248,14 @@ public class GraphEdge
         this.idRoomFirst = idFirst;
         this.idRoomSecond = idSecond;
     }
-    public GraphEdge(int idFirst, int idSecond, int length)
-    {
-        this.idRoomFirst = idFirst;
-        this.idRoomSecond = idSecond;
-        this.length = length;
-    }
     public GraphEdge(int idFirst, int idSecond, Vector2 posPointFirst, Vector2 posPointSecond)
     {
         this.idRoomFirst = idFirst;
         this.idRoomSecond = idSecond;
         this.posPointFirst = posPointFirst;
         this.posPointSecond = posPointSecond;
+        this.length = (int)Vector2.Distance(posPointFirst, posPointSecond);
+
     }
     public static bool operator ==(GraphEdge first, GraphEdge second)
     {
@@ -269,25 +313,49 @@ public class GraphEdge
 
 public class Triangle
 {
-    public int[] edges;
-    public Vector2 posPointFirst;
-    public Vector2 posPointSecond;
-    public Vector2 posPointThird;
+    public GraphEdge[] edges;
     public CircumCircle circle;
 
     public Triangle(Vector2 posPointFirst, Vector2 posPointSecond, Vector2 posPointThird, int[] edgesId)
     {
-        this.posPointFirst = posPointFirst;
-        this.posPointSecond = posPointSecond;
-        this.posPointThird = posPointThird;
+        edges = new GraphEdge[3]
+        {
+            new GraphEdge(edgesId[0], edgesId[1],posPointFirst, posPointSecond ),
+            new GraphEdge(edgesId[1], edgesId[2],posPointSecond, posPointThird) ,
+            new GraphEdge(edgesId[2], edgesId[0],posPointThird, posPointFirst )
+        };
         circle = new CircumCircle(posPointFirst, posPointSecond, posPointThird);
-        edges = edgesId;
     }
-    public static Triangle SuperTriangle(List<Vector2> pointsList, int maxWidth, int maxHeigth)
+    public Triangle(Vector2 posPointFirst, Vector2 posPointSecond, Vector2 posPointThird)
     {
-        int offsetX = maxWidth * 4;
-        int offsetY = maxHeigth * 4;
-        return new Triangle(new Vector2(0 - offsetX * 2, 0 - offsetY * 2), new Vector2(maxWidth + offsetX, 0 - offsetY * 2), new Vector2(maxWidth + offsetX, maxHeigth + offsetY), new int[3] { -1, -2, -3 });
+        edges = new GraphEdge[3]
+        {
+            new GraphEdge(-1, -2,posPointFirst, posPointSecond ),
+            new GraphEdge(-2, -3,posPointSecond, posPointThird) ,
+            new GraphEdge(-3, -1,posPointThird, posPointFirst )
+        };
+        circle = new CircumCircle(posPointFirst, posPointSecond, posPointThird);
+
+    }
+    public Triangle(GraphEdge edge, Vector2 point, int vertexId)
+    {
+        edges = new GraphEdge[3]
+        {
+            new GraphEdge(edge.idRoomFirst, edge.idRoomSecond,edge.posPointFirst, edge.posPointSecond),
+            new GraphEdge(edge.idRoomSecond, vertexId,edge.posPointSecond, point) ,
+            new GraphEdge(vertexId, edge.idRoomFirst,point, edge.posPointFirst)
+        };
+        circle = new CircumCircle(edge.posPointFirst, edge.posPointSecond, point);
+
+    }
+    public static Triangle SuperTriangle(int maxWidth, int maxHeigth)
+    {
+        int margin = 1000;
+        Vector2 point1 = new Vector2(0.5f * maxWidth, -2 * maxWidth - margin);
+        Vector2 point2 = new Vector2(-2 * maxHeigth - margin, 2 * maxHeigth + margin);
+        Vector2 point3 = new Vector2(2 * maxWidth + maxHeigth + margin, 2 * maxHeigth + margin);
+        return new Triangle(point1, point2, point3);
+
     }
     public bool InCircle(Vector2 vertex)
     {
@@ -295,6 +363,28 @@ public class Triangle
             return true;
         else
             return false;
+    }
+    public bool Contains(GraphEdge edge)
+    {
+        foreach (GraphEdge edgeTrianlge in edges)
+        {
+            if (edgeTrianlge == edge)
+                return true;
+        }
+        return false;
+    }
+    public bool SuperTriangleCheck()
+    {
+        foreach (GraphEdge edge in edges)
+        {
+            if (edge.idRoomFirst < 0 || edge.idRoomSecond < 0)
+                return true;
+        }
+        return false;
+    }
+    public bool ContainsPoint(Vector2 point)
+    {
+        return circle.ContainsPoint(point);
     }
 }
 
@@ -304,74 +394,31 @@ public class CircumCircle
     public float radius;
     public CircumCircle(Vector2 posPointFirst, Vector2 posPointSecond, Vector2 posPointThird)
     {
-        if (!IsPerpendicular(posPointFirst, posPointSecond, posPointThird))
-            getCircumCircle(posPointFirst, posPointSecond, posPointThird);
-        else if (!IsPerpendicular(posPointFirst, posPointThird, posPointSecond))
-            getCircumCircle(posPointFirst, posPointThird, posPointSecond);
-        else if (!IsPerpendicular(posPointSecond, posPointFirst, posPointThird))
-            getCircumCircle(posPointSecond, posPointFirst, posPointThird);
-        else if (!IsPerpendicular(posPointSecond, posPointThird, posPointFirst))
-            getCircumCircle(posPointSecond, posPointThird, posPointFirst);
-        else if (!IsPerpendicular(posPointThird, posPointSecond, posPointFirst))
-            getCircumCircle(posPointThird, posPointSecond, posPointFirst);
-        else if (!IsPerpendicular(posPointThird, posPointFirst, posPointSecond))
-            getCircumCircle(posPointThird, posPointFirst, posPointSecond);
-        else
+        var p0 = posPointFirst;
+        var p1 = posPointSecond;
+        var p2 = posPointThird;
+        var dA = p0.x * p0.x + p0.y * p0.y;
+        var dB = p1.x * p1.x + p1.y * p1.y;
+        var dC = p2.x * p2.x + p2.y * p2.y;
+
+        var aux1 = (dA * (p2.y - p1.y) + dB * (p0.y - p2.y) + dC * (p1.y - p0.y));
+        var aux2 = -(dA * (p2.x - p1.x) + dB * (p0.x - p2.x) + dC * (p1.x - p0.x));
+        var div = (2 * (p0.x * (p2.y - p1.y) + p1.x * (p0.y - p2.y) + p2.x * (p1.y - p0.y)));
+
+        if (div == 0)
         {
-            //The three points are perpendicular to axis
-            radius = -1;
+            throw new DivideByZeroException();
         }
-    }
-    private bool IsPerpendicular(Vector2 posPointFirst, Vector2 posPointSecond, Vector2 posPointThird)
-    {
-        float deltaYSecondFirst = Math.Abs(posPointSecond.y - posPointFirst.y);
-        float deltaXSecondFirst = Math.Abs(posPointSecond.x - posPointFirst.x);
-        float deltaYThirdSecond = Math.Abs(posPointThird.y - posPointSecond.y);
-        float deltaXThirdSecond = Math.Abs(posPointThird.x - posPointSecond.x);
-        //The points are pependicular and parallel to x-y axis
-        if (deltaXSecondFirst <= 0.0000001f && deltaYThirdSecond <= 0.0000001f)
-            return false;
-        //A line of two point are perpendicular to x - axis
-        if (deltaYSecondFirst <= 0.0000001f)
-            return true;
-        //A line of two point are perpendicular to x - axis
-        else if (deltaYThirdSecond <= 0.0000001f)
-            return true;
-        //A line of two point are perpendicular to y - axis
-        else if (deltaXSecondFirst <= 0.0000001f)
-            return true;
-        //A line of two point are perpendicular to y - axis
-        else if (deltaXThirdSecond <= 0.0000001f)
-            return true;
-        return false;
+        center = new Vector2(aux1 / div, aux2 / div);
+        radius = Vector2.Distance(center, posPointFirst);
     }
 
-    private void getCircumCircle(Vector2 posPointFirst, Vector2 posPointSecond, Vector2 posPointThird)
+    public bool ContainsPoint(Vector2 point)
     {
-        float deltaYSecondFirst = Math.Abs(posPointSecond.y - posPointFirst.y);
-        float deltaXSecondFirst = Math.Abs(posPointSecond.x - posPointFirst.x);
-        float deltaYThirdSecond = Math.Abs(posPointThird.y - posPointSecond.y);
-        float deltaXThirdSecond = Math.Abs(posPointThird.x - posPointSecond.x);
-        if (deltaXSecondFirst <= 0.0000001f && deltaYThirdSecond <= 0.0000001f)
-        {
-            center = new Vector2(posPointSecond.x + posPointThird.x, posPointFirst.y + posPointSecond.y) * 0.5f;
-            radius = Math.Max(Math.Max(Vector2.Distance(center, posPointFirst), Vector2.Distance(center, posPointSecond)), Vector2.Distance(center, posPointThird));
-            return;
-        }
-        float slopeFirst = deltaYSecondFirst / deltaXSecondFirst;
-        float slopeSecond = deltaYThirdSecond / deltaXThirdSecond;
-        if (Math.Abs(slopeFirst - slopeSecond) <= 0.0000001f)
-        {
-            radius = -1;
-            return;
-        }
-        float x = (slopeFirst * slopeSecond * (posPointFirst.y - posPointThird.y) + slopeSecond * (posPointFirst.x + posPointSecond.x) - slopeFirst * (posPointSecond.x + posPointThird.x))
-            / (2 * (slopeSecond - slopeFirst));
-        float y = -1 * (x - (posPointFirst.x + posPointSecond.x) / 2) / slopeFirst + (posPointFirst.y + posPointSecond.y) / 2;
-        center = new Vector2(x, y);
-        float dx = center.x - posPointFirst.x;
-        float dy = center.y - posPointFirst.y;
-        radius = Mathf.Sqrt(dx * dx + dy * dy);
+        if (Vector2.Distance(center, point) <= radius)
+            return true;
+        else
+            return false;
     }
 }
 
