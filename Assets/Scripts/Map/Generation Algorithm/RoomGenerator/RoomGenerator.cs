@@ -21,17 +21,14 @@ public class RoomGenerator : DungeonGeneratorBase
     public readonly static int mapMaxWidth = 512;
     private int[,] map;
 
-    private List<Room> rooms;
-
     protected override int[,] GenerateDungeon()
     {
         return Run();
     }
-
     protected int[,] Run()
     {
         map = new int[mapMaxWidth, mapMaxHeight];
-        rooms = new List<Room>();
+        List<Room> rooms = new List<Room>();
         List<Room> roomList = new List<Room>();
         int roomNumber = Random.Range(roomNumberMin, roomNumberMax);
         for (int i = 0; i < roomNumber; i++)
@@ -176,7 +173,6 @@ public class RoomGenerator : DungeonGeneratorBase
         }
         return map;
     }
-
     private Room GenerateRandomRoom()
     {
         Room room = null;

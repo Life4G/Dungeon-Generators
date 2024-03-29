@@ -20,7 +20,6 @@ public class Room
         this.tiles = tiles;
         this.valid = false;
     }
-
     public Room(Room room)
     {
         massRoomPos = new Vector2Int(massRoomPos.x, massRoomPos.y);
@@ -33,7 +32,6 @@ public class Room
     {
         return massRoomPos;
     }
-
     public Vector2Int GetPosCenter()
     {
         return new Vector2Int(massRoomPos.x + sizeX / 2, massRoomPos.y + sizeY / 2); ;
@@ -71,7 +69,6 @@ public class Room
         sizeX = width;
         sizeY = height;
     }
-
     public void SetSize(int size)
     {
         sizeX = size;
@@ -208,7 +205,6 @@ public class Room
                 }
             }
     }
-
     public bool Validate()
     {
         if (this == null)
@@ -267,14 +263,12 @@ public class Room
             return true;
         return false;
     }
-
     private bool IsInside(int x, int y, int[,] tilesToCheck)
     {
         if (x >= 0 && y >= 0 && x < tilesToCheck.GetLength(1) && y < tilesToCheck.GetLength(0) && tilesToCheck[y, x] == 1)
             return true;
         return false;
     }
-
     public bool CheckConnection(Room other)
     {
         if (this == null || other == null)

@@ -9,12 +9,22 @@ public class Graph
 {
     public List<Room> vertices;
     public List<GraphEdge> edges;
+    public int[,] graphMap;
 
     public Graph(List<Room> rooms, int maxWidth, int maxHeigth)
     {
         vertices = rooms.ToList();
+        graphMap = new int[vertices.Count, vertices.Count];
+        for (int i = 0; i < vertices.Count; i++)
+            for (int j = 0; j < vertices.Count; j++)
+                graphMap[i, j] = -1;
         edges = Triangulation(vertices, maxWidth, maxHeigth);
         //edges = SpanningTree(vertices, edges);
+        for (int i =0; i <edges.Count; i++)
+        {
+            graphMap[edges[i].idRoomFirst, edges[i].idRoomSecond] = i;
+            graphMap[edges[i].idRoomSecond, edges[i].idRoomFirst] = i;
+        }
     }
     public bool IsAdjucent(int room, int roomOther)
     {
@@ -28,20 +38,19 @@ public class Graph
     {
         return id >= vertices.Count;
     }
-    public Tuple<int, int> GetConnectedRooms(int id)
+    public Tuple<int, int> GetRoomsFromEdge(int id)
     {
         return edges[id].GetRooms();
     }
     public List<int> GetNeighbors(int room)
     {
         List<int> neighbors = new List<int>();
-        foreach (GraphEdge edge in edges)
+        for(int i =0; i < vertices.Count;i++) 
         {
-            if (edge.Contains(room))
-                neighbors.Add(edge.GetRoomNeighbor(room));
+            if (graphMap[room,i] != -1)
+                neighbors.Add(i);
         }
         return neighbors;
-
     }
     public List<GraphEdge> SpanningTree(List<Room> rooms, List<GraphEdge> edges)
     {
@@ -159,7 +168,6 @@ public class Graph
 
         return edges;
     }
-
     //    List<Vector2> points = new List<Vector2>();
     //    for (int i = 0; i < rooms.Count; i++)
     //        points.Add(rooms[i].GetPosCenter());
@@ -309,8 +317,8 @@ public class GraphEdge
         this.posPointFirst = posPointFirst;
         this.posPointSecond = posPointSecond;
     }
-}
 
+}
 public class Triangle
 {
     public GraphEdge[] edges;
@@ -387,7 +395,6 @@ public class Triangle
         return circle.ContainsPoint(point);
     }
 }
-
 public class CircumCircle
 {
     public Vector2 center;
@@ -412,7 +419,6 @@ public class CircumCircle
         center = new Vector2(aux1 / div, aux2 / div);
         radius = Vector2.Distance(center, posPointFirst);
     }
-
     public bool ContainsPoint(Vector2 point)
     {
         if (Vector2.Distance(center, point) <= radius)
@@ -421,11 +427,9 @@ public class CircumCircle
             return false;
     }
 }
-
 public class PriorityQueue<T> where T : IComparable<T>
 {
     private List<T> heap = new List<T>();
-
     public int Count => heap.Count;
 
     public void Enqueue(T item)
@@ -442,7 +446,6 @@ public class PriorityQueue<T> where T : IComparable<T>
             i = parent;
         }
     }
-
     public T Dequeue()
     {
         int lastIndex = heap.Count - 1;
@@ -471,7 +474,6 @@ public class PriorityQueue<T> where T : IComparable<T>
 
         return frontItem;
     }
-
     private void Swap(int i, int j)
     {
         T temp = heap[i];
