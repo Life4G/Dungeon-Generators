@@ -12,6 +12,7 @@ public abstract class DungeonGeneratorBase : MonoBehaviour
     protected int seed = 0;
     [SerializeField]
     public WallsGenerator wallsGenerator;
+    public Graph graph;
 
     //Функция по генерации сида
     protected int GenerateSeed()

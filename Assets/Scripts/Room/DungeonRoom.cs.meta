@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Scripts/Room/DungeonRoom.cs.meta
 guid: 95477012c71e1c94ea4f353fa06c3146
+========
+guid: 6d45857b47f744644b25ea0303f5ab6f
+>>>>>>>> stray:Assets/Scripts/Room/DungeonRoomManager.cs.meta
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2

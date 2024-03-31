@@ -2,6 +2,7 @@ using Assets.Scripts.Room;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+[ExecuteInEditMode]
 public class GridManager : MonoBehaviour
 {
     [SerializeField]
@@ -116,4 +117,10 @@ public class GridManager : MonoBehaviour
     {
         Reload();
     }
+
+    void Awake()
+    {
+        Reload();
+    }
+
 }
