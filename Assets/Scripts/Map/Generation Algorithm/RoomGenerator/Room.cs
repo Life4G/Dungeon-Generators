@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Drawing;
 using UnityEngine;
-using System;
-using System.Text;
 
 public class Room
 {
@@ -26,7 +24,7 @@ public class Room
         sizeX = room.sizeX;
         sizeY = room.sizeY;
         tiles = room.tiles.Clone() as int[,];
-        this.valid = false;
+        valid = false;
     }
     public Vector2Int GetPos()
     {
@@ -265,9 +263,10 @@ public class Room
     }
     private bool IsInside(int x, int y, int[,] tilesToCheck)
     {
-        if (x >= 0 && y >= 0 && x < tilesToCheck.GetLength(1) && y < tilesToCheck.GetLength(0) && tilesToCheck[y, x] == 1)
-            return true;
-        return false;
+        if (x >= 0 && y >= 0 && x < tilesToCheck.GetLength(1) && y < tilesToCheck.GetLength(0))
+            return tilesToCheck[y, x] == 1;
+        else
+            return false;
     }
     public bool CheckConnection(Room other)
     {
@@ -344,17 +343,6 @@ public class Room
                 if (IsInside(i, l.y - 1, tilesToCheck))
                     stack.Push(new Vector2Int(i, l.y - 1));
         }
-        
-        //for (int y = 0; y < sizeNewY; y++)
-        //{
-        //    StringBuilder sb = new StringBuilder();
-        //    for (int x = 0; x < sizeNewX; x++)
-        //    {
-        //        sb.Append(tilesToCheck[y, x]);
-        //    }
-        //    Debug.Log(sb.ToString());
-        //}
-        //Debug.Log("---------------------------------------------------------------------------------------*>");
         
         if (tilesSum == tilesCheckedSum)
             return true;

@@ -36,13 +36,13 @@ public abstract class DungeonGeneratorBase : MonoBehaviour
         //Эта штука нужно чтобы запомнить состояние рандома до вызова генерации
         //нужно чтобы в случае чего использовать одновременно несколько сидов под разные объекты и исключить возможность их взаимодействия между собой
         //писать полную идею не буду можешь просто погуглить про рандом unity либо потом спроси объясню
-        UnityEngine.Random.State state = UnityEngine.Random.state;
+        Random.State state = Random.state;
         //Теперь задаем сиид
-        UnityEngine.Random.InitState(seed);
+        Random.InitState(seed);
         //Вызываем генерацию данжей
         resultPositions = GenerateDungeon();
         //Возвращаем рандом до задания сида
-        UnityEngine.Random.state = state;
+        Random.state = state;
         return resultPositions;
     }
 
@@ -53,13 +53,13 @@ public abstract class DungeonGeneratorBase : MonoBehaviour
         //Эта штука нужно чтобы запомнить состояние рандома до вызова генерации
         //нужно чтобы в случае чего использовать одновременно несколько сидов под разные объекты и исключить возможность их взаимодействия между собой
         //писать полную идею не буду можешь просто погуглить про рандом unity либо потом спроси объясню
-        UnityEngine.Random.State state = UnityEngine.Random.state;
+        Random.State state = Random.state;
         //Теперь задаем сиид
-        UnityEngine.Random.InitState(seed);
+        Random.InitState(seed);
         //Вызываем генерацию данжей
         resultPositions = GenerateDungeon();
         //Возвращаем рандом до задания сида
-        UnityEngine.Random.state = state;
+        Random.state = state;
         return resultPositions;
     }
 
@@ -91,7 +91,7 @@ public static class Direction2D
 
     public static Vector2Int GetRandomCardinalDirection()
     {
-        return cardinalDirectionsList[UnityEngine.Random.Range(0, cardinalDirectionsList.Count)];
+        return cardinalDirectionsList[Random.Range(0, cardinalDirectionsList.Count)];
     }
     public static List<Vector2Int> GetNewCardinalPosesFromPos(Vector2Int pos)
     {

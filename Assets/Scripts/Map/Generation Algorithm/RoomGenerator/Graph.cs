@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using UnityEngine;
-using static UnityEngine.ParticleSystem;
 
 public class Graph
 {
@@ -19,8 +17,13 @@ public class Graph
             for (int j = 0; j < vertices.Count; j++)
                 graphMap[i, j] = -1;
         edges = Triangulation(vertices, maxWidth, maxHeigth);
-        //edges = SpanningTree(vertices, edges);
         for (int i =0; i <edges.Count; i++)
+        {
+            graphMap[edges[i].idRoomFirst, edges[i].idRoomSecond] = i;
+            graphMap[edges[i].idRoomSecond, edges[i].idRoomFirst] = i;
+        }
+        edges = SpanningTree();
+        for (int i = 0; i < edges.Count; i++)
         {
             graphMap[edges[i].idRoomFirst, edges[i].idRoomSecond] = i;
             graphMap[edges[i].idRoomSecond, edges[i].idRoomFirst] = i;
@@ -52,66 +55,53 @@ public class Graph
         }
         return neighbors;
     }
-    public List<GraphEdge> SpanningTree(List<Room> rooms, List<GraphEdge> edges)
+    int minKey(int[] key, bool[] mstSet)
     {
+        // Initialize min value
+        int min = int.MaxValue, min_index = -1;
 
-        List<List<int[]>> adj = new List<List<int[]>>();
-        List<GraphEdge> edgesSpanned = new List<GraphEdge>();
-        for (int i = 0; i < vertices.Count; i++)
-        {
-            adj.Add(new List<int[]>());
-        }
-
-
-        for (int i = 0; i < edges.Count; i++)
-        {
-            int u = edges[i].idRoomFirst;
-            int v = edges[i].idRoomSecond;
-            int wt = edges[i].GetLength();
-            adj[u].Add(new int[] { v, wt });
-            adj[v].Add(new int[] { u, wt });
-        }
-
-
-        PriorityQueue<(int, int)> pq = new PriorityQueue<(int, int)>();
-
-
-        bool[] visited = new bool[vertices.Count];
-
-
-        int res = 0;
-
-
-        pq.Enqueue((0, 0));
-        int prev = 0;
-
-
-        while (pq.Count > 0)
-        {
-            var p = pq.Dequeue();
-            int wt = p.Item1;
-            int u = p.Item2;
-
-            if (visited[u])
+        for (int v = 0; v < vertices.Count; v++)
+            if (mstSet[v] == false && key[v] < min)
             {
-                continue;
+                min = key[v];
+                min_index = v;
             }
 
-            res += wt;
-            edgesSpanned.Add(new GraphEdge(prev, u, rooms[prev].GetPosCenter(), rooms[u].GetPosCenter()));
-            prev = u;
-            visited[u] = true;
+        return min_index;
+    }
+    private List<GraphEdge> SpanningTree()
+    {
+            int[] parent = new int[vertices.Count];
 
-            foreach (var v in adj[u])
+            int[] key = new int[vertices.Count];
+
+            bool[] mstSet = new bool[vertices.Count];
+
+            for (int i = 0; i < vertices.Count; i++)
             {
-                if (!visited[v[0]])
-                {
-                    pq.Enqueue((v[1], v[0]));
-                }
+                key[i] = int.MaxValue;
+                mstSet[i] = false;
             }
-        }
 
-        return edgesSpanned;
+            key[0] = 0;
+            parent[0] = -1;
+
+            for (int count = 0; count < vertices.Count - 1; count++)
+            {
+                int u = minKey(key, mstSet);
+                mstSet[u] = true;
+                for (int v = 0; v < vertices.Count; v++)
+                    if (graphMap[u, v] != -1 && mstSet[v] == false
+                        && edges[graphMap[u, v]].GetLength() < key[v])
+                    {
+                        parent[v] = u;
+                        key[v] = edges[graphMap[u, v]].GetLength();
+                    }
+            }
+            List<GraphEdge> edgesNew = new List<GraphEdge>();
+        for (int i = 1; i < vertices.Count; i++)
+            edgesNew.Add(edges[graphMap[i, parent[i]]]);
+        return edgesNew;
     }
     private List<GraphEdge> Triangulation(List<Room> rooms, int maxWidth, int maxHeigth)
     {
@@ -168,80 +158,7 @@ public class Graph
 
         return edges;
     }
-    //    List<Vector2> points = new List<Vector2>();
-    //    for (int i = 0; i < rooms.Count; i++)
-    //        points.Add(rooms[i].GetPosCenter());
-    //    List<Triangle> triangles = new List<Triangle> { Triangle.SuperTriangle(points, maxWidth, maxHeigth) };
-    //    for (int i = 0; i < points.Count; i++)
-    //    {
-    //        triangles = AddVertex(points[i], i, triangles);
-    //    }
-    //    List<GraphEdge> roomConnections = new List<GraphEdge>();
-    //    for (int i = 0; i < triangles.Count; i++)
-    //    {
-    //        GraphEdge connection1 = new GraphEdge(triangles[i].edges[0], triangles[i].edges[1]);
-    //        GraphEdge connection2 = new GraphEdge(triangles[i].edges[1], triangles[i].edges[2]);
-    //        GraphEdge connection3 = new GraphEdge(triangles[i].edges[2], triangles[i].edges[0]);
-    //        if (connection1.idRoomFirst > -1 && connection1.idRoomSecond > -1)
-    //        {
-    //            connection1.SetPoses(vertices[connection1.idRoomFirst].GetPosCenter(), vertices[connection1.idRoomSecond].GetPosCenter());
-    //            roomConnections.Add(connection1);
-    //        }
-    //        if (connection2.idRoomFirst > -1 && connection2.idRoomSecond > -1)
-    //        {
-    //            connection2.SetPoses(vertices[connection2.idRoomFirst].GetPosCenter(), vertices[connection2.idRoomSecond].GetPosCenter());
-    //            roomConnections.Add(connection2);
-    //        }
-    //        if (connection3.idRoomFirst > -1 && connection3.idRoomSecond > -1)
-    //        {
-    //            connection3.SetPoses(vertices[connection3.idRoomFirst].GetPosCenter(), vertices[connection3.idRoomSecond].GetPosCenter());
-    //            roomConnections.Add(connection3);
-    //        }
-    //    };
-    //    return roomConnections;
-    //}
-    //private List<Triangle> AddVertex(Vector2 vertex, int roomId, List<Triangle> triangles)
-    //{
-    //    List<GraphEdge> edges = new List<GraphEdge>();
-    //    List<Triangle> badTriangles = new List<Triangle>();
-    //    for (int i = 0; i < triangles.Count; i++)
-    //    {
-    //        if (triangles[i].circle.radius != -1)
-    //        {
-    //            if (triangles[i].InCircle(vertex))
-    //            {
-    //                badTriangles.Add(triangles[i]);
-    //            }
-    //        }
-    //    }
-    //    foreach (Triangle badTriangle in badTriangles)
-    //    {
-    //        edges.Add(new GraphEdge(badTriangle.edges[0], badTriangle.edges[1], badTriangle.posPointFirst, badTriangle.posPointSecond));
-    //        edges.Add(new GraphEdge(badTriangle.edges[1], badTriangle.edges[2], badTriangle.posPointSecond, badTriangle.posPointThird));
-    //        edges.Add(new GraphEdge(badTriangle.edges[2], badTriangle.edges[0], badTriangle.posPointThird, badTriangle.posPointFirst));
-    //        triangles.Remove(badTriangle);
-    //    }
-    //    List<GraphEdge> uniqueEdges = new List<GraphEdge>();
-    //    for (int i = 0; i < edges.Count; i++)
-    //    {
-    //        bool isUnique = true;
-    //        for (int j = 0; j < edges.Count; j++)
-    //        {
-    //            if (i != j && edges[i] == edges[j])
-    //            {
-    //                isUnique = false;
-    //                break;
-    //            }
-    //        }
-    //        if (isUnique)
-    //            uniqueEdges.Add(edges[i]);
-    //    }
-    //    foreach (GraphEdge edge in uniqueEdges)
-    //    {
-    //        triangles.Add(new Triangle(edge.posPointFirst, edge.posPointSecond, vertex, new int[3] { edge.idRoomFirst, edge.idRoomSecond, roomId }));
-    //    }
-    //    return triangles;
-    //}
+
 }
 
 public class GraphEdge
@@ -425,59 +342,5 @@ public class CircumCircle
             return true;
         else
             return false;
-    }
-}
-public class PriorityQueue<T> where T : IComparable<T>
-{
-    private List<T> heap = new List<T>();
-    public int Count => heap.Count;
-
-    public void Enqueue(T item)
-    {
-        heap.Add(item);
-        int i = heap.Count - 1;
-        while (i > 0)
-        {
-            int parent = (i - 1) / 2;
-            if (heap[parent].CompareTo(heap[i]) <= 0)
-                break;
-
-            Swap(parent, i);
-            i = parent;
-        }
-    }
-    public T Dequeue()
-    {
-        int lastIndex = heap.Count - 1;
-        T frontItem = heap[0];
-        heap[0] = heap[lastIndex];
-        heap.RemoveAt(lastIndex);
-
-        --lastIndex;
-        int parent = 0;
-        while (true)
-        {
-            int leftChild = parent * 2 + 1;
-            if (leftChild > lastIndex)
-                break;
-
-            int rightChild = leftChild + 1;
-            if (rightChild <= lastIndex && heap[leftChild].CompareTo(heap[rightChild]) > 0)
-                leftChild = rightChild;
-
-            if (heap[parent].CompareTo(heap[leftChild]) <= 0)
-                break;
-
-            Swap(parent, leftChild);
-            parent = leftChild;
-        }
-
-        return frontItem;
-    }
-    private void Swap(int i, int j)
-    {
-        T temp = heap[i];
-        heap[i] = heap[j];
-        heap[j] = temp;
     }
 }
