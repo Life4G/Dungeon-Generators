@@ -8,8 +8,18 @@ using UnityEngine.Tilemaps;
 public class RoomStyle : MonoBehaviour
 {
     public string         styleName;                  // имя стиля комнаты 
-    public Tilemap        styleTilemap;
+
     public List<TileBase> floorTile;                  // тайл пола
+    public List<TileBase> leftFloorTile;              // тайл левого пола
+    public List<TileBase> topFloorTile;               // тайл верхнего пола
+    public List<TileBase> rightFloorTile;             // тайл правого пола
+    public List<TileBase> bottomFloorTile;            // тайл нижнего пола
+    public List<TileBase> topLeftFloorTile;           // тайл верхнего левого угла пола
+    public List<TileBase> topRightFloorTile;          // тайл верхнего правого угла пола
+    public List<TileBase> bottomLeftFloorTile;        // тайл нижнего левого угла пола
+    public List<TileBase> bottomRightFloorTile;       // тайл нижнего правого угла пола
+
+
     public List<TileBase> leftWallTile;               // тайл левой стены
     public List<TileBase> rightWallTile;              // тайл правой стены
     public List<TileBase> bottomWallTile;             // тайл нижней стены
@@ -23,8 +33,17 @@ public class RoomStyle : MonoBehaviour
     public RoomStyle()
     {
         styleName = "";
-        styleTilemap = null;
+
         floorTile = null;
+        leftFloorTile = null;
+        topFloorTile = null;
+        rightFloorTile = null;
+        bottomFloorTile = null;
+        topLeftFloorTile = null;
+        topRightFloorTile = null;
+        bottomLeftFloorTile = null;
+        bottomRightFloorTile = null;
+
         leftWallTile = null;
         rightWallTile = null;
         bottomWallTile = null;
@@ -36,11 +55,23 @@ public class RoomStyle : MonoBehaviour
     }
 
     // конструктор присваивания
-    public RoomStyle(string name, Tilemap tilemap, List<TileBase> floor, List<TileBase> leftWall, List<TileBase> rightWall, List<TileBase> bottomWall, List<TileBase> topWall, List<TileBase> topLeftCorner, List<TileBase> topRightCorner, List<TileBase> bottomLeftCorner, List<TileBase> bottomRightCorner)
+    public RoomStyle(string name, List<TileBase> floor, List<TileBase> leftWall, List<TileBase> rightWall, List<TileBase> bottomWall, List<TileBase> topWall,
+            List<TileBase> topLeftCorner, List<TileBase> topRightCorner, List<TileBase> bottomLeftCorner, List<TileBase> bottomRightCorner, List<TileBase> leftFloor,
+            List<TileBase> topFloor, List<TileBase> rightFloor, List<TileBase> bottomFloor, List<TileBase> topLeftFloor, List<TileBase> topRightFloor,
+            List<TileBase> bottomLeftFloor, List<TileBase> bottomRightFloor)
     {
         styleName = name;
-        styleTilemap = tilemap;
+
         floorTile = floor;
+        leftFloorTile = leftFloor;
+        topFloorTile = topFloor;
+        rightFloorTile = rightFloor;
+        bottomFloorTile = bottomFloor;
+        topLeftFloorTile = topLeftFloor;
+        topRightFloorTile = topRightFloor;
+        bottomLeftFloorTile = bottomLeftFloor;
+        bottomRightFloorTile = bottomRightFloor;
+
         leftWallTile = leftWall;
         rightWallTile = rightWall;
         bottomWallTile = bottomWall;

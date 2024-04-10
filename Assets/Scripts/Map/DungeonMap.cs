@@ -3,17 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace Assets.Scripts.Map
 {
     public class DungeonMap
     {
-        private DungeonTile[,] tiles; // массив плиток подземелья
+        public DungeonTile[,] tiles; // массив плиток подземелья
 
         // конструктор по размеру карты
         public DungeonMap(int width, int height)
         {
-            tiles = new DungeonTile[width, height];
+            this.tiles = new DungeonTile[width, height];
             InitializeTiles();
         }
 
@@ -44,15 +45,14 @@ namespace Assets.Scripts.Map
             }
             return null; // если координаты вне карты
         }
-
-        // установка содержимого
-        public void SetTileContent(int x, int y, object content)
+        public int GetWidth()
         {
-            DungeonTile tile = GetTile(x, y);
-            if (tile != null)
-            {
-                tile.SetContent(content);
-            }
+            return tiles.GetLength(0);
+        }
+
+        public int GetHeight()
+        {
+            return tiles.GetLength(1);
         }
 
         // конструктор по массиву тайлов пола
@@ -60,8 +60,9 @@ namespace Assets.Scripts.Map
         {
             int width = roomIndices.GetLength(0);
             int height = roomIndices.GetLength(1);
-            tiles = new DungeonTile[width, height];
+            this.tiles = new DungeonTile[width, height];
             InitializeMapWithRoomIndices(roomIndices);
+            AddWalls();
         }
 
         // инициализация карты массивом тайлов пола
@@ -81,11 +82,11 @@ namespace Assets.Scripts.Map
                     bool isPassable = roomIndices[x, y] != -1;
 
                     tiles[x, y] = new DungeonTile();
-                    tiles[x, y].SetRoomIndex(roomIndices[x, y]);
-                    tiles[x, y].SetHasAdjacentWall(isAdjacentToWall);
-                    tiles[x, y].SetIsCorner(isCorner);
-                    tiles[x, y].SetPassability(isPassable);
-                    tiles[x, y].SetPassageCost(isPassable ? 1 : 999);
+                    tiles[x, y].textureType = 0;    // пол
+                    tiles[x, y].roomIndex = roomIndices[x, y];
+                    tiles[x, y].hasAdjacentWall = isAdjacentToWall;
+                    tiles[x, y].isCorner = isCorner;
+                    tiles[x, y].isPassable = isPassable;
                 }
             }
         }
@@ -109,23 +110,6 @@ namespace Assets.Scripts.Map
         }
 
         // обновление карты подземелья из массива тайлов пола
-        public void UpdateMapWithRoomIndices_(int[,] roomIndices)
-        {
-            int width = roomIndices.GetLength(0);
-            int height = roomIndices.GetLength(1);
-
-            for (int y = 0; y < height; y++)
-            {
-                for (int x = 0; x < width; x++)
-                {
-                    if (tiles[x, y] != null)
-                    {
-                        tiles[x, y].SetRoomIndex(roomIndices[x, y]);
-                    }
-                }
-            }
-        }
-
         public void UpdateMapWithRoomIndices(int[,] roomIndices)
         {
             int width = roomIndices.GetLength(0);
@@ -141,14 +125,88 @@ namespace Assets.Scripts.Map
 
                     if (tiles[x, y] != null)
                     {
-                        tiles[x, y].SetRoomIndex(roomIndices[x, y]);
-                        tiles[x, y].SetHasAdjacentWall(isAdjacentToWall);
-                        tiles[x, y].SetIsCorner(isCorner);
-                        tiles[x, y].SetPassability(isPassable);
-                        tiles[x, y].SetPassageCost(isPassable ? 1 : 999);
+                        tiles[x, y].roomIndex = roomIndices[x, y];
+                        tiles[x, y].hasAdjacentWall = isAdjacentToWall;
+                        tiles[x, y].isCorner = isCorner;
+                        tiles[x, y].isPassable = isPassable;
                     }
                 }
             }
+        }
+
+        public void AddWalls()
+        {
+            WallsGenerator wallsGenerator = new WallsGenerator();
+            int[,] walls = wallsGenerator.GenerateWallsFromDungeonMap(this);
+
+            int width = GetWidth();
+            int height = GetHeight();
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    //tiles[x, y].roomIndex = FindAdjacentPassableTileRoomIndex(x, y);
+                    if (walls[x, y] != -1) tiles[x, y].roomIndex = walls[x, y];
+                    tiles[x, y].hasAdjacentWall = false;
+                    tiles[x, y].isCorner = false;
+                    tiles[x, y].isPassable = false;
+                }
+            }
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    bool top = y + 1 < height && walls[x, y] != -1;
+                    bool bottom = y - 1 >= 0 && walls[x, y] != -1;
+                    bool left = x - 1 >= 0 && walls[x, y] != -1;
+                    bool right = x + 1 < width && walls[x, y] != -1;
+
+                    if (!top && !left) tiles[x, y].textureType = 1;
+                    else if (!top && !right) tiles[x, y].textureType = 2;
+                    else if (!bottom && !left) tiles[x, y].textureType = 3;
+                    else if (!bottom && !right) tiles[x, y].textureType = 4;
+
+                    else if (top && bottom && !left) tiles[x, y].textureType = 5;
+                    else if (top && bottom && !right) tiles[x, y].textureType = 6;
+                    else if (left && right && !top) tiles[x, y].textureType = 7;
+                    else if (left && right && !bottom) tiles[x, y].textureType = 8;
+                }
+            }
+        }
+
+        private int FindAdjacentPassableTileRoomIndex(int x, int y)
+        {
+            int[] dx = { 0, 1, 0, -1 };
+            int[] dy = { -1, 0, 1, 0 };
+
+            for (int i = 0; i < 4; i++)
+            {
+                int newX = x + dx[i];
+                int newY = y + dy[i];
+
+                if (newX >= 0 && newX < GetWidth() && newY >= 0 && newY < GetHeight())
+                {
+                    DungeonTile adjacentTile = GetTile(newX, newY);
+                    if (adjacentTile != null && adjacentTile.isPassable)
+                    {
+                        return adjacentTile.roomIndex;
+                    }
+                }
+            }
+
+            return -1;
+        }
+
+
+        public bool HasTile(int x, int y)
+        {
+            if (x >= 0 && x < this.tiles.GetLength(0) && y >= 0 && y < this.tiles.GetLength(1))
+            {
+                return this.tiles[x, y].roomIndex >= 0;
+            }
+            return false;
         }
 
     }
