@@ -15,8 +15,12 @@ namespace Assets.Scripts.Room
         public int width;           // ширина комнаты
         public int height;          // высота комнаты
         public int styleId;         // идентификатор стиля комнаты
+        public float centerX;       // X координата центра комнаты
+        public float centerY;       // Y координата центра комнаты
 
-        // конструктор по умолчанию
+        /// <summary>
+        /// Конструктор по умолчанию.
+        /// </summary>
         public DungeonRoom()
         {
             id = 0;
@@ -25,10 +29,22 @@ namespace Assets.Scripts.Room
             width = 0;
             height = 0;
             styleId = 0;
+            centerX = 0;
+            centerY = 0;
         }
 
-        // конструктор присваивания
-        public DungeonRoom(int id, string name, int size, int width, int height, int styleId)
+        /// <summary>
+        /// Конструктор присваивания.
+        /// </summary>
+        /// <param name="id">Идентификатор комнаты.</param>
+        /// <param name="name">Имя комнаты.</param>
+        /// <param name="size">Размер комнаты (кол-во плиток пола).</param>
+        /// <param name="width">Ширина комнаты.</param>
+        /// <param name="height">Высота комнаты.</param>
+        /// <param name="styleId">Идентификатор  стиля комнаты.</param>
+        /// <param name="centerX">X координата центра комнаты.</param>
+        /// <param name="centerY">Y координата центра комнаты.</param>
+        public DungeonRoom(int id, string name, int size, int width, int height, int styleId, float centerX, float centerY)
         {
             this.id = id;
             this.name = name;
@@ -36,6 +52,8 @@ namespace Assets.Scripts.Room
             this.width = width;
             this.height = height;
             this.styleId = styleId;
+            this.centerX = centerX;
+            this.centerY = centerY;
         }
     }
 }

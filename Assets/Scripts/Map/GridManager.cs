@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using System.Linq;
 using Assets.Scripts.Map;
+using TMPro;
 
 public class GridManager : MonoBehaviour
 {
@@ -148,6 +149,8 @@ public class GridManager : MonoBehaviour
         roomManager = new DungeonRoomManager(map);
         roomManager.AssignRandomStylesToRooms(roomStyleManager);
         roomManager.PrintRoomsInfo();
+        roomManager.ClearRoomsInfoFromMap();
+        roomManager.DisplayRoomsInfoOnMap();
 
         PaintFromDungeonMap(map);
 
@@ -164,6 +167,8 @@ public class GridManager : MonoBehaviour
         roomManager = new DungeonRoomManager(map);
         roomManager.AssignRandomStylesToRooms(roomStyleManager);
         roomManager.PrintRoomsInfo();
+        roomManager.ClearRoomsInfoFromMap();
+        roomManager.DisplayRoomsInfoOnMap();
 
         PaintFromDungeonMap(map);
     }

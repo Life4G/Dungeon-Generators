@@ -111,13 +111,17 @@ namespace Assets.Scripts.Room
                     }
                     int width = maxX - minX + 1;
                     int height = maxY - minY + 1;
+                    float centerX = (minX + maxX) / 2.0f;
+                    float centerY = (minY + maxY) / 2.0f;
 
                     DungeonRoom room = new DungeonRoom
                     {
                         id = id,
                         size = size,
                         width = width,
-                        height = height
+                        height = height,
+                        centerX = centerX,
+                        centerY = centerY
                     };
                     createdRooms.Add(room);
                 }
@@ -131,8 +135,12 @@ namespace Assets.Scripts.Room
         }
 
 
-        // рандомные индексы стилей имеющимся комнатам
-        // автонейминг комнат
+
+        /// <summary>
+        /// Определяет рандомные индексы стилей имеющимся комнатам и дает им имена.
+        /// </summary>
+        /// <param name="roomStyleManager">Менеджер стилей коомнат.</param>
+
         public void AssignRandomStylesToRooms(RoomStyleManager roomStyleManager)
         {
             try
@@ -151,7 +159,9 @@ namespace Assets.Scripts.Room
             }
         }
 
-        // вывести информацию о всех комнатах в консоль
+        /// <summary>
+        /// Выводит информацию о всех комнатах в консоль.
+        /// </summary>
         public void PrintRoomsInfo()
         {
             foreach (DungeonRoom room in rooms)
@@ -160,7 +170,13 @@ namespace Assets.Scripts.Room
             }
         }
 
-        // вернуть id стиля комнаты
+
+        /// <summary>
+        /// Возвращает иденнтификатор стиля комнаты.
+        /// </summary>
+        /// <param name="roomId">Идентификатор комнаты.</param>
+        /// <returns></returns>
+
         public int GetRoomStyleId(int roomId)
         {
             if (rooms == null)
@@ -178,6 +194,49 @@ namespace Assets.Scripts.Room
             Debug.LogWarning($"Комната с id {roomId} не найдена.");
             return -1;
         }
+
+        /// <summary>
+        /// Отображает информацию о комнатах на карте.
+        /// </summary>
+        public void DisplayRoomsInfoOnMap()
+        {
+            GameObject textParent = new GameObject("RoomsInfo");
+
+            foreach (DungeonRoom room in rooms)
+            {
+                GameObject textObj = new GameObject($"RoomInfo_{room.id}");
+                textObj.transform.SetParent(textParent.transform);
+
+                Vector3 textPosition = new Vector3(room.centerX, room.centerY, 0);
+                textObj.transform.position = textPosition;
+
+                TextMesh textMesh = textObj.AddComponent<TextMesh>();
+                textMesh.text = $"ID: {room.id}\nSize: {room.size}\nWidth: {room.width}\nHeight: {room.height}";
+                textMesh.characterSize = 0.1f;
+                textMesh.anchor = TextAnchor.MiddleCenter;
+
+                textMesh.fontSize = 100;
+                textMesh.color = Color.black;
+                textMesh.fontStyle = FontStyle.Bold;
+            }
+
+        }
+
+        /// <summary>
+        /// Очищает информацию о комнатах на карте.
+        /// </summary>
+        public void ClearRoomsInfoFromMap()
+        {
+            // поиск объекта "RoomsInfo" на сцене
+            GameObject roomsInfoParent = GameObject.Find("RoomsInfo");
+
+            // удалить с дочерними если найденн
+            if (roomsInfoParent != null)
+            {
+                GameObject.Destroy(roomsInfoParent);
+            }
+        }
+
 
     }
 }

@@ -14,7 +14,9 @@ namespace Assets.Scripts.Map
         public bool isCorner { get; set; }           // угловая ли плитка
         public bool isPassable { get; set; }         // проходима ли плитка
 
-        // конструктор по умолчанию
+        /// <summary>
+        /// Конструктор по умолчанию
+        /// </summary>
         public DungeonTile()
         {
             roomIndex = -1;
@@ -24,7 +26,14 @@ namespace Assets.Scripts.Map
             isPassable = false;
         }
 
-        // конструктор присваивания
+        /// <summary>
+        /// Конструктор присваивания.
+        /// </summary>
+        /// <param name="roomIndex">Инндекс комнаты.</param>
+        /// <param name="textureType">Тип текстуры.</param>
+        /// <param name="hasAdjacentWall">Наличие стены рядом.</param>
+        /// <param name="isCorner">Угловая ли плитка.</param>
+        /// <param name="isPassable">Прооходима ли плитка.</param>
         public DungeonTile(int roomIndex, int textureType, bool hasAdjacentWall, bool isCorner, bool isPassable)
         {
             this.roomIndex = roomIndex;

@@ -11,14 +11,20 @@ namespace Assets.Scripts.Map
     {
         public DungeonTile[,] tiles; // массив плиток подземелья
 
-        // конструктор по размеру карты
+        /// <summary>
+        /// Конструктор по размеру карты.
+        /// </summary>
+        /// <param name="width">Ширина карты.</param>
+        /// <param name="height">Высота карты.</param>
         public DungeonMap(int width, int height)
         {
             this.tiles = new DungeonTile[width, height];
             InitializeTiles();
         }
 
-        // инициализация всех плиток в массиве значением -1
+        /// <summary>
+        /// Инициализация всех плиток в массиве значением -1.
+        /// </summary>
         private void InitializeTiles()
         {
             int width = tiles.GetLength(0);
@@ -33,7 +39,12 @@ namespace Assets.Scripts.Map
             }
         }
 
-        // вернуть тайл подземелья
+        /// <summary>
+        /// Вернуть тайл подземелья
+        /// </summary>
+        /// <param name="x">X координата тайла.</param>
+        /// <param name="y">Y координата тайла.</param>
+        /// <returns>Тайл.</returns>
         public DungeonTile GetTile(int x, int y)
         {
             int width = tiles.GetLength(0);
@@ -45,17 +56,28 @@ namespace Assets.Scripts.Map
             }
             return null; // если координаты вне карты
         }
+        /// <summary>
+        /// Получить высоту карты.
+        /// </summary>
+        /// <returns>Высота карты.</returns>
+        /// 
         public int GetWidth()
         {
             return tiles.GetLength(0);
         }
-
+        /// <summary>
+        /// Получить ширинну карты.
+        /// </summary>
+        /// <returns>Ширина карты.</returns>
         public int GetHeight()
         {
             return tiles.GetLength(1);
         }
 
-        // конструктор по массиву тайлов пола
+        /// <summary>
+        /// Конструктор по массиву тайлов пола.
+        /// </summary>
+        /// <param name="roomIndices">Массив тайлов пола.</param>
         public DungeonMap(int[,] roomIndices)
         {
             int width = roomIndices.GetLength(0);
@@ -65,7 +87,10 @@ namespace Assets.Scripts.Map
             AddWalls();
         }
 
-        // инициализация карты массивом тайлов пола
+        /// <summary>
+        /// Инициализация карты массивом тайлов пола.
+        /// </summary>
+        /// <param name="roomIndices">Массив тайлов пола.</param>
         private void InitializeMapWithRoomIndices(int[,] roomIndices)
         {
             int width = roomIndices.GetLength(0);
@@ -91,7 +116,15 @@ namespace Assets.Scripts.Map
             }
         }
 
-        // проверка на нахождение у стены
+        /// <summary>
+        /// Проверка на нахождение у стены.
+        /// </summary>
+        /// <param name="roomIndices">Массив тайлов пола.</param>
+        /// <param name="x">X координата тайла.</param>
+        /// <param name="y">Y координата тайла.</param>
+        /// <param name="width">Ширина  карты.</param>
+        /// <param name="height">Высота карты.</param>
+        /// <returns>True - тайл находится у стены. False - тайл не находится у стены.</returns>
         private bool IsAdjacentToWall(int[,] roomIndices, int x, int y, int width, int height)
         {
             return (x > 0 && roomIndices[x - 1, y] == -1) ||
@@ -100,7 +133,15 @@ namespace Assets.Scripts.Map
                    (y < height - 1 && roomIndices[x, y + 1] == -1);
         }
 
-        // проверка на угол
+        /// <summary>
+        /// Проверка на угол.
+        /// </summary>
+        /// <param name="roomIndices">Массив тайлов пола.</param>
+        /// <param name="x">X координата тайла.</param>
+        /// <param name="y">Y координата тайла.</param>
+        /// <param name="width">Ширина  карты.</param>
+        /// <param name="height">Высота карты.</param>
+        /// <returns>True - тайл угловой. False - тайл не угловой.</returns>
         private bool IsCorner(int[,] roomIndices, int x, int y, int width, int height)
         {
             return (x > 0 && y > 0 && roomIndices[x - 1, y - 1] == -1) ||
@@ -109,7 +150,10 @@ namespace Assets.Scripts.Map
                    (x < width - 1 && y < height - 1 && roomIndices[x + 1, y + 1] == -1);
         }
 
-        // обновление карты подземелья из массива тайлов пола
+        /// <summary>
+        /// Обновление карты подземелья из массива тайлов пола.
+        /// </summary>
+        /// <param name="roomIndices">Массив тайлов пола.</param>
         public void UpdateMapWithRoomIndices(int[,] roomIndices)
         {
             int width = roomIndices.GetLength(0);
@@ -134,6 +178,9 @@ namespace Assets.Scripts.Map
             }
         }
 
+        /// <summary>
+        /// Добавить тайлы стен.
+        /// </summary>
         public void AddWalls()
         {
             WallsGenerator wallsGenerator = new WallsGenerator();
@@ -146,7 +193,6 @@ namespace Assets.Scripts.Map
             {
                 for (int x = 0; x < width; x++)
                 {
-                    //tiles[x, y].roomIndex = FindAdjacentPassableTileRoomIndex(x, y);
                     if (walls[x, y] != -1) tiles[x, y].roomIndex = walls[x, y];
                     tiles[x, y].hasAdjacentWall = false;
                     tiles[x, y].isCorner = false;
@@ -158,48 +204,36 @@ namespace Assets.Scripts.Map
             {
                 for (int x = 0; x < width; x++)
                 {
-                    bool top = y + 1 < height && walls[x, y] != -1;
-                    bool bottom = y - 1 >= 0 && walls[x, y] != -1;
-                    bool left = x - 1 >= 0 && walls[x, y] != -1;
-                    bool right = x + 1 < width && walls[x, y] != -1;
-
-                    if (!top && !left) tiles[x, y].textureType = 1;
-                    else if (!top && !right) tiles[x, y].textureType = 2;
-                    else if (!bottom && !left) tiles[x, y].textureType = 3;
-                    else if (!bottom && !right) tiles[x, y].textureType = 4;
-
-                    else if (top && bottom && !left) tiles[x, y].textureType = 5;
-                    else if (top && bottom && !right) tiles[x, y].textureType = 6;
-                    else if (left && right && !top) tiles[x, y].textureType = 7;
-                    else if (left && right && !bottom) tiles[x, y].textureType = 8;
-                }
-            }
-        }
-
-        private int FindAdjacentPassableTileRoomIndex(int x, int y)
-        {
-            int[] dx = { 0, 1, 0, -1 };
-            int[] dy = { -1, 0, 1, 0 };
-
-            for (int i = 0; i < 4; i++)
-            {
-                int newX = x + dx[i];
-                int newY = y + dy[i];
-
-                if (newX >= 0 && newX < GetWidth() && newY >= 0 && newY < GetHeight())
-                {
-                    DungeonTile adjacentTile = GetTile(newX, newY);
-                    if (adjacentTile != null && adjacentTile.isPassable)
+                    if (walls[x, y] != -1)
                     {
-                        return adjacentTile.roomIndex;
+                        tiles[x, y].textureType = 0; // пол
+
+                        bool top = y + 1 < height && walls[x, y + 1] == -1;
+                        bool bottom = y - 1 >= 0 && walls[x, y - 1] == -1;
+                        bool left = x - 1 >= 0 && walls[x - 1, y] == -1;
+                        bool right = x + 1 < width && walls[x + 1, y] == -1;
+
+                        if (left && top) tiles[x, y].textureType = 1;           // верхний левый угол
+                        else if (right && top) tiles[x, y].textureType = 2;     // верхний правый угол
+                        else if (left && bottom) tiles[x, y].textureType = 3;   // нижний левый угол
+                        else if (right && bottom) tiles[x, y].textureType = 4;  // нижний правый угол
+
+                        else if (left) tiles[x, y].textureType = 5;             // левая стена
+                        else if (right) tiles[x, y].textureType = 6;            // правая стена
+                        else if (top) tiles[x, y].textureType = 7;              // верхняя стена
+                        else if (bottom) tiles[x, y].textureType = 8;           // нижняя стена
                     }
                 }
             }
 
-            return -1;
         }
 
-
+        /// <summary>
+        /// Проверка на наличие тайла по координатам.
+        /// </summary>
+        /// <param name="x">X координата тайла.</param>
+        /// <param name="y">Y координата тайла.</param>
+        /// <returns>True - тайл есть. False - тайл отсутствует.</returns>
         public bool HasTile(int x, int y)
         {
             if (x >= 0 && x < this.tiles.GetLength(0) && y >= 0 && y < this.tiles.GetLength(1))
