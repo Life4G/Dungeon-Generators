@@ -12,6 +12,11 @@ namespace Assets.Scripts.Room
     {
         public DungeonRoom[] rooms;
 
+        // Не вычисляет центры
+        /// <summary>
+        /// Конструктор по массиву тайлов пола.
+        /// </summary>
+        /// <param name="floorMap">Массив тайлов пола.</param>
         public DungeonRoomManager(int[,] floorMap)
         {
             try
@@ -71,6 +76,10 @@ namespace Assets.Scripts.Room
             }
         }
 
+        /// <summary>
+        /// Конструктор по структуре карты.
+        /// </summary>
+        /// <param name="dungeonMap">Карта.</param>
         public DungeonRoomManager(DungeonMap dungeonMap)
         {
             try
@@ -134,13 +143,10 @@ namespace Assets.Scripts.Room
             }
         }
 
-
-
         /// <summary>
         /// Определяет рандомные индексы стилей имеющимся комнатам и дает им имена.
         /// </summary>
         /// <param name="roomStyleManager">Менеджер стилей коомнат.</param>
-
         public void AssignRandomStylesToRooms(RoomStyleManager roomStyleManager)
         {
             try
@@ -170,13 +176,11 @@ namespace Assets.Scripts.Room
             }
         }
 
-
         /// <summary>
         /// Возвращает иденнтификатор стиля комнаты.
         /// </summary>
         /// <param name="roomId">Идентификатор комнаты.</param>
         /// <returns></returns>
-
         public int GetRoomStyleId(int roomId)
         {
             if (rooms == null)
@@ -233,7 +237,7 @@ namespace Assets.Scripts.Room
             // удалить с дочерними если найденн
             if (roomsInfoParent != null)
             {
-                GameObject.Destroy(roomsInfoParent);
+                GameObject.DestroyImmediate(roomsInfoParent);
             }
         }
 

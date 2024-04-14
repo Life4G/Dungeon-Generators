@@ -15,7 +15,11 @@ namespace Assets.Scripts.Room
         [SerializeField]
         private List<RoomStyle> roomStyles;
 
-        // получить стиль по названию
+        /// <summary>
+        /// Возвращает стиль комнаты по имени.
+        /// </summary>
+        /// <param name="name">Имя стиля комнаты.</param>
+        /// <returns>Найденный стиль комнаты или null, если стиль не найден.</returns>
         public RoomStyle GetRoomStyle(string name)
         {
             try
@@ -35,7 +39,11 @@ namespace Assets.Scripts.Room
             }
         }
 
-        // получить стиль по индексу
+        /// <summary>
+        /// Возвращает стиль комнаты по индексу в списке.
+        /// </summary>
+        /// <param name="index">Индекс стиля в списке.</param>
+        /// <returns>Стиль комнаты по указанному индексу или null при выходе индекса за пределы списка.</returns>
         public RoomStyle GetRoomStyle(int index)
         {
             try
@@ -49,14 +57,20 @@ namespace Assets.Scripts.Room
             }
         }
 
-        // вернуть количество стилей
+        /// <summary>
+        /// Возвращает общее количество стилей комнат.
+        /// </summary>
+        /// <returns>Количество стилей комнат.</returns>
         public int GetStylesCount()
         {
             Debug.Log("Всего стилей: " + roomStyles.Count);
             return roomStyles.Count;
         }
 
-        // cлучайный индекс стиля
+        /// <summary>
+        /// Возвращает случайный индекс стиля из списка стилей.
+        /// </summary>
+        /// <returns>Индекс случайного стиля комнаты или -1, если список стилей пуст.</returns>
         public int GetRandomStyleIndex()
         {
             if (roomStyles.Count == 0)
@@ -69,7 +83,10 @@ namespace Assets.Scripts.Room
             return index;
         }
 
-        // cлучайное название стиля
+        /// <summary>
+        /// Возвращает случайное имя стиля из списка стилей.
+        /// </summary>
+        /// <returns>Имя случайного стиля комнаты или null, если список стилей пуст.</returns>
         public string GetRandomStyleName()
         {
             if (roomStyles.Count == 0)
@@ -83,7 +100,11 @@ namespace Assets.Scripts.Room
             return styleName;
         }
 
-        // название стиля по индексу
+        /// <summary>
+        /// Возвращает имя стиля комнаты по индексу.
+        /// </summary>
+        /// <param name="index">Индекс стиля в списке.</param>
+        /// <returns>Имя стиля комнаты по указанному индексу или пустую строку при некрректном индексе.</returns>
         public string GetStyleNameByIndex(int index)
         {
             if (index >= 0 && index < roomStyles.Count)

@@ -14,7 +14,11 @@ public class WallsGenerator : MonoBehaviour
         new Vector2Int(-1, 1)   // вверх-влево 
     };
 
-    // генерирует двумерный массив позиций для стен на основе двумерного массива позиций пола
+    /// <summary>
+    /// Генерирует двумерный массив позиций для стен на основе двумерного массива позиций пола.
+    /// </summary>
+    /// <param name="floorArray">Двумерный массив, представляющий карту пола.</param>
+    /// <returns>Двумерный массив, представляющий карту стен.</returns>
     public int[,] GenerateWallsFromFloor(int[,] floorArray)
     {
         int width = floorArray.GetLength(0);
@@ -59,6 +63,11 @@ public class WallsGenerator : MonoBehaviour
         return wallArray;
     }
 
+    /// <summary>
+    /// Генерирует двумерный массив позиций для стен, используя карту подземелья.
+    /// </summary>
+    /// <param name="dungeonMap">Карта подземелья, содержащая информацию о поле.</param>
+    /// <returns>Двумерный массив, представляющий карту стен.</returns>
     public int[,] GenerateWallsFromDungeonMap(DungeonMap dungeonMap)
     {
         int width = dungeonMap.GetWidth();

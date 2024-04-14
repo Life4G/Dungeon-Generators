@@ -15,35 +15,52 @@ public class GridManager : MonoBehaviour
     public DungeonGeneratorBase generator;
 
     [SerializeField]
-    public WallsGenerator wallsGenerator;
-
-    [SerializeField]
     public Tilemap tilemap;
 
     private RoomStyle currentRoomStyle;
     private DungeonRoomManager roomManager;
     private DungeonMap map;
 
+    /// <summary>
+    /// Устанавливает текущий стиль комнаты, используя имя стиля.
+    /// </summary>
+    /// <param name="styleName">Имя стиля комнаты.</param>
     public void SetRoomStyle(string styleName)
     {
         currentRoomStyle = roomStyleManager.GetRoomStyle(styleName);
     }
 
+    /// <summary>
+    /// Устанавливает текущий стиль комнаты, используя индекс стиля.
+    /// </summary>
+    /// <param name="styleIndex">Индекс стиля комнаты.</param>
     public void SetRoomStyle(int styleIndex)
     {
         currentRoomStyle = roomStyleManager.GetRoomStyle(styleIndex);
     }
 
+    /// <summary>
+    /// Устанавливает случайный стиль комнаты из доступных в менеджере стилей.
+    /// </summary>
     public void SetRandomRoomStyle()
     {
         SetRoomStyle(roomStyleManager.GetRandomStyleIndex());
     }
 
+    /// <summary>
+    /// Возвращает количество доступных стилей комнат.
+    /// </summary>
+    /// <returns>Количество стилей комнат.</returns>
     public int GetStylesCount()
     {
         return roomStyleManager.GetStylesCount();
     }
 
+    /// <summary>
+    /// Рисует тайлы на карте, используя заданный двумерный массив.
+    /// </summary>
+    /// <param name="array">Двумерный массив, представляющий карту.</param>
+    /// <param name="isWall">Указывает, является ли массивом стен.</param>
     private void PaintFromArray(int[,] array, bool isWall)
     {
         System.Random rand = new System.Random();
@@ -63,6 +80,10 @@ public class GridManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Рисует тайлы на карте, используя карту подземелья.
+    /// </summary>
+    /// <param name="dungeonMap">Карта подземелья.</param>
     private void PaintFromDungeonMap(DungeonMap dungeonMap)
     {
         System.Random rand = new System.Random();
@@ -113,6 +134,14 @@ public class GridManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Определяет тайл стены, исходя из его позиции и окружения.
+    /// </summary>
+    /// <param name="x">X координата тайла.</param>
+    /// <param name="y">Y координата тайла.</param>
+    /// <param name="array">Двумерный массив, представляющий карту.</param>
+    /// <param name="rand">Экземпляр класса Random.</param>
+    /// <returns>Выбранный тайл стены.</returns>
     private TileBase DetermineWallTile(int x, int y, int[,] array, System.Random rand)
     {
         bool top = y + 1 < array.GetLength(1) && array[x, y + 1] != -1;
@@ -135,11 +164,17 @@ public class GridManager : MonoBehaviour
         return possibleTiles.Any() ? possibleTiles[rand.Next(possibleTiles.Count)] : null;
     }
 
+    /// <summary>
+    /// Очищает все тайлы на карте.
+    /// </summary>
     public void Clear()
     {
         tilemap.ClearAllTiles();
     }
 
+    /// <summary>
+    /// Перезагружает и генерирует карту подземелья.
+    /// </summary>
     public void Reload()
     {
         Clear();
@@ -158,6 +193,10 @@ public class GridManager : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Перезагружает и генерирует карту подземелья с использованием заданного сида генерации.
+    /// </summary>
+    /// <param name="seed">Сид генерации карты.</param>
     public void Reload(int seed)
     {
         Clear();
@@ -173,6 +212,9 @@ public class GridManager : MonoBehaviour
         PaintFromDungeonMap(map);
     }
 
+    /// <summary>
+    /// Инициализация и генерация начальной карты подземелья при старте.
+    /// </summary>
     void Start()
     {
         Reload();
