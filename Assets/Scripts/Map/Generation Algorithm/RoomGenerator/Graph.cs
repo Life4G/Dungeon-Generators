@@ -17,7 +17,7 @@ public class Graph
         for (int i = 0; i < vertices.Count; i++)
             for (int j = 0; j < vertices.Count; j++)
                 graphMap[i, j] = -1;
-        for (int i =0; i <edges.Count; i++)
+        for (int i = 0; i < edges.Count; i++)
         {
             graphMap[edges[i].idRoomFirst, edges[i].idRoomSecond] = i;
             graphMap[edges[i].idRoomSecond, edges[i].idRoomFirst] = i;
@@ -26,10 +26,12 @@ public class Graph
         for (int i = 0; i < vertices.Count; i++)
             for (int j = 0; j < vertices.Count; j++)
                 graphMap[i, j] = -1;
+        //Finalezation (It's stupid as bloody chicken that rides on a bike)
+        //P.S: Somebody beat the shit out of Stray and make him fix that shit
         for (int i = 0; i < edges.Count; i++)
         {
-            graphMap[edges[i].idRoomFirst, edges[i].idRoomSecond] = i;
-            graphMap[edges[i].idRoomSecond, edges[i].idRoomFirst] = i;
+            graphMap[edges[i].idRoomFirst, edges[i].idRoomSecond] = i + vertices.Count;
+            graphMap[edges[i].idRoomSecond, edges[i].idRoomFirst] = i + vertices.Count;
         }
     }
     public bool IsAdjucent(int room, int roomOther)
@@ -51,9 +53,9 @@ public class Graph
     public List<int> GetNeighbors(int room)
     {
         List<int> neighbors = new List<int>();
-        for(int i =0; i < vertices.Count;i++) 
+        for (int i = 0; i < vertices.Count; i++)
         {
-            if (graphMap[room,i] != -1)
+            if (graphMap[room, i] != -1)
                 neighbors.Add(i);
         }
         return neighbors;
@@ -74,34 +76,34 @@ public class Graph
     }
     private List<GraphEdge> SpanningTree()
     {
-            int[] parent = new int[vertices.Count];
+        int[] parent = new int[vertices.Count];
 
-            int[] key = new int[vertices.Count];
+        int[] key = new int[vertices.Count];
 
-            bool[] mstSet = new bool[vertices.Count];
+        bool[] mstSet = new bool[vertices.Count];
 
-            for (int i = 0; i < vertices.Count; i++)
-            {
-                key[i] = int.MaxValue;
-                mstSet[i] = false;
-            }
+        for (int i = 0; i < vertices.Count; i++)
+        {
+            key[i] = int.MaxValue;
+            mstSet[i] = false;
+        }
 
-            key[0] = 0;
-            parent[0] = -1;
+        key[0] = 0;
+        parent[0] = -1;
 
-            for (int count = 0; count < vertices.Count - 1; count++)
-            {
-                int u = minKey(key, mstSet);
-                mstSet[u] = true;
-                for (int v = 0; v < vertices.Count; v++)
-                    if (graphMap[u, v] != -1 && mstSet[v] == false
-                        && edges[graphMap[u, v]].GetLength() < key[v])
-                    {
-                        parent[v] = u;
-                        key[v] = edges[graphMap[u, v]].GetLength();
-                    }
-            }
-            List<GraphEdge> edgesNew = new List<GraphEdge>();
+        for (int count = 0; count < vertices.Count - 1; count++)
+        {
+            int u = minKey(key, mstSet);
+            mstSet[u] = true;
+            for (int v = 0; v < vertices.Count; v++)
+                if (graphMap[u, v] != -1 && mstSet[v] == false
+                    && edges[graphMap[u, v]].GetLength() < key[v])
+                {
+                    parent[v] = u;
+                    key[v] = edges[graphMap[u, v]].GetLength();
+                }
+        }
+        List<GraphEdge> edgesNew = new List<GraphEdge>();
         for (int i = 1; i < vertices.Count; i++)
             edgesNew.Add(edges[graphMap[i, parent[i]]]);
         return edgesNew;
