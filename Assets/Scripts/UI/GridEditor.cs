@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEditor;
+using System.Text;
 
 [CustomEditor(typeof(GridManager))]
 public class GridEditor : Editor
@@ -20,5 +21,28 @@ public class GridEditor : Editor
             else
             manager.Reload();
         }
+
+        if (GUILayout.Button("Output Graph"))
+        {
+            int[,] graph = manager.generator.graph.graphMap;
+
+            StringBuilder output = new StringBuilder();
+            int rows = graph.GetLength(0);
+            int cols = graph.GetLength(1);
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < cols; j++)
+                {
+                    output.Append(graph[i, j] + "\t");
+                }
+                if (i < rows - 1)
+                {
+                    output.AppendLine();
+                }
+            }
+            Debug.Log(output.ToString());
+        }
     }
+
+
 }
