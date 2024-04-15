@@ -27,6 +27,7 @@ public class GridManager : MonoBehaviour
     public void SetRoomStyle(string styleName)
     {
         currentRoomStyle = roomStyleManager.GetRoomStyle(styleName);
+        generator.graph.
     }
 
     public void SetRoomStyle(int styleIndex)

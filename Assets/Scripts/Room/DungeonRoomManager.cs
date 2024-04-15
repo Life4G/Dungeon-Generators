@@ -233,7 +233,7 @@ namespace Assets.Scripts.Room
             // удалить с дочерними если найденн
             if (roomsInfoParent != null)
             {
-                GameObject.Destroy(roomsInfoParent);
+                GameObject.DestroyImmediate(roomsInfoParent);
             }
         }
 
