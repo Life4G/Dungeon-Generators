@@ -43,6 +43,4 @@ public class GridEditor : Editor
             Debug.Log(output.ToString());
         }
     }
-
-
 }

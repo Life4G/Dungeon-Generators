@@ -1,7 +1,7 @@
 using Assets.Scripts.Map;
 using UnityEngine;
 
-public class WallsGenerator : MonoBehaviour
+public class WallsGenerator
 {
     private static readonly Vector2Int[] AllDirections = {
         new Vector2Int(0, 1),   // вверх

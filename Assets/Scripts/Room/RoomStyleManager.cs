@@ -79,7 +79,7 @@ namespace Assets.Scripts.Room
                 return -1;
             }
             int index = Random.Range(0, roomStyles.Count);
-            Debug.Log("Случайный индекс стиля: " + index);
+            //Debug.Log("Случайный индекс стиля: " + index);
             return index;
         }
 

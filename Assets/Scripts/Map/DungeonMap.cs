@@ -56,6 +56,7 @@ namespace Assets.Scripts.Map
             }
             return null; // если координаты вне карты
         }
+
         /// <summary>
         /// Получить высоту карты.
         /// </summary>
@@ -65,6 +66,7 @@ namespace Assets.Scripts.Map
         {
             return tiles.GetLength(0);
         }
+
         /// <summary>
         /// Получить ширинну карты.
         /// </summary>

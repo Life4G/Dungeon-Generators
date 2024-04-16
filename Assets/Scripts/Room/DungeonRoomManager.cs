@@ -80,11 +80,12 @@ namespace Assets.Scripts.Room
         /// Конструктор по структуре карты.
         /// </summary>
         /// <param name="dungeonMap">Карта.</param>
-        public DungeonRoomManager(DungeonMap dungeonMap)
+        public DungeonRoomManager(DungeonMap dungeonMap, int [,] corridorsGraph)
         {
             try
             {
                 Dictionary<int, List<Vector2Int>> roomTiles = new Dictionary<int, List<Vector2Int>>();
+                int roomsCount = corridorsGraph.GetLength(0);
 
                 for (int y = 0; y < dungeonMap.GetHeight(); y++)
                 {
@@ -111,6 +112,7 @@ namespace Assets.Scripts.Room
                     var tiles = roomEntry.Value;
                     int size = tiles.Count;
                     int minX = int.MaxValue, maxX = int.MinValue, minY = int.MaxValue, maxY = int.MinValue;
+                    bool isCorridor = true;
                     foreach (var tile in tiles)
                     {
                         minX = Mathf.Min(minX, tile.x);
@@ -123,6 +125,8 @@ namespace Assets.Scripts.Room
                     float centerX = (minX + maxX) / 2.0f;
                     float centerY = (minY + maxY) / 2.0f;
 
+                    if (id < roomsCount) { isCorridor = false; }
+
                     DungeonRoom room = new DungeonRoom
                     {
                         id = id,
@@ -130,7 +134,8 @@ namespace Assets.Scripts.Room
                         width = width,
                         height = height,
                         centerX = centerX,
-                        centerY = centerY
+                        centerY = centerY,
+                        isCorridor = isCorridor
                     };
                     createdRooms.Add(room);
                 }
@@ -172,7 +177,7 @@ namespace Assets.Scripts.Room
         {
             foreach (DungeonRoom room in rooms)
             {
-                Debug.Log($"Room ID: {room.id}, Name: {room.name}, Size: {room.size}, Width: {room.width}, Height: {room.height}, Style ID: {room.styleId}");
+                Debug.Log($"Room ID: {room.id}, Name: {room.name}, Size: {room.size}, Width: {room.width}, Height: {room.height}, Style ID: {room.styleId}, isCorridor: {room.isCorridor}");
             }
         }
 
@@ -215,7 +220,17 @@ namespace Assets.Scripts.Room
                 textObj.transform.position = textPosition;
 
                 TextMesh textMesh = textObj.AddComponent<TextMesh>();
-                textMesh.text = $"ID: {room.id}\nSize: {room.size}\nWidth: {room.width}\nHeight: {room.height}";
+                string textId;
+                if (room.isCorridor)
+                {
+
+                    textId = $"ID: {room.id} (corridor)";
+                }
+                else
+                {
+                    textId = $"ID: {room.id} (room)";
+                }
+                textMesh.text = $"{textId}\nSize: {room.size}\nWidth: {room.width}\nHeight: {room.height}";
                 textMesh.characterSize = 0.1f;
                 textMesh.anchor = TextAnchor.MiddleCenter;
 
@@ -241,6 +256,19 @@ namespace Assets.Scripts.Room
             }
         }
 
+        public DungeonRoom GetRoomById(int id)
+        {
+            foreach (var room in rooms)
+            {
+                if (room.id == id)
+                {
+                    return room;
+                }
+            }
+
+            Debug.LogWarning($"Room with ID {id} not found.");
+            return null;
+        }
 
     }
 }
