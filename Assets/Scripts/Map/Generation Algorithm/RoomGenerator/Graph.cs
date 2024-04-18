@@ -186,12 +186,12 @@ public class Graph
             map = new int[vertices.Count, vertices.Count];
             for (int i = 0; i < vertices.Count; i++)
                 for (int j = 0; j < vertices.Count; j++)
-                    graphMap[i, j] = -1;
+                    map[i, j] = -1;
 
             for (int i = 0; i < edges.Count; i++)
             {
-                graphMap[edges[i].idRoomFirst, edges[i].idRoomSecond] = i;
-                graphMap[edges[i].idRoomSecond, edges[i].idRoomFirst] = i;
+                map[edges[i].idRoomFirst, edges[i].idRoomSecond] = i;
+                map[edges[i].idRoomSecond, edges[i].idRoomFirst] = i;
             }
         }
         else
