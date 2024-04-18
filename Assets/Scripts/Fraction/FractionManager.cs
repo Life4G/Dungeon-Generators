@@ -16,7 +16,7 @@ namespace Assets.Scripts.Fraction
 
     public class FractionManager : MonoBehaviour
     {
-        [SerializeField]
-        public List<FractionRelation> relations;
+        public List<Fraction> fractions;
+        public List<FractionRelationship> relationships;
     }
 }

@@ -7,11 +7,12 @@ using UnityEngine;
 
 namespace Assets.Scripts.Fraction
 {
-    [System.Serializable]
-    public class Fraction : MonoBehaviour
-    {
-        public string name;
-        public float distributionCoefficient;   // Коэффициент влияния
 
-    }
+
+        [System.Serializable]
+        public class Fraction
+        {
+            public string name;                // имя фракции
+            public float territoryCoefficient; // коэффициент распределения территорий
+        }
 }
