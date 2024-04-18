@@ -132,7 +132,7 @@ public class GridManager : MonoBehaviour
                 }
                 else if (dungeonMap.tiles[x, y].roomIndex >= 0 && generator.graph.IsCorridor(dungeonMap.tiles[x, y].roomIndex))
                 {
-                    List<int> roomIndices = FindConnectedRoomsIndices(dungeonMap.tiles[x, y].roomIndex, generator.graph.graphMap);
+                    List<int> roomIndices = FindConnectedRoomsIndices(dungeonMap.tiles[x, y].roomIndex, generator.graph.GetGraphMap());
 
                     int room1Index = roomIndices[0];
                     int room2Index = roomIndices[1];
@@ -381,7 +381,7 @@ public class GridManager : MonoBehaviour
 
         map = new DungeonMap(generator.CreateDungeon());
 
-        roomManager = new DungeonRoomManager(map, generator.graph.graphMap);
+        roomManager = new DungeonRoomManager(map, generator.graph.GetGraphMap());
         roomManager.AssignRandomStylesToRooms(roomStyleManager);
         //roomManager.PrintRoomsInfo();
         roomManager.ClearRoomsInfoFromMap();
@@ -403,7 +403,7 @@ public class GridManager : MonoBehaviour
 
         map = new DungeonMap(generator.CreateDungeon(seed));
 
-        roomManager = new DungeonRoomManager(map, generator.graph.graphMap);
+        roomManager = new DungeonRoomManager(map, generator.graph.GetGraphMap());
         roomManager.AssignRandomStylesToRooms(roomStyleManager);
         //roomManager.PrintRoomsInfo();
         roomManager.ClearRoomsInfoFromMap();

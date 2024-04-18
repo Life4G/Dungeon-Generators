@@ -5,34 +5,18 @@ using UnityEngine;
 
 public class Graph
 {
-    public List<Room> vertices;
-    public List<GraphEdge> edges;
-    public int[,] graphMap;
+    private readonly List<Room> vertices;
+    private readonly List<GraphEdge> edges;
+    private readonly int[,] graphMap;
 
     public Graph(List<Room> rooms, int maxWidth, int maxHeigth)
     {
         vertices = rooms.ToList();
-        graphMap = new int[vertices.Count, vertices.Count];
-        edges = Triangulation(vertices, maxWidth, maxHeigth);
-        for (int i = 0; i < vertices.Count; i++)
-            for (int j = 0; j < vertices.Count; j++)
-                graphMap[i, j] = -1;
-        for (int i = 0; i < edges.Count; i++)
-        {
-            graphMap[edges[i].idRoomFirst, edges[i].idRoomSecond] = i;
-            graphMap[edges[i].idRoomSecond, edges[i].idRoomFirst] = i;
-        }
+        edges = Triangulation(maxWidth, maxHeigth);
+        graphMap = CalcMap();
         edges = SpanningTree();
-        for (int i = 0; i < vertices.Count; i++)
-            for (int j = 0; j < vertices.Count; j++)
-                graphMap[i, j] = -1;
-        //Finalezation (It's stupid as bloody chicken that rides on a bike)
-        //P.S: Somebody beat the shit out of Stray and make him fix that shit
-        for (int i = 0; i < edges.Count; i++)
-        {
-            graphMap[edges[i].idRoomFirst, edges[i].idRoomSecond] = i + vertices.Count;
-            graphMap[edges[i].idRoomSecond, edges[i].idRoomFirst] = i + vertices.Count;
-        }
+        graphMap = CalcMap();
+        FinalizeMap();
     }
     public bool IsAdjucent(int room, int roomOther)
     {
@@ -46,9 +30,40 @@ public class Graph
     {
         return id >= vertices.Count;
     }
+    public int[,] GetGraphMap()
+    {
+        return graphMap;
+    }
+    public List<Room> GetRooms()
+    {
+        return vertices;
+    }
+    public List<GraphEdge> GetCorridors()
+    {
+        return edges;
+    }
     public Tuple<int, int> GetRoomsFromEdge(int id)
     {
-        return edges[id].GetRooms();
+        return edges[id - vertices.Count].GetRoomsIds();
+    }
+    public GraphEdge GetCorridor(int id)
+    {
+        if (id - vertices.Count < 0)
+            return null;
+        else
+            return edges[id - vertices.Count];
+    }
+    public Room GetRoom(int id) 
+    {
+        if (id >= vertices.Count)
+
+            return null;
+        else
+            return vertices[id];
+    }
+    public Tuple<Vector2Int, Vector2Int> GetEdgeCoords(int id)
+    {
+        return edges[id - vertices.Count].GetCoords();
     }
     public List<int> GetNeighbors(int room)
     {
@@ -60,7 +75,7 @@ public class Graph
         }
         return neighbors;
     }
-    int minKey(int[] key, bool[] mstSet)
+    private int minKey(int[] key, bool[] mstSet)
     {
         // Initialize min value
         int min = int.MaxValue, min_index = -1;
@@ -108,13 +123,13 @@ public class Graph
             edgesNew.Add(edges[graphMap[i, parent[i]]]);
         return edgesNew;
     }
-    private List<GraphEdge> Triangulation(List<Room> rooms, int maxWidth, int maxHeigth)
+    private List<GraphEdge> Triangulation(int maxWidth, int maxHeigth)
     {
         List<GraphEdge> edges = new List<GraphEdge>();
 
-        List<Vector2> points = new List<Vector2>();
-        for (int i = 0; i < rooms.Count; i++)
-            points.Add(rooms[i].GetPosCenter());
+        List<Vector2Int> points = new List<Vector2Int>();
+        for (int i = 0; i < vertices.Count; i++)
+            points.Add(vertices[i].GetPosCenter());
 
         Triangle superTriangle = Triangle.SuperTriangle(maxWidth, maxHeigth);
         List<Triangle> triangles = new List<Triangle> { superTriangle };
@@ -163,28 +178,65 @@ public class Graph
 
         return edges;
     }
+    private int[,] CalcMap()
+    {
+        int[,] map;
+        if (graphMap == null)
+        {
+            map = new int[vertices.Count, vertices.Count];
+            for (int i = 0; i < vertices.Count; i++)
+                for (int j = 0; j < vertices.Count; j++)
+                    graphMap[i, j] = -1;
 
+            for (int i = 0; i < edges.Count; i++)
+            {
+                graphMap[edges[i].idRoomFirst, edges[i].idRoomSecond] = i;
+                graphMap[edges[i].idRoomSecond, edges[i].idRoomFirst] = i;
+            }
+        }
+        else
+        {
+            map = graphMap;
+            for (int i = 0; i < vertices.Count; i++)
+                for (int j = 0; j < vertices.Count; j++)
+                    graphMap[i, j] = -1;
+
+            for (int i = 0; i < edges.Count; i++)
+            {
+                graphMap[edges[i].idRoomFirst, edges[i].idRoomSecond] = i;
+                graphMap[edges[i].idRoomSecond, edges[i].idRoomFirst] = i;
+            }
+        }
+        return map;
+    }
+    private void FinalizeMap()
+    {
+        for (int i = 0; i < vertices.Count; i++)
+            for (int j = 0; j < vertices.Count; j++)
+                if (graphMap[i, j] != -1)
+                    graphMap[i, j] += vertices.Count();
+    }
 }
 
 public class GraphEdge
 {
     public int idRoomFirst;
     public int idRoomSecond;
-    public Vector2 posPointFirst;
-    public Vector2 posPointSecond;
+    public Vector2Int posPoint1;
+    public Vector2Int posPoint2;
     private int length;
     public GraphEdge(int idFirst, int idSecond)
     {
         this.idRoomFirst = idFirst;
         this.idRoomSecond = idSecond;
     }
-    public GraphEdge(int idFirst, int idSecond, Vector2 posPointFirst, Vector2 posPointSecond)
+    public GraphEdge(int idFirst, int idSecond, Vector2Int posPoint1, Vector2Int posPoint2)
     {
         this.idRoomFirst = idFirst;
         this.idRoomSecond = idSecond;
-        this.posPointFirst = posPointFirst;
-        this.posPointSecond = posPointSecond;
-        this.length = (int)Vector2.Distance(posPointFirst, posPointSecond);
+        this.posPoint1 = posPoint1;
+        this.posPoint2 = posPoint2;
+        this.length = (int)Vector2.Distance(posPoint1, posPoint2);
 
     }
     public static bool operator ==(GraphEdge first, GraphEdge second)
@@ -226,18 +278,22 @@ public class GraphEdge
             return idRoomFirst;
         return -1;
     }
-    public Tuple<int, int> GetRooms()
+    public Tuple<int, int> GetRoomsIds()
     {
         return new Tuple<int, int>(idRoomFirst, idRoomSecond);
     }
+    public Tuple<Vector2Int, Vector2Int> GetCoords()
+    {
+        return new Tuple<Vector2Int, Vector2Int>(posPoint1, posPoint2);
+    }
     public int GetLength()
     {
-        return (int)Vector2.Distance(posPointFirst, posPointSecond);
+        return (int)Vector2.Distance(posPoint1, posPoint2);
     }
-    public void SetPoses(Vector2 posPointFirst, Vector2 posPointSecond)
+    public void SetPoses(Vector2Int posPoint1, Vector2Int posPoint2)
     {
-        this.posPointFirst = posPointFirst;
-        this.posPointSecond = posPointSecond;
+        this.posPoint1 = posPoint1;
+        this.posPoint2 = posPoint2;
     }
 
 }
@@ -246,48 +302,48 @@ public class Triangle
     public GraphEdge[] edges;
     public CircumCircle circle;
 
-    public Triangle(Vector2 posPointFirst, Vector2 posPointSecond, Vector2 posPointThird, int[] edgesId)
+    public Triangle(Vector2Int posPoint1, Vector2Int posPoint2, Vector2Int posPoint3, int[] edgesId)
     {
         edges = new GraphEdge[3]
         {
-            new GraphEdge(edgesId[0], edgesId[1],posPointFirst, posPointSecond ),
-            new GraphEdge(edgesId[1], edgesId[2],posPointSecond, posPointThird) ,
-            new GraphEdge(edgesId[2], edgesId[0],posPointThird, posPointFirst )
+            new GraphEdge(edgesId[0], edgesId[1],posPoint1, posPoint2 ),
+            new GraphEdge(edgesId[1], edgesId[2],posPoint2, posPoint3) ,
+            new GraphEdge(edgesId[2], edgesId[0],posPoint3, posPoint1 )
         };
-        circle = new CircumCircle(posPointFirst, posPointSecond, posPointThird);
+        circle = new CircumCircle(posPoint1, posPoint2, posPoint3);
     }
-    public Triangle(Vector2 posPointFirst, Vector2 posPointSecond, Vector2 posPointThird)
+    public Triangle(Vector2Int posPoint1, Vector2Int posPoint2, Vector2Int posPoint3)
     {
         edges = new GraphEdge[3]
         {
-            new GraphEdge(-1, -2,posPointFirst, posPointSecond ),
-            new GraphEdge(-2, -3,posPointSecond, posPointThird) ,
-            new GraphEdge(-3, -1,posPointThird, posPointFirst )
+            new GraphEdge(-1, -2,posPoint1, posPoint2 ),
+            new GraphEdge(-2, -3,posPoint2, posPoint3) ,
+            new GraphEdge(-3, -1,posPoint3, posPoint1 )
         };
-        circle = new CircumCircle(posPointFirst, posPointSecond, posPointThird);
+        circle = new CircumCircle(posPoint1, posPoint2, posPoint3);
 
     }
-    public Triangle(GraphEdge edge, Vector2 point, int vertexId)
+    public Triangle(GraphEdge edge, Vector2Int point, int vertexId)
     {
         edges = new GraphEdge[3]
         {
-            new GraphEdge(edge.idRoomFirst, edge.idRoomSecond,edge.posPointFirst, edge.posPointSecond),
-            new GraphEdge(edge.idRoomSecond, vertexId,edge.posPointSecond, point) ,
-            new GraphEdge(vertexId, edge.idRoomFirst,point, edge.posPointFirst)
+            new GraphEdge(edge.idRoomFirst, edge.idRoomSecond,edge.posPoint1, edge.posPoint2),
+            new GraphEdge(edge.idRoomSecond, vertexId,edge.posPoint2, point) ,
+            new GraphEdge(vertexId, edge.idRoomFirst,point, edge.posPoint1)
         };
-        circle = new CircumCircle(edge.posPointFirst, edge.posPointSecond, point);
+        circle = new CircumCircle(edge.posPoint1, edge.posPoint2, point);
 
     }
     public static Triangle SuperTriangle(int maxWidth, int maxHeigth)
     {
         int margin = 1000;
-        Vector2 point1 = new Vector2(0.5f * maxWidth, -2 * maxWidth - margin);
-        Vector2 point2 = new Vector2(-2 * maxHeigth - margin, 2 * maxHeigth + margin);
-        Vector2 point3 = new Vector2(2 * maxWidth + maxHeigth + margin, 2 * maxHeigth + margin);
+        Vector2Int point1 = new Vector2Int(maxWidth / 2, -2 * maxWidth - margin);
+        Vector2Int point2 = new Vector2Int(-2 * maxHeigth - margin, 2 * maxHeigth + margin);
+        Vector2Int point3 = new Vector2Int(2 * maxWidth + maxHeigth + margin, 2 * maxHeigth + margin);
         return new Triangle(point1, point2, point3);
 
     }
-    public bool InCircle(Vector2 vertex)
+    public bool InCircle(Vector2Int vertex)
     {
         if ((vertex.x - circle.center.x) * (vertex.x - circle.center.x) + (vertex.y - circle.center.y) * (vertex.y - circle.center.y) <= circle.radius * circle.radius)
             return true;
@@ -312,7 +368,7 @@ public class Triangle
         }
         return false;
     }
-    public bool ContainsPoint(Vector2 point)
+    public bool ContainsPoint(Vector2Int point)
     {
         return circle.ContainsPoint(point);
     }
@@ -321,25 +377,22 @@ public class CircumCircle
 {
     public Vector2 center;
     public float radius;
-    public CircumCircle(Vector2 posPointFirst, Vector2 posPointSecond, Vector2 posPointThird)
+    public CircumCircle(Vector2 posPoint1, Vector2 posPoint2, Vector2 posPoint3)
     {
-        var p0 = posPointFirst;
-        var p1 = posPointSecond;
-        var p2 = posPointThird;
-        var dA = p0.x * p0.x + p0.y * p0.y;
-        var dB = p1.x * p1.x + p1.y * p1.y;
-        var dC = p2.x * p2.x + p2.y * p2.y;
+        var dA = posPoint1.x * posPoint1.x + posPoint1.y * posPoint1.y;
+        var dB = posPoint2.x * posPoint2.x + posPoint2.y * posPoint2.y;
+        var dC = posPoint3.x * posPoint3.x + posPoint3.y * posPoint3.y;
 
-        var aux1 = (dA * (p2.y - p1.y) + dB * (p0.y - p2.y) + dC * (p1.y - p0.y));
-        var aux2 = -(dA * (p2.x - p1.x) + dB * (p0.x - p2.x) + dC * (p1.x - p0.x));
-        var div = (2 * (p0.x * (p2.y - p1.y) + p1.x * (p0.y - p2.y) + p2.x * (p1.y - p0.y)));
+        var aux1 = (dA * (posPoint3.y - posPoint2.y) + dB * (posPoint1.y - posPoint3.y) + dC * (posPoint2.y - posPoint1.y));
+        var aux2 = -(dA * (posPoint3.x - posPoint2.x) + dB * (posPoint1.x - posPoint3.x) + dC * (posPoint2.x - posPoint1.x));
+        var div = (2 * (posPoint1.x * (posPoint3.y - posPoint2.y) + posPoint2.x * (posPoint1.y - posPoint3.y) + posPoint3.x * (posPoint2.y - posPoint1.y)));
 
         if (div == 0)
         {
             throw new DivideByZeroException();
         }
         center = new Vector2(aux1 / div, aux2 / div);
-        radius = Vector2.Distance(center, posPointFirst);
+        radius = Vector2.Distance(center, posPoint1);
     }
     public bool ContainsPoint(Vector2 point)
     {
