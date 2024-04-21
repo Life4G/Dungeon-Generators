@@ -7,8 +7,6 @@ using UnityEngine;
 
 namespace Assets.Scripts.Fraction
 {
-
-
         [System.Serializable]
         public class Fraction
         {

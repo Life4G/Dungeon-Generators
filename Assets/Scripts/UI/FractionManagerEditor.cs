@@ -1,13 +1,9 @@
 using Assets.Scripts.Fraction;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static UnityEngine.GraphicsBuffer;
 using UnityEditor;
 using UnityEngine;
 using UnityEditorInternal;
+using UnityEditor.SceneManagement;
 
 namespace Assets.Scripts.UI
 {
@@ -52,9 +48,7 @@ namespace Assets.Scripts.UI
                 EditorGUI.LabelField(rect, "Fractions");
             };
 
-
             //-------------------------------------------------------------------------------------------
-
 
             relationshipList = new ReorderableList(serializedObject,
                 serializedObject.FindProperty("relationships"),
@@ -97,20 +91,18 @@ namespace Assets.Scripts.UI
             {
                 EditorGUI.LabelField(rect, "Fraction Relationships");
             };
-
         }
-
-
         public override void OnInspectorGUI()
         {
-            serializedObject.Update();
-
+            base.OnInspectorGUI();
             EditorGUI.BeginChangeCheck();
             fractionList.DoLayoutList();
             if (EditorGUI.EndChangeCheck())
             {
                 // если были изменения в списке фракций, обновляем взаимоотношения
                 UpdateRelationships((FractionManager)target);
+                Undo.RecordObject(target, "SAVE THIS");
+                EditorUtility.SetDirty(target);
             }
 
             relationshipList.DoLayoutList();
@@ -127,8 +119,6 @@ namespace Assets.Scripts.UI
 
             serializedObject.ApplyModifiedProperties();
         }
-
-
         private void UpdateRelationships(FractionManager manager)
         {
             if (manager.fractions.Count < 2)
@@ -176,21 +166,23 @@ namespace Assets.Scripts.UI
                         });
                     }
                 }
-
                 manager.relationships = newRelationships;
-
+                SerializedProperty relationProperty = serializedObject.FindProperty("relationships");
+                relationProperty.ClearArray();
+                for (int i = 0; i < newRelationships.Count; i++)
+                { 
+                    relationProperty.InsertArrayElementAtIndex(i);
+                    relationProperty.GetArrayElementAtIndex(i).FindPropertyRelative("fraction1Index").intValue = newRelationships[i].fraction1Index;
+                    relationProperty.GetArrayElementAtIndex(i).FindPropertyRelative("fraction2Index").intValue = newRelationships[i].fraction2Index;
+                }
             }
 
-            // менеджер измененн - сообщить об этом юннити
-            EditorUtility.SetDirty(manager);
             if (GUI.changed)
             {
                 // обновить инсппектор
                 Repaint();
             }
         }
-
-
         private void PrintFractionsToDebugger()
         {
             FractionManager manager = (FractionManager)target;

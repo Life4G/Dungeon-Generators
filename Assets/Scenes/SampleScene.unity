@@ -10031,20 +10031,73 @@ MonoBehaviour:
     territoryCoefficient: 4
   - name: Human
     territoryCoefficient: 4
-  - name: I'm tired
-    territoryCoefficient: 100
+  - name: Human424244
+    territoryCoefficient: 4
+  - name: 2424244
+    territoryCoefficient: 4
   relationships:
   - fraction1Index: 0
-    fraction2Index: 0
-    relationshipType: 1
-  - fraction1Index: 0
-    fraction2Index: 0
-    relationshipType: 1
-  - fraction1Index: 0
-    fraction2Index: 0
+    fraction2Index: 1
     relationshipType: 0
   - fraction1Index: 0
-    fraction2Index: 0
+    fraction2Index: 2
+    relationshipType: 0
+  - fraction1Index: 0
+    fraction2Index: 3
+    relationshipType: 0
+  - fraction1Index: 0
+    fraction2Index: 4
+    relationshipType: 0
+  - fraction1Index: 0
+    fraction2Index: 5
+    relationshipType: 0
+  - fraction1Index: 0
+    fraction2Index: 6
+    relationshipType: 0
+  - fraction1Index: 1
+    fraction2Index: 2
+    relationshipType: 0
+  - fraction1Index: 1
+    fraction2Index: 3
+    relationshipType: 0
+  - fraction1Index: 1
+    fraction2Index: 4
+    relationshipType: 0
+  - fraction1Index: 1
+    fraction2Index: 5
+    relationshipType: 0
+  - fraction1Index: 1
+    fraction2Index: 6
+    relationshipType: 0
+  - fraction1Index: 2
+    fraction2Index: 3
+    relationshipType: 0
+  - fraction1Index: 2
+    fraction2Index: 4
+    relationshipType: 0
+  - fraction1Index: 2
+    fraction2Index: 5
+    relationshipType: 0
+  - fraction1Index: 2
+    fraction2Index: 6
+    relationshipType: 0
+  - fraction1Index: 3
+    fraction2Index: 4
+    relationshipType: 0
+  - fraction1Index: 3
+    fraction2Index: 5
+    relationshipType: 0
+  - fraction1Index: 3
+    fraction2Index: 6
+    relationshipType: 0
+  - fraction1Index: 4
+    fraction2Index: 5
+    relationshipType: 0
+  - fraction1Index: 4
+    fraction2Index: 6
+    relationshipType: 0
+  - fraction1Index: 5
+    fraction2Index: 6
     relationshipType: 0
 --- !u!4 &388999072
 Transform:
@@ -14376,8 +14429,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 10
-  movePoint: {fileID: 0}
-  targetObject: {fileID: 0}
+  movePoint: {fileID: 688476239}
+  targetObject: {fileID: 1653075066}
   isTracked: 1
 --- !u!28 &520381066
 Texture2D:
@@ -81880,7 +81933,7 @@ Transform:
   m_GameObject: {fileID: 1975189473}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.14, y: -0.74, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

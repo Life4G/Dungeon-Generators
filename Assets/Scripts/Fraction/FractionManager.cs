@@ -13,10 +13,10 @@ namespace Assets.Scripts.Fraction
         Ally,
         Enemy
     }
-
+    [ExecuteInEditMode]
     public class FractionManager : MonoBehaviour
     {
-        public List<Fraction> fractions;
+        public List<Fraction> fractions; 
         public List<FractionRelationship> relationships;
     }
 }
