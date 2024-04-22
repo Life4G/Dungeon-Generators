@@ -4,6 +4,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEditorInternal;
 using UnityEditor.SceneManagement;
+using Unity.VisualScripting;
 
 namespace Assets.Scripts.UI
 {
@@ -12,6 +13,7 @@ namespace Assets.Scripts.UI
     {
         private ReorderableList relationshipList;
         private ReorderableList fractionList;
+        
 
         private void OnEnable()
         {
@@ -129,7 +131,6 @@ namespace Assets.Scripts.UI
             {
                 // сохранить старые
                 var oldRelationships = new Dictionary<(int, int), RelationshipType>();
-
                 foreach (var rel in manager.relationships)
                 {
                     var key = (rel.fraction1Index, rel.fraction2Index);
@@ -143,9 +144,10 @@ namespace Assets.Scripts.UI
                 var newRelationships = new List<FractionRelationship>();
 
                 // геннерация новых
-                for (int i = 0; i < manager.fractions.Count; i++)
+                SerializedProperty factionChangedList = serializedObject.FindProperty("fractions");
+                for (int i = 0; i < factionChangedList.arraySize; i++)
                 {
-                    for (int j = i + 1; j < manager.fractions.Count; j++)
+                    for (int j = i + 1; j < factionChangedList.arraySize; j++)
                     {
                         var key = (i, j);
                         RelationshipType relationshipType;
@@ -166,7 +168,6 @@ namespace Assets.Scripts.UI
                         });
                     }
                 }
-                manager.relationships = newRelationships;
                 SerializedProperty relationProperty = serializedObject.FindProperty("relationships");
                 relationProperty.ClearArray();
                 for (int i = 0; i < newRelationships.Count; i++)
