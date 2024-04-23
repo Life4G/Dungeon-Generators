@@ -7,6 +7,8 @@ public class GridEditor : Editor
 {
     int seed;
     string seedString;
+    string roomIdString;
+    int roomId;
     public override void OnInspectorGUI()
     {
         DrawDefaultInspector();
@@ -20,6 +22,14 @@ public class GridEditor : Editor
                 manager.Reload(seed);
             else
             manager.Reload();
+        }
+        GUILayout.Label("RoomId");
+        roomIdString = GUILayout.TextField(roomIdString);
+        if (GUILayout.Button("Validate"))
+        {
+            if (int.TryParse(roomIdString, out roomId))
+                Debug.Log(manager.generator.graph.GetRoom(roomId).Validate().ToString());
+
         }
 
         if (GUILayout.Button("Output Graph"))

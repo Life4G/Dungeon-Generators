@@ -40,23 +40,24 @@ public class RoomGenerator : DungeonGeneratorBase
         do
         {
             roomsValidated = true;
+            int index = -1;
             Room room = null;
+            Operations operation = Operations.None;
             for (int i = 0; i < roomList.Count && room == null; i++)
             {
                 if (roomList[i] != null && !roomList[i].GetValidation())
                 {
+                    index = i;
                     room = roomList[i];
                     roomsValidated = false;
                 }
             }
-            for (int i = 0; i < roomList.Count; i++)
+            for (int i = 0; i < roomList.Count && room != null; i++)
             {
-                if (roomList[i] != null && room != null && roomList[i] != room)
+                if (roomList[i] != null && roomList[i] != room)
                 {
-
                     if (room.CheckIntersection(roomList[i]))
                     {
-                        Operations operation;
                         operation = TryOperations(room, roomList[i], room.IsProperSubsetOf(roomList[i]));
                         switch (operation)
                         {
@@ -77,11 +78,13 @@ public class RoomGenerator : DungeonGeneratorBase
 
                             case Operations.DifferenceBA:
                                 roomList[i].Difference(room);
+                                roomList[i].SetValidation(false);
                                 room = null;
                                 break;
 
                             case Operations.SymmetricDifference:
                                 room.SymmetricDifference(roomList[i]);
+                                roomList[i].SetValidation(false) ;
                                 break;
                         }
                     }
@@ -92,18 +95,28 @@ public class RoomGenerator : DungeonGeneratorBase
                             room.Union(roomList[i]);
                             roomList[i] = null;
                         }
-
                     }
-
                 }
             }
             if (room != null)
             {
-                room.SetValidation(true);
+                if (room.Validate())
+                {
+                    room.SetValidation(true);
+                    roomList[index] = room;
+                }
+                else
+                {
+                    if (operation == Operations.None && roomList.Count-1>roomNumber)
+                        roomList.Remove(room);
+                    else
+                    {
+                        room = GenerateRandomRoom();
+                        roomList[index] = room;
+                    }
+                }
+
             }
-            //if (roomsGenerated.Count == 0 && roomsValidated.Count < roomNumber / 2)
-            //    for (int i = roomsValidated.Count; i < roomNumber; i++)
-            //        roomsGenerated.Add(GenerateRandomRoom());
 
         } while (!roomsValidated);
 
@@ -111,9 +124,6 @@ public class RoomGenerator : DungeonGeneratorBase
             if (roomList[i] != null)
                 rooms.Add(roomList[i]);
 
-        //for (int i = 0; i < rooms.Count - 1; i++)
-        //    roomConnections.Add(new RoomConnection(i, i + 1, rooms[i].GetPosCenter(), rooms[i + 1].GetPosCenter()));
-        // Graph
         graph = new Graph(rooms, mapMaxWidth, mapMaxHeight);
 
         for (int i = 0; i < mapMaxHeight; i++)
@@ -138,13 +148,13 @@ public class RoomGenerator : DungeonGeneratorBase
         List<GraphEdge> corridors = graph.GetCorridors();
         for (int i = 0; i < corridors.Count; i++)
         {
-            int dx = (int)Mathf.Abs(corridors[i].posPoint2.x - corridors[i].posPoint1.x);
-            int sx = (int)corridors[i].posPoint1.x < corridors[i].posPoint2.x ? 1 : -1;
-            int dy = (int)-Mathf.Abs(corridors[i].posPoint2.y - corridors[i].posPoint1.y);
-            int sy = (int)corridors[i].posPoint1.y < corridors[i].posPoint2.y ? 1 : -1;
+            int dx = Mathf.Abs(corridors[i].posPoint2.x - corridors[i].posPoint1.x);
+            int sx = corridors[i].posPoint1.x < corridors[i].posPoint2.x ? 1 : -1;
+            int dy = -Mathf.Abs(corridors[i].posPoint2.y - corridors[i].posPoint1.y);
+            int sy = corridors[i].posPoint1.y < corridors[i].posPoint2.y ? 1 : -1;
             int error = dx + dy;
-            int x = (int)corridors[i].posPoint1.x;
-            int y = (int)corridors[i].posPoint1.y;
+            int x = corridors[i].posPoint1.x;
+            int y = corridors[i].posPoint1.y;
             while (true)
             {
                 if (map[y, x] == -1)
@@ -152,19 +162,19 @@ public class RoomGenerator : DungeonGeneratorBase
 
                     map[y, x] = rooms.Count + i;
                 }
-                if (x == (int)corridors[i].posPoint2.x && y == (int)corridors[i].posPoint2.y)
+                if (x == corridors[i].posPoint2.x && y == corridors[i].posPoint2.y)
                     break;
                 int e2 = 2 * error;
                 if (e2 >= dy)
                 {
-                    if (x == (int)corridors[i].posPoint2.x)
+                    if (x == corridors[i].posPoint2.x)
                         break;
                     error = error + dy;
                     x += sx;
                 };
                 if (e2 <= dx)
                 {
-                    if (y == (int)corridors[i].posPoint2.y)
+                    if (y == corridors[i].posPoint2.y)
                         break;
                     error = error + dx;
                     y += sy;
@@ -188,12 +198,12 @@ public class RoomGenerator : DungeonGeneratorBase
             case 2:
                 room = GenerateRombusRoom();
                 break;
-                //case 3:
-                //    room = GenerateCornerRoom();
-                //    break;
-                //case 4:
-                //    room = GenerateTriangleRoom();
-                //    break;
+            case 3:
+                room = GenerateCornerRoom();
+                break;
+            case 4:
+                room = GenerateTriangleRoom();
+                break;
 
         }
         return room;
@@ -454,7 +464,40 @@ public class RoomGenerator : DungeonGeneratorBase
         }
         return op;
     }
+    private bool TryOperation(Room room, Room roomOther, Operations operation)
+    {
+        Room roomTest;
+        switch (operation)
+        {
+            case Operations.Intersect:
+                roomTest = new Room(room);
+                roomTest.Intersect(roomOther);
+                return roomTest.Validate();
 
+            case Operations.Union:
+                roomTest = new Room(room);
+                roomTest.Union(roomOther);
+                return roomTest.Validate();
+
+            case Operations.DifferenceAB:
+                roomTest = new Room(room);
+                roomTest.Difference(new Room(roomOther));
+                return roomTest.Validate();
+
+            case Operations.DifferenceBA:
+                roomTest = new Room(roomOther);
+                roomTest.Difference(new Room(room));
+                return roomTest.Validate();
+
+            case Operations.SymmetricDifference:
+                roomTest = new Room(room);
+                Room roomOtherTest = new Room(roomOther);
+                roomTest.SymmetricDifference(new Room(roomOtherTest));
+                return roomTest.Validate() && roomOtherTest.Validate();
+
+        }
+        return false;
+    }
 }
 //private Room OperationApplication(Room room, Room roomOther)
 //{

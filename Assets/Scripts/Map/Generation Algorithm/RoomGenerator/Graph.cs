@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Drawing;
 using UnityEngine;
+using UnityEngine.TextCore.LowLevel;
 
 public class Graph
 {
@@ -15,7 +17,9 @@ public class Graph
         edges = Triangulation(maxWidth, maxHeigth);
         graphMap = CalcMap();
         edges = SpanningTree();
+        AdjustEdges();
         graphMap = CalcMap();
+
         FinalizeMap();
     }
     public bool IsAdjucent(int room, int roomOther)
@@ -53,7 +57,7 @@ public class Graph
         else
             return edges[id - vertices.Count];
     }
-    public Room GetRoom(int id) 
+    public Room GetRoom(int id)
     {
         if (id >= vertices.Count)
 
@@ -178,6 +182,13 @@ public class Graph
 
         return edges;
     }
+    private void AdjustEdges()
+    {
+        foreach (GraphEdge edge in edges)
+        {
+            edge.AdjustPos(vertices[edge.idRoomFirst], vertices[edge.idRoomSecond]);
+        }
+    }
     private int[,] CalcMap()
     {
         int[,] map;
@@ -288,12 +299,61 @@ public class GraphEdge
     }
     public int GetLength()
     {
-        return (int)Vector2.Distance(posPoint1, posPoint2);
+        return (int)Vector2Int.Distance(posPoint1, posPoint2);
     }
     public void SetPoses(Vector2Int posPoint1, Vector2Int posPoint2)
     {
         this.posPoint1 = posPoint1;
         this.posPoint2 = posPoint2;
+    }
+    public void AdjustPos(Room room, Room roomOther)
+    {
+        
+        Vector2Int roomPos = room.GetPos();
+        Vector2Int roomPosOther = roomOther.GetPos();
+        int newX = -1;
+        int newY = -1;
+
+        int roomDistance = int.MaxValue;
+        int[,] roomTiles = room.GetTiles();
+        Size roomSize = room.GetSize();
+        for (int y = 0; y < roomSize.Height; y++)
+            for (int x = 0; x < roomSize.Width; x++)
+            {
+                if (roomTiles[y, x] != 0)
+                {
+                    int roomDistanceNew = (roomPos.x + x - roomPosOther.x) * (roomPos.x + x - roomPosOther.x) + (roomPos.y + y - roomPosOther.y) * (roomPos.y + y - roomPosOther.y);
+                    if (roomDistance >= roomDistanceNew)
+                    {
+                        roomDistance = roomDistanceNew;
+                        newX = roomPos.x + x;
+                        newY = roomPos.y + y;
+                    }
+                }
+            }
+        roomPos.Set(newX, newY);
+
+        roomDistance = int.MaxValue;
+        roomTiles = roomOther.GetTiles();
+        roomSize = roomOther.GetSize();
+        for (int y = 0; y < roomSize.Height; y++)
+            for (int x = 0; x < roomSize.Width; x++)
+            {
+                if (roomTiles[y, x] != 0)
+                {
+                    int roomDistanceNew = (roomPosOther.x + x - roomPos.x) * (roomPosOther.x + x - roomPos.x) + (roomPosOther.y + x - roomPos.y) * (roomPosOther.y + x - roomPos.y);
+                    if (roomDistance >= roomDistanceNew)
+                    {
+                        roomDistance = roomDistanceNew;
+                        newX = roomPosOther.x + x;
+                        newY = roomPosOther.y + y;
+                    }
+                }
+            }
+        roomPosOther.Set(newX, newY);
+
+        posPoint1 = roomPos;
+        posPoint2 = roomPosOther;
     }
 
 }

@@ -84,7 +84,7 @@ public class Room
         int collisonX2 = Mathf.Min(massRoomPos.x + sizeX, other.massRoomPos.x + other.sizeX);
         int collisonY2 = Mathf.Min(massRoomPos.y + sizeY, other.massRoomPos.y + other.sizeY);
 
-        if (collisonX1 > collisonX2 || collisonY1 > collisonY2)
+        if (collisonX1 >= collisonX2 || collisonY1 >= collisonY2)
             return false;
 
         for (int y = collisonY1; y < collisonY2; y++)
@@ -238,8 +238,8 @@ public class Room
             while (IsInside(lx, l.y, tilesToCheck))
             {
                 tilesToCheck[l.y, lx] = 2;
-                tilesCheckedSum++;
                 lx--;
+                tilesCheckedSum++;
             }
             int rx = l.x + 1;
 
@@ -250,10 +250,10 @@ public class Room
                 rx++;
             }
 
-            for (int i = lx; i < rx; i++)
+            for (int i = lx; i < rx-1; i++)
                 if (IsInside(i, l.y + 1, tilesToCheck))
                     stack.Push(new Vector2Int(i, l.y + 1));
-            for (int i = lx; i < rx; i++)
+            for (int i = lx; i < rx-1; i++)
                 if (IsInside(i, l.y - 1, tilesToCheck))
                     stack.Push(new Vector2Int(i, l.y - 1));
         }
@@ -343,7 +343,7 @@ public class Room
                 if (IsInside(i, l.y - 1, tilesToCheck))
                     stack.Push(new Vector2Int(i, l.y - 1));
         }
-        
+
         if (tilesSum == tilesCheckedSum)
             return true;
         return false;
