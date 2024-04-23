@@ -18,6 +18,7 @@ namespace Assets.Scripts.Room
         public float centerX;       // X координата центра комнаты
         public float centerY;       // Y координата центра комнаты
         public bool isCorridor;     // является ли коридором
+        public int fractionIndex;    // индекс фракции, которой принадлежит комната
 
         /// <summary>
         /// Конструктор по умолчанию.
@@ -33,6 +34,7 @@ namespace Assets.Scripts.Room
             centerX = 0;
             centerY = 0;
             isCorridor = false;
+            fractionIndex = -1;
         }
 
         /// <summary>
@@ -47,7 +49,8 @@ namespace Assets.Scripts.Room
         /// <param name="centerX">X координата центра комнаты.</param>
         /// <param name="centerY">Y координата центра комнаты.</param>
         /// <param name="isCorridor">Является ли коридором.</param>
-        public DungeonRoom(int id, string name, int size, int width, int height, int styleId, float centerX, float centerY, bool isCorridor)
+        /// <param name="fractionIndex">Индекс фракции.</param>
+        public DungeonRoom(int id, string name, int size, int width, int height, int styleId, float centerX, float centerY, bool isCorridor, int fractionIndex)
         {
             this.id = id;
             this.name = name;
@@ -58,6 +61,7 @@ namespace Assets.Scripts.Room
             this.centerX = centerX;
             this.centerY = centerY;
             this.isCorridor = isCorridor;
+            this.fractionIndex = fractionIndex;
         }
     }
 }

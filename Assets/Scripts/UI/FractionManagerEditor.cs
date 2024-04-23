@@ -1,13 +1,10 @@
 using Assets.Scripts.Fraction;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static UnityEngine.GraphicsBuffer;
 using UnityEditor;
 using UnityEngine;
 using UnityEditorInternal;
+using UnityEditor.SceneManagement;
+using Unity.VisualScripting;
 
 namespace Assets.Scripts.UI
 {
@@ -16,6 +13,7 @@ namespace Assets.Scripts.UI
     {
         private ReorderableList relationshipList;
         private ReorderableList fractionList;
+
 
         private void OnEnable()
         {
@@ -52,9 +50,7 @@ namespace Assets.Scripts.UI
                 EditorGUI.LabelField(rect, "Fractions");
             };
 
-
             //-------------------------------------------------------------------------------------------
-
 
             relationshipList = new ReorderableList(serializedObject,
                 serializedObject.FindProperty("relationships"),
@@ -77,13 +73,15 @@ namespace Assets.Scripts.UI
                                        ? fractionsProperty.GetArrayElementAtIndex(fraction2Index).FindPropertyRelative("name").stringValue
                                        : "None";
 
-                EditorGUI.LabelField(new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight), fraction1Name);
-                EditorGUI.LabelField(new Rect(rect.x + 105, rect.y, 100, EditorGUIUtility.singleLineHeight), "-");
-                EditorGUI.LabelField(new Rect(rect.x + 210, rect.y, 100, EditorGUIUtility.singleLineHeight), fraction2Name);
+                float halfWidth = rect.width * 0.25f;
+
+                EditorGUI.LabelField(new Rect(rect.x, rect.y, halfWidth - 5, EditorGUIUtility.singleLineHeight), fraction1Name);
+                EditorGUI.LabelField(new Rect(rect.x + halfWidth + 5, rect.y, halfWidth - 5, EditorGUIUtility.singleLineHeight), "-");
+                EditorGUI.LabelField(new Rect(rect.x + halfWidth * 2 + 5, rect.y, halfWidth - 5, EditorGUIUtility.singleLineHeight), fraction2Name);
 
                 // поле для изменения типа взаимотношений
                 EditorGUI.PropertyField(
-                    new Rect(rect.x + 315, rect.y, rect.width - 315 - 30, EditorGUIUtility.singleLineHeight),
+                    new Rect(rect.x + halfWidth * 3 + 5, rect.y, halfWidth - 5, EditorGUIUtility.singleLineHeight),
                     element.FindPropertyRelative("relationshipType"), GUIContent.none);
             };
 
@@ -97,20 +95,18 @@ namespace Assets.Scripts.UI
             {
                 EditorGUI.LabelField(rect, "Fraction Relationships");
             };
-
         }
-
-
         public override void OnInspectorGUI()
         {
-            serializedObject.Update();
-
+            base.OnInspectorGUI();
             EditorGUI.BeginChangeCheck();
             fractionList.DoLayoutList();
             if (EditorGUI.EndChangeCheck())
             {
                 // если были изменения в списке фракций, обновляем взаимоотношения
                 UpdateRelationships((FractionManager)target);
+                Undo.RecordObject(target, "SAVE THIS");
+                EditorUtility.SetDirty(target);
             }
 
             relationshipList.DoLayoutList();
@@ -127,8 +123,6 @@ namespace Assets.Scripts.UI
 
             serializedObject.ApplyModifiedProperties();
         }
-
-
         private void UpdateRelationships(FractionManager manager)
         {
             if (manager.fractions.Count < 2)
@@ -139,7 +133,6 @@ namespace Assets.Scripts.UI
             {
                 // сохранить старые
                 var oldRelationships = new Dictionary<(int, int), RelationshipType>();
-
                 foreach (var rel in manager.relationships)
                 {
                     var key = (rel.fraction1Index, rel.fraction2Index);
@@ -153,9 +146,10 @@ namespace Assets.Scripts.UI
                 var newRelationships = new List<FractionRelationship>();
 
                 // геннерация новых
-                for (int i = 0; i < manager.fractions.Count; i++)
+                SerializedProperty factionChangedList = serializedObject.FindProperty("fractions");
+                for (int i = 0; i < factionChangedList.arraySize; i++)
                 {
-                    for (int j = i + 1; j < manager.fractions.Count; j++)
+                    for (int j = i + 1; j < factionChangedList.arraySize; j++)
                     {
                         var key = (i, j);
                         RelationshipType relationshipType;
@@ -176,29 +170,31 @@ namespace Assets.Scripts.UI
                         });
                     }
                 }
-
-                manager.relationships = newRelationships;
-
+                SerializedProperty relationProperty = serializedObject.FindProperty("relationships");
+                relationProperty.ClearArray();
+                for (int i = 0; i < newRelationships.Count; i++)
+                {
+                    relationProperty.InsertArrayElementAtIndex(i);
+                    relationProperty.GetArrayElementAtIndex(i).FindPropertyRelative("fraction1Index").intValue = newRelationships[i].fraction1Index;
+                    relationProperty.GetArrayElementAtIndex(i).FindPropertyRelative("fraction2Index").intValue = newRelationships[i].fraction2Index;
+                }
             }
 
-            // менеджер измененн - сообщить об этом юннити
-            EditorUtility.SetDirty(manager);
             if (GUI.changed)
             {
                 // обновить инсппектор
                 Repaint();
             }
         }
-
-
         private void PrintFractionsToDebugger()
         {
             FractionManager manager = (FractionManager)target;
 
-            Debug.Log("Fractions:");
+            Debug.Log("Fractions:"); int i = 0;
             foreach (var fraction in manager.fractions)
             {
-                Debug.Log($"Fraction name: {fraction.name}, Territory coefficient: {fraction.territoryCoefficient}");
+                Debug.Log($"Fraction name: {fraction.name}, Territory coefficient: {fraction.territoryCoefficient}, Rooms: {manager.CalculateRoomsForFraction(20, i)}");
+                i++;
             }
         }
         private void OutputRelationshipsToDebugger(FractionManager manager)
