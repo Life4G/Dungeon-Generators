@@ -18,7 +18,10 @@ public class GridManager : MonoBehaviour
     public Tilemap tilemap;
 
     private RoomStyle currentRoomStyle;
+
+    [SerializeField]
     private DungeonRoomManager roomManager;
+
     private DungeonMap map;
 
     /// <summary>
@@ -132,7 +135,7 @@ public class GridManager : MonoBehaviour
                 }
                 else if (dungeonMap.tiles[x, y].roomIndex >= 0 && generator.graph.IsCorridor(dungeonMap.tiles[x, y].roomIndex))
                 {
-                    List<int> roomIndices = FindConnectedRoomsIndices(dungeonMap.tiles[x, y].roomIndex, generator.graph.GetGraphMap());
+                    List<int> roomIndices = FindConnectedRoomsIndices(dungeonMap.tiles[x, y].roomIndex, generator.graph.graphMap);
 
                     int room1Index = roomIndices[0];
                     int room2Index = roomIndices[1];
@@ -381,9 +384,12 @@ public class GridManager : MonoBehaviour
 
         map = new DungeonMap(generator.CreateDungeon());
 
-        roomManager = new DungeonRoomManager(map, generator.graph.GetGraphMap());
+        //roomManager = new DungeonRoomManager(map, generator.graph.graphMap);
+        roomManager.Initialize(map, generator.graph.graphMap);
         roomManager.AssignRandomStylesToRooms(roomStyleManager);
-        //roomManager.PrintRoomsInfo();
+        roomManager.AssignFractions();
+
+        roomManager.PrintRoomsInfo();
         roomManager.ClearRoomsInfoFromMap();
         roomManager.DisplayRoomsInfoOnMap();
 
@@ -403,9 +409,12 @@ public class GridManager : MonoBehaviour
 
         map = new DungeonMap(generator.CreateDungeon(seed));
 
-        roomManager = new DungeonRoomManager(map, generator.graph.GetGraphMap());
+        //roomManager = new DungeonRoomManager(map, generator.graph.graphMap);
+        roomManager.Initialize(map, generator.graph.graphMap);
         roomManager.AssignRandomStylesToRooms(roomStyleManager);
-        //roomManager.PrintRoomsInfo();
+        roomManager.AssignFractions();
+
+        roomManager.PrintRoomsInfo();
         roomManager.ClearRoomsInfoFromMap();
         roomManager.DisplayRoomsInfoOnMap();
 

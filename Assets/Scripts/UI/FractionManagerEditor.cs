@@ -13,7 +13,7 @@ namespace Assets.Scripts.UI
     {
         private ReorderableList relationshipList;
         private ReorderableList fractionList;
-        
+
 
         private void OnEnable()
         {
@@ -73,13 +73,15 @@ namespace Assets.Scripts.UI
                                        ? fractionsProperty.GetArrayElementAtIndex(fraction2Index).FindPropertyRelative("name").stringValue
                                        : "None";
 
-                EditorGUI.LabelField(new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight), fraction1Name);
-                EditorGUI.LabelField(new Rect(rect.x + 105, rect.y, 100, EditorGUIUtility.singleLineHeight), "-");
-                EditorGUI.LabelField(new Rect(rect.x + 210, rect.y, 100, EditorGUIUtility.singleLineHeight), fraction2Name);
+                float halfWidth = rect.width * 0.25f;
+
+                EditorGUI.LabelField(new Rect(rect.x, rect.y, halfWidth - 5, EditorGUIUtility.singleLineHeight), fraction1Name);
+                EditorGUI.LabelField(new Rect(rect.x + halfWidth + 5, rect.y, halfWidth - 5, EditorGUIUtility.singleLineHeight), "-");
+                EditorGUI.LabelField(new Rect(rect.x + halfWidth * 2 + 5, rect.y, halfWidth - 5, EditorGUIUtility.singleLineHeight), fraction2Name);
 
                 // поле для изменения типа взаимотношений
                 EditorGUI.PropertyField(
-                    new Rect(rect.x + 315, rect.y, rect.width - 315 - 30, EditorGUIUtility.singleLineHeight),
+                    new Rect(rect.x + halfWidth * 3 + 5, rect.y, halfWidth - 5, EditorGUIUtility.singleLineHeight),
                     element.FindPropertyRelative("relationshipType"), GUIContent.none);
             };
 
@@ -171,7 +173,7 @@ namespace Assets.Scripts.UI
                 SerializedProperty relationProperty = serializedObject.FindProperty("relationships");
                 relationProperty.ClearArray();
                 for (int i = 0; i < newRelationships.Count; i++)
-                { 
+                {
                     relationProperty.InsertArrayElementAtIndex(i);
                     relationProperty.GetArrayElementAtIndex(i).FindPropertyRelative("fraction1Index").intValue = newRelationships[i].fraction1Index;
                     relationProperty.GetArrayElementAtIndex(i).FindPropertyRelative("fraction2Index").intValue = newRelationships[i].fraction2Index;
@@ -188,10 +190,11 @@ namespace Assets.Scripts.UI
         {
             FractionManager manager = (FractionManager)target;
 
-            Debug.Log("Fractions:");
+            Debug.Log("Fractions:"); int i = 0;
             foreach (var fraction in manager.fractions)
             {
-                Debug.Log($"Fraction name: {fraction.name}, Territory coefficient: {fraction.territoryCoefficient}");
+                Debug.Log($"Fraction name: {fraction.name}, Territory coefficient: {fraction.territoryCoefficient}, Rooms: {manager.CalculateRoomsForFraction(20, i)}");
+                i++;
             }
         }
         private void OutputRelationshipsToDebugger(FractionManager manager)
