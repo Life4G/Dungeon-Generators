@@ -4,6 +4,7 @@ using System.Drawing;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using static SetOperations;
+using static UnityEngine.EventSystems.EventTrigger;
 
 public class RoomGenerator : DungeonGeneratorBase
 {
@@ -84,7 +85,7 @@ public class RoomGenerator : DungeonGeneratorBase
 
                             case Operations.SymmetricDifference:
                                 room.SymmetricDifference(roomList[i]);
-                                roomList[i].SetValidation(false) ;
+                                roomList[i].SetValidation(false);
                                 break;
                         }
                     }
@@ -107,7 +108,7 @@ public class RoomGenerator : DungeonGeneratorBase
                 }
                 else
                 {
-                    if (operation == Operations.None && roomList.Count-1>roomNumber)
+                    if (operation == Operations.None && roomList.Count - 1 > roomNumber)
                         roomList.Remove(room);
                     else
                     {
@@ -145,44 +146,90 @@ public class RoomGenerator : DungeonGeneratorBase
                         map[y + roomPos.y, x + roomPos.x] = i;
                 }
         }
-        List<GraphEdge> corridors = graph.GetCorridors();
-        for (int i = 0; i < corridors.Count; i++)
+        DrawCorridors(graph.GetCorridors(), rooms.Count);
+        return map;
+    }
+    private int ipart(double x) { return (int)x; }
+
+    private int round(double x) { return ipart(x + 0.5); }
+
+    private void DrawCorridors(List<GraphEdge> corridors, int offset)
+    {
+        for (int index = 0; index < corridors.Count; index++)
         {
-            int dx = Mathf.Abs(corridors[i].posPoint2.x - corridors[i].posPoint1.x);
-            int sx = corridors[i].posPoint1.x < corridors[i].posPoint2.x ? 1 : -1;
-            int dy = -Mathf.Abs(corridors[i].posPoint2.y - corridors[i].posPoint1.y);
-            int sy = corridors[i].posPoint1.y < corridors[i].posPoint2.y ? 1 : -1;
-            int error = dx + dy;
-            int x = corridors[i].posPoint1.x;
-            int y = corridors[i].posPoint1.y;
-            while (true)
+            double x1 = corridors[index].posPoint1.x, x2 = corridors[index].posPoint2.x, y1 = corridors[index].posPoint1.y, y2 = corridors[index].posPoint2.y;
+            bool steer = Math.Abs(y2 - y1) > Math.Abs(x2 - x1);
+            double temp;
+
+            if (steer)
             {
-                if (map[y, x] == -1)
-                {
+                temp = x1; x1 = y1; y1 = temp;
+                temp = x2; x2 = y2; y2 = temp;
+            }
+            if (x1 > x2)
+            {
+               
+                temp = x1; x1 = x2; x2 = temp;
+                temp = y1; y1 = y2; y2 = temp;
+            }
+            double dx = x2 - x1;
+            double dy = y2 - y1;
+            double gradient;
+            if (dx == 0)
+                gradient = 1;
+            else
+                gradient = dy / dx;
 
-                    map[y, x] = rooms.Count + i;
+            double xEnd = round(x1);
+            double yEnd = y1 + gradient * (xEnd - x1);
+            double xPixel1 = xEnd;
+            double yPixel1 = ipart(yEnd);
+            if (steer)
+            {
+                map[(int)xPixel1, (int)yPixel1] = index + offset;
+                map[(int)xPixel1, (int)yPixel1 + 1] = index + offset;
+            }
+            else
+            {
+                map[(int)yPixel1, (int)xPixel1] = index + offset;
+                map[(int)yPixel1 + 1, (int)xPixel1] = index + offset;
+            }
+            double intery = yEnd + gradient;
+
+            xEnd = round(x2);
+            yEnd = y2 + gradient * (xEnd - x2);
+            double xPixel2 = xEnd;
+            double yPixel2 = ipart(yEnd);
+            if (steer)
+            {
+                map[(int)xPixel2, (int)yPixel2] = index + offset;
+                map[(int)xPixel2, (int)yPixel2 + 1] = index + offset;
+            }
+            else
+            {
+                map[(int)yPixel2, (int)xPixel2] = index + offset;
+                map[(int)yPixel2 + 1, (int)xPixel2] = index + offset;
+            }
+
+            if (steer)
+            {
+                for (int x = (int)(xPixel1 + 1); x <= xPixel2 - 1; x++)
+                {
+                    map[x, ipart(intery)] = index + offset;
+                    map[x, ipart(intery) + 1] = index + offset;
+                    intery += gradient;
                 }
-                if (x == corridors[i].posPoint2.x && y == corridors[i].posPoint2.y)
-                    break;
-                int e2 = 2 * error;
-                if (e2 >= dy)
+            }
+            else
+            {
+                for (int x = (int)(xPixel1 + 1); x <= xPixel2 - 1; x++)
                 {
-                    if (x == corridors[i].posPoint2.x)
-                        break;
-                    error = error + dy;
-                    x += sx;
-                };
-                if (e2 <= dx)
-                {
-                    if (y == corridors[i].posPoint2.y)
-                        break;
-                    error = error + dx;
-                    y += sy;
-                };
-
+                    map[ipart(intery), x] = index + offset;
+                    map[ipart(intery) + 1, x] = index + offset;
+                    intery += gradient;
+                }
             }
         }
-        return map;
     }
     private Room GenerateRandomRoom()
     {

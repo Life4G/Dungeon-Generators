@@ -310,7 +310,7 @@ public class GraphEdge
     {
         
         Vector2Int roomPos = room.GetPos();
-        Vector2Int roomPosOther = roomOther.GetPos();
+        Vector2Int roomPosOther = roomOther.GetPosCenter();
         int newX = -1;
         int newY = -1;
 
@@ -331,8 +331,10 @@ public class GraphEdge
                     }
                 }
             }
-        roomPos.Set(newX, newY);
+        posPoint1.Set(newX, newY);
 
+        roomPos = roomOther.GetPos();
+        roomPosOther = posPoint1;
         roomDistance = int.MaxValue;
         roomTiles = roomOther.GetTiles();
         roomSize = roomOther.GetSize();
@@ -341,19 +343,16 @@ public class GraphEdge
             {
                 if (roomTiles[y, x] != 0)
                 {
-                    int roomDistanceNew = (roomPosOther.x + x - roomPos.x) * (roomPosOther.x + x - roomPos.x) + (roomPosOther.y + x - roomPos.y) * (roomPosOther.y + x - roomPos.y);
+                    int roomDistanceNew = (roomPos.x + x - roomPosOther.x) * (roomPos.x + x - roomPosOther.x) + (roomPos.y + y - roomPosOther.y) * (roomPos.y + y - roomPosOther.y);
                     if (roomDistance >= roomDistanceNew)
                     {
                         roomDistance = roomDistanceNew;
-                        newX = roomPosOther.x + x;
-                        newY = roomPosOther.y + y;
+                        newX = roomPos.x + x;
+                        newY = roomPos.y + y;
                     }
                 }
             }
-        roomPosOther.Set(newX, newY);
-
-        posPoint1 = roomPos;
-        posPoint2 = roomPosOther;
+        posPoint2.Set(newX, newY);
     }
 
 }
