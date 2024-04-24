@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Assets.Scripts.Fraction
 {
+    /// <summary>
+    /// Взаимоотношение двух фракций.
+    /// </summary>
     [System.Serializable]
     public class FractionRelationship
     {

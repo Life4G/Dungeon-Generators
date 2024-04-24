@@ -9,7 +9,9 @@ using Random = UnityEngine.Random;
 
 namespace Assets.Scripts.Room
 {
-
+    /// <summary>
+    /// Менеджер стилей комнат.
+    /// </summary>
     public class RoomStyleManager : MonoBehaviour
     {
         [SerializeField]

@@ -9,12 +9,40 @@ using UnityEngine;
 
 namespace Assets.Scripts.Room
 {
+    /// <summary>
+    /// Менеджер комнат подземелья.
+    /// </summary>
     public class DungeonRoomManager : MonoBehaviour
     {
         [SerializeField]
         private FractionManager fractionManager;
 
         public DungeonRoom[] rooms;
+
+        public enum DistributionMethod
+        {
+            Sequential,
+            Random
+        }
+
+        [SerializeField]
+        private DistributionMethod distributionMethod;
+
+        /// <summary>
+        /// Вызов распределения фракций в зависимости от выбранного метода в distributionMethod.
+        /// </summary>
+        public void AssignFractions()
+        {
+            switch (distributionMethod)
+            {
+                case DistributionMethod.Sequential:
+                    AssignFractionsToRoomsSequentially();
+                    break;
+                case DistributionMethod.Random:
+                    AssignFractionsToRoomsRandomly();
+                    break;
+            }
+        }
 
         // Не вычисляет центры
         /// <summary>
@@ -344,6 +372,11 @@ namespace Assets.Scripts.Room
             }
         }
 
+        /// <summary>
+        /// Получение комнаты по ее идентификатору.
+        /// </summary>
+        /// <param name="id">Идентификатор комнаты.</param>
+        /// <returns>Комната.</returns>
         public DungeonRoom GetRoomById(int id)
         {
             foreach (var room in rooms)
@@ -393,10 +426,22 @@ namespace Assets.Scripts.Room
         }
 
         /// <summary>
-        /// Присваивает комнатам, не являющимся коридорами, индексы фракций на основе их коэффициентов.
+        /// Последовательное присваивание комнатам, не являющимся коридорами, индексы фракций на основе их коэффициентов.
         /// </summary>
-        public void AssignFactionsToRooms()
+        public void AssignFractionsToRoomsSequentially()
         {
+            if (fractionManager.fractions.Count == 0)
+            {
+                Debug.LogError("Fractions not defined.");
+                return;
+            }
+
+            // очиста прошлых присваиваний
+            foreach (var room in rooms)
+            {
+                room.fractionIndex = -1; // -1 - отсутствие фракции
+            }
+
             int totalRooms = CountNonCorridorRooms();
             List<int> nonCorridorRoomIndices = GetNonCorridorRoomIndices();
             List<int> roomAssignments = new List<int>();
@@ -440,6 +485,65 @@ namespace Assets.Scripts.Room
                 remainingRooms--;
             }
         }
+
+        /// <summary>
+        /// Случайное присваивание комнатам, не являющимся коридорами, индексы фракций на основе их коэффициентов.
+        /// </summary>
+        public void AssignFractionsToRoomsRandomly()
+        {
+            if (fractionManager.fractions.Count == 0)
+            {
+                Debug.LogError("Fractions not defined.");
+                return;
+            }
+
+            // очиста прошлых присваиваний
+            foreach (var room in rooms)
+            {
+                room.fractionIndex = -1; // -1 - отсутствие фракции
+            }
+
+            int totalRooms = rooms.Count(r => !r.isCorridor);
+            Dictionary<int, int> fractionRoomCounts = new Dictionary<int, int>();
+
+            // кол-ва комнат для фракций
+            for (int i = 0; i < fractionManager.fractions.Count; i++)
+            {
+                fractionRoomCounts[i] = fractionManager.CalculateRoomsForFraction(totalRooms, i);
+            }
+
+            // список индексов доступных комнат
+            List<int> availableRoomIndexes = rooms
+                .Select((room, index) => new { Room = room, Index = index })
+                .Where(x => !x.Room.isCorridor)
+                .Select(x => x.Index)
+                .ToList();
+
+            System.Random random = new System.Random();
+
+            foreach (var pair in fractionRoomCounts)
+            {
+                int fractionIndex = pair.Key;
+                int roomsForFraction = pair.Value;
+
+                for (int i = 0; i < roomsForFraction; i++)
+                {
+                    if (availableRoomIndexes.Count == 0)
+                    {
+                        Debug.LogError("Not enough rooms.");
+                        return;
+                    }
+
+                    // случайный индекс из доступных комнат
+                    int randomIndex = random.Next(availableRoomIndexes.Count);
+                    int roomIndex = availableRoomIndexes[randomIndex];
+                    availableRoomIndexes.RemoveAt(randomIndex);
+
+                    rooms[roomIndex].fractionIndex = fractionIndex;
+                }
+            }
+        }
+
 
     }
 }

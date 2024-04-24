@@ -387,7 +387,7 @@ public class GridManager : MonoBehaviour
         //roomManager = new DungeonRoomManager(map, generator.graph.graphMap);
         roomManager.Initialize(map, generator.graph.graphMap);
         roomManager.AssignRandomStylesToRooms(roomStyleManager);
-        roomManager.AssignFactionsToRooms();
+        roomManager.AssignFractions();
 
         roomManager.PrintRoomsInfo();
         roomManager.ClearRoomsInfoFromMap();
@@ -412,7 +412,7 @@ public class GridManager : MonoBehaviour
         //roomManager = new DungeonRoomManager(map, generator.graph.graphMap);
         roomManager.Initialize(map, generator.graph.graphMap);
         roomManager.AssignRandomStylesToRooms(roomStyleManager);
-        roomManager.AssignFactionsToRooms();
+        roomManager.AssignFractions();
 
         roomManager.PrintRoomsInfo();
         roomManager.ClearRoomsInfoFromMap();

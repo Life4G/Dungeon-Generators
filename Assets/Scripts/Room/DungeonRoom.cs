@@ -7,6 +7,9 @@ using UnityEngine;
 
 namespace Assets.Scripts.Room
 {
+    /// <summary>
+    /// Комната подземелья.
+    /// </summary>
     public class DungeonRoom
     {
         public int id;              // идентификатор комнаты

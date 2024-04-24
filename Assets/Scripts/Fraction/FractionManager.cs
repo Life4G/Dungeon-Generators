@@ -14,6 +14,9 @@ namespace Assets.Scripts.Fraction
         Enemy
     }
 
+    /// <summary>
+    /// Менеджер фракций.
+    /// </summary>
     public class FractionManager : MonoBehaviour
     {
         public List<Fraction> fractions;
