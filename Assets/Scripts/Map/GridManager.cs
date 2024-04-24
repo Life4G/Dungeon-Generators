@@ -95,7 +95,7 @@ public class GridManager : MonoBehaviour
             for (int x = 0; x < dungeonMap.GetWidth(); x++)
             {
                 int textureType = dungeonMap.tiles[x, y].textureType;
-                if (dungeonMap.tiles[x, y].roomIndex >= 0 && generator.graph.IsRoom(dungeonMap.tiles[x, y].roomIndex))
+                if (dungeonMap.tiles[x, y].roomIndex >= 0 && generator.GetGraph().IsRoom(dungeonMap.tiles[x, y].roomIndex))
                 {
                     currentRoomStyle = roomStyleManager.GetRoomStyle(roomManager.GetRoomStyleId(dungeonMap.tiles[x, y].roomIndex));
                     Vector3Int tilePosition = new Vector3Int(x, y, 0);
@@ -133,9 +133,9 @@ public class GridManager : MonoBehaviour
                     }
                     tilemap.SetTile(tilePosition, tileToUse);
                 }
-                else if (dungeonMap.tiles[x, y].roomIndex >= 0 && generator.graph.IsCorridor(dungeonMap.tiles[x, y].roomIndex))
+                else if (dungeonMap.tiles[x, y].roomIndex >= 0 && generator.GetGraph().IsCorridor(dungeonMap.tiles[x, y].roomIndex))
                 {
-                    List<int> roomIndices = FindConnectedRoomsIndices(dungeonMap.tiles[x, y].roomIndex, generator.graph.graphMap);
+                    List<int> roomIndices = FindConnectedRoomsIndices(dungeonMap.tiles[x, y].roomIndex, generator.GetGraph().GetGraphMap());
 
                     int room1Index = roomIndices[0];
                     int room2Index = roomIndices[1];
@@ -385,7 +385,7 @@ public class GridManager : MonoBehaviour
         map = new DungeonMap(generator.CreateDungeon());
 
         //roomManager = new DungeonRoomManager(map, generator.graph.graphMap);
-        roomManager.Initialize(map, generator.graph.graphMap);
+        roomManager.Initialize(map, generator.GetGraph().GetGraphMap());
         roomManager.AssignRandomStylesToRooms(roomStyleManager);
         roomManager.AssignFractions();
 
@@ -410,7 +410,7 @@ public class GridManager : MonoBehaviour
         map = new DungeonMap(generator.CreateDungeon(seed));
 
         //roomManager = new DungeonRoomManager(map, generator.graph.graphMap);
-        roomManager.Initialize(map, generator.graph.graphMap);
+        roomManager.Initialize(map, generator.GetGraph().GetGraphMap());
         roomManager.AssignRandomStylesToRooms(roomStyleManager);
         roomManager.AssignFractions();
 

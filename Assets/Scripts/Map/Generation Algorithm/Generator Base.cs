@@ -1,8 +1,9 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 //Базовый класс для генераторов от которого наследуются все остальные
-public abstract class DungeonGeneratorBase : MonoBehaviour 
+public abstract class DungeonGeneratorBase : MonoBehaviour
 {
     //Стартовая позиция равная 0 (можно поменять из редактора)
     [SerializeField]
@@ -12,7 +13,7 @@ public abstract class DungeonGeneratorBase : MonoBehaviour
     protected int seed = 0;
     [SerializeField]
     public WallsGenerator wallsGenerator;
-    public Graph graph;
+    protected Graph graph;
 
     //Функция по генерации сида
     protected int GenerateSeed()
@@ -76,6 +77,9 @@ public abstract class DungeonGeneratorBase : MonoBehaviour
         return seed;
     }
 
+    public Graph GetGraph()
+    { return graph; }
+
 }
 
 //Статический класс который возвращает рандомное движение (вверх вниз и т.д)
@@ -83,9 +87,9 @@ public static class Direction2D
 {
     public static List<Vector2Int> cardinalDirectionsList = new List<Vector2Int>
     {
-        new Vector2Int(0, 1), 
+        new Vector2Int(0, 1),
         new Vector2Int(1, 0),
-        new Vector2Int(0, -1), 
+        new Vector2Int(0, -1),
         new Vector2Int(-1, 0)
     };
 
@@ -96,8 +100,8 @@ public static class Direction2D
     public static List<Vector2Int> GetNewCardinalPosesFromPos(Vector2Int pos)
     {
         List<Vector2Int> newPoses = new List<Vector2Int>();
-        foreach (Vector2Int direction in cardinalDirectionsList) 
-        { 
+        foreach (Vector2Int direction in cardinalDirectionsList)
+        {
             newPoses.Add(pos + direction);
         }
         return newPoses;

@@ -28,13 +28,12 @@ public class GridEditor : Editor
         if (GUILayout.Button("Validate"))
         {
             if (int.TryParse(roomIdString, out roomId))
-                Debug.Log(manager.generator.graph.GetRoom(roomId).Validate().ToString());
-
+                Debug.Log(manager.generator.GetGraph().GetRoom(roomId).Validate().ToString());
         }
 
         if (GUILayout.Button("Output Graph"))
         {
-            int[,] graph = manager.generator.graph.GetGraphMap();
+            int[,] graph = manager.generator.GetGraph().GetGraphMap();
 
             StringBuilder output = new StringBuilder();
             int rows = graph.GetLength(0);
