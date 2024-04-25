@@ -135,15 +135,16 @@ public class RoomGenerator : DungeonGeneratorBase
                         map[y + roomPos.y, x + roomPos.x] = i;
                 }
         }
-        for (int i = 0; i < graph.edges.Count; i++)
+        List<GraphEdge> corridors = graph.GetCorridors();
+        for (int i = 0; i < corridors.Count; i++)
         {
-            int dx = (int)Mathf.Abs(graph.edges[i].posPointSecond.x - graph.edges[i].posPointFirst.x);
-            int sx = (int)graph.edges[i].posPointFirst.x < graph.edges[i].posPointSecond.x ? 1 : -1;
-            int dy = (int)-Mathf.Abs(graph.edges[i].posPointSecond.y - graph.edges[i].posPointFirst.y);
-            int sy = (int)graph.edges[i].posPointFirst.y < graph.edges[i].posPointSecond.y ? 1 : -1;
+            int dx = (int)Mathf.Abs(corridors[i].posPoint2.x - corridors[i].posPoint1.x);
+            int sx = (int)corridors[i].posPoint1.x < corridors[i].posPoint2.x ? 1 : -1;
+            int dy = (int)-Mathf.Abs(corridors[i].posPoint2.y - corridors[i].posPoint1.y);
+            int sy = (int)corridors[i].posPoint1.y < corridors[i].posPoint2.y ? 1 : -1;
             int error = dx + dy;
-            int x = (int)graph.edges[i].posPointFirst.x;
-            int y = (int)graph.edges[i].posPointFirst.y;
+            int x = (int)corridors[i].posPoint1.x;
+            int y = (int)corridors[i].posPoint1.y;
             while (true)
             {
                 if (map[y, x] == -1)
@@ -151,19 +152,19 @@ public class RoomGenerator : DungeonGeneratorBase
 
                     map[y, x] = rooms.Count + i;
                 }
-                if (x == (int)graph.edges[i].posPointSecond.x && y == (int)graph.edges[i].posPointSecond.y)
+                if (x == (int)corridors[i].posPoint2.x && y == (int)corridors[i].posPoint2.y)
                     break;
                 int e2 = 2 * error;
                 if (e2 >= dy)
                 {
-                    if (x == (int)graph.edges[i].posPointSecond.x)
+                    if (x == (int)corridors[i].posPoint2.x)
                         break;
                     error = error + dy;
                     x += sx;
                 };
                 if (e2 <= dx)
                 {
-                    if (y == (int)graph.edges[i].posPointSecond.y)
+                    if (y == (int)corridors[i].posPoint2.y)
                         break;
                     error = error + dx;
                     y += sy;

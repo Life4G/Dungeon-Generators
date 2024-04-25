@@ -24,7 +24,7 @@ public class GridEditor : Editor
 
         if (GUILayout.Button("Output Graph"))
         {
-            int[,] graph = manager.generator.graph.graphMap;
+            int[,] graph = manager.generator.graph.GetGraphMap();
 
             StringBuilder output = new StringBuilder();
             int rows = graph.GetLength(0);
