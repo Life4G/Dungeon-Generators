@@ -15,10 +15,12 @@ public class GridManager : MonoBehaviour
     public DungeonGeneratorBase generator;
 
     [SerializeField]
+    private DungeonRoomManager roomManager;
+
+    [SerializeField]
     public Tilemap tilemap;
 
     private RoomStyle currentRoomStyle;
-    private DungeonRoomManager roomManager;
     private DungeonMap map;
 
     /// <summary>
@@ -381,13 +383,16 @@ public class GridManager : MonoBehaviour
 
         map = new DungeonMap(generator.CreateDungeon());
 
-        roomManager = new DungeonRoomManager(map, generator.graph.GetGraphMap());
+        roomManager.Initialize(map, generator.graph.GetGraphMap());
         roomManager.AssignRandomStylesToRooms(roomStyleManager);
+        roomManager.AssignFractions();
+
         //roomManager.PrintRoomsInfo();
-        roomManager.ClearRoomsInfoFromMap();
-        roomManager.DisplayRoomsInfoOnMap();
 
         PaintFromDungeonMap(map);
+
+        roomManager.ClearRoomsInfoFromMap();
+        roomManager.DisplayRoomsInfoOnMap();
 
         //----------------------------
 
@@ -403,13 +408,16 @@ public class GridManager : MonoBehaviour
 
         map = new DungeonMap(generator.CreateDungeon(seed));
 
-        roomManager = new DungeonRoomManager(map, generator.graph.GetGraphMap());
+        roomManager.Initialize(map, generator.graph.GetGraphMap());
         roomManager.AssignRandomStylesToRooms(roomStyleManager);
+        roomManager.AssignFractions();
+
         //roomManager.PrintRoomsInfo();
-        roomManager.ClearRoomsInfoFromMap();
-        roomManager.DisplayRoomsInfoOnMap();
 
         PaintFromDungeonMap(map);
+
+        roomManager.ClearRoomsInfoFromMap();
+        roomManager.DisplayRoomsInfoOnMap();
     }
 
     /// <summary>
