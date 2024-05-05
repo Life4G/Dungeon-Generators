@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.scellecs.morpeh": {
+      "version": "https://github.com/X-Crew/Morpeh.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "2eb519ce4a4c3d0cc3096e92d0db1166aa69d88a"
+    },
     "com.unity.2d.animation": {
       "version": "9.0.4",
       "depth": 1,
