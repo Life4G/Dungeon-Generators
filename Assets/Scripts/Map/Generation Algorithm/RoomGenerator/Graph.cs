@@ -81,7 +81,6 @@ public class Graph
     }
     private int minKey(int[] key, bool[] mstSet)
     {
-        // Initialize min value
         int min = int.MaxValue, min_index = -1;
 
         for (int v = 0; v < vertices.Count; v++)
