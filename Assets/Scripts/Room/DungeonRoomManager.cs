@@ -25,7 +25,8 @@ namespace Assets.Scripts.Room
         {
             Sequential,
             Random,
-            GraphBased
+            SequentiallyGraphBased, // последовательное
+            ParallelGraphBased      // параллельное
         }
 
         [SerializeField]
@@ -44,8 +45,11 @@ namespace Assets.Scripts.Room
                 case DistributionMethod.Random:
                     AssignFractionsToRoomsRandomly();
                     break;
-                case DistributionMethod.GraphBased:
-                    AssignFractionsToRoomsGraphBased(graph);
+                case DistributionMethod.SequentiallyGraphBased:
+                    AssignFractionsToRoomsSequentiallyGraphBased(graph);
+                    break;
+                case DistributionMethod.ParallelGraphBased:
+                    AssignFractionsToRoomsParallelGraphBased(graph);
                     break;
             }
         }
@@ -364,7 +368,6 @@ namespace Assets.Scripts.Room
             }
         }
 
-
         /// <summary>
         /// Очищает информацию о комнатах на карте.
         /// </summary>
@@ -456,6 +459,7 @@ namespace Assets.Scripts.Room
         }
 
 
+
         /// <summary>
         /// Последовательное присваивание комнатам, не являющимся коридорами, индексы фракций на основе их коэффициентов.
         /// </summary>
@@ -528,7 +532,7 @@ namespace Assets.Scripts.Room
                 return;
             }
 
-            // очиста прошлых присваиваний
+            // очистка прошлых присваиваний
             foreach (var room in rooms)
             {
                 room.fractionIndex = -1; // -1 - отсутствие фракции
@@ -575,8 +579,24 @@ namespace Assets.Scripts.Room
             }
         }
 
-        public void AssignFractionsToRoomsGraphBased(int[,] connections)
+        /// <summary>
+        /// Параллельное присваивание комнатам, не являющимся коридорами, индексы фракций на основе их коэффициентов и графа соединений.
+        /// </summary>
+        /// <param name="connections">Граф соединений комнат коридорами.</param>
+        public void AssignFractionsToRoomsParallelGraphBased(int[,] connections)
         {
+            if (fractionManager.fractions.Count == 0)
+            {
+                Debug.LogError("Fractions not defined.");
+                return;
+            }
+
+            // очиста прошлых присваиваний
+            foreach (var room in rooms)
+            {
+                room.fractionIndex = -1; // -1 - отсутствие фракции
+            }
+
             int totalRooms = CountNonCorridorRooms();
             List<int> availableRooms = rooms.Where(room => !room.isCorridor).Select(room => room.id).ToList();
             Dictionary<int, int> roomToFaction = new Dictionary<int, int>();
@@ -584,23 +604,24 @@ namespace Assets.Scripts.Room
             Dictionary<int, int> roomsTarget = fractionManager.CalculateRoomsForAllFractions(totalRooms);
             System.Random random = new System.Random();
 
-            // Логируем начальные цели по комнатам для каждой фракции
+            // логи - старт
+            Debug.Log($"Total rooms: {availableRooms.Count}");
             foreach (var target in roomsTarget)
             {
-                Debug.Log($"Фракция {fractionManager.fractions[target.Key].name} должна занять {target.Value} комнат.");
+                Debug.Log($"Fraction {fractionManager.fractions[target.Key].name} needs {target.Value} rooms");
             }
 
-            // Начальное распределение по одной комнате для каждой фракции
-            foreach (var factionIndex in activeFactions)
+            // по одной комнате на фракцию
+            foreach (var factionIndex in activeFactions.ToList())
             {
                 if (availableRooms.Count == 0) break;
                 int roomIndex = random.Next(availableRooms.Count);
                 int roomId = availableRooms[roomIndex];
                 roomToFaction[roomId] = factionIndex;
                 availableRooms.RemoveAt(roomIndex);
+                Debug.Log($"Fraction {fractionManager.fractions[factionIndex].name} starts with room {roomId}");
             }
 
-            // Основной цикл распределения
             bool addedAnyRoom;
             do
             {
@@ -611,8 +632,9 @@ namespace Assets.Scripts.Room
                 {
                     var ownedRooms = roomToFaction.Where(pair => pair.Value == factionIndex).Select(pair => pair.Key).ToList();
                     List<int> expandableRooms = new List<int>();
+                    bool foundExpandable = false;
 
-                    // Найти смежные комнаты, которые можно занять
+                    // найти смежные свободые комнаты
                     foreach (var ownedRoomId in ownedRooms)
                     {
                         for (int i = 0; i < rooms.Length; i++)
@@ -620,6 +642,7 @@ namespace Assets.Scripts.Room
                             if (ownedRoomId < connections.GetLength(0) && i < connections.GetLength(1) && connections[ownedRoomId, i] >= 0 && availableRooms.Contains(i) && !roomToFaction.ContainsKey(i))
                             {
                                 expandableRooms.Add(i);
+                                foundExpandable = true;
                             }
                         }
                     }
@@ -630,26 +653,34 @@ namespace Assets.Scripts.Room
                         roomToFaction[newRoomId] = factionIndex;
                         availableRooms.Remove(newRoomId);
                         addedAnyRoom = true;
+                    }
+                    else if (!foundExpandable && availableRooms.Count > 0) // если не найдено свободных соседей, назначить случайную комнату
+                    {
+                        int randomRoomId = availableRooms[random.Next(availableRooms.Count)];
+                        roomToFaction[randomRoomId] = factionIndex;
+                        availableRooms.Remove(randomRoomId);
+                        addedAnyRoom = true;
+                    }
 
-                        int currentCount = roomToFaction.Count(pair => pair.Value == factionIndex);
-                        if (currentCount < roomsTarget[factionIndex])
-                        {
-                            nextRoundActiveFactions.Add(factionIndex);
-                        }
+                    int currentCount = roomToFaction.Count(pair => pair.Value == factionIndex);
+
+                    if (currentCount < roomsTarget[factionIndex])
+                    {
+                        nextRoundActiveFactions.Add(factionIndex);
                     }
                 }
 
                 activeFactions = nextRoundActiveFactions;
-            } while (addedAnyRoom && availableRooms.Count > 0 && activeFactions.Count > 0);
+            } while (addedAnyRoom && availableRooms.Count > 0);
 
-            // Логируем конечные результаты распределения
+            // логи - финиш
             foreach (var faction in fractionManager.fractions.Select((f, idx) => idx))
             {
                 int roomCount = roomToFaction.Count(pair => pair.Value == faction);
-                Debug.Log($"Фракция {fractionManager.fractions[faction].name} занимает {roomCount} комнат.");
+                Debug.Log($"Fraction {fractionManager.fractions[faction].name} has {roomCount} rooms");
             }
 
-            // Применить распределение к комнатам
+            // применить распределение к комнатам
             foreach (var room in rooms)
             {
                 if (roomToFaction.ContainsKey(room.id))
@@ -658,5 +689,106 @@ namespace Assets.Scripts.Room
                 }
             }
         }
+
+        /// <summary>
+        /// Последовательное присваивание комнатам, не являющимся коридорами, индексы фракций на основе их коэффициентов и графа соединений.
+        /// </summary>
+        /// <param name="connections">Граф соединений комнат коридорами.</param>
+        public void AssignFractionsToRoomsSequentiallyGraphBased(int[,] connections)
+        {
+            if (fractionManager.fractions.Count == 0)
+            {
+                Debug.LogError("Fractions not defined.");
+                return;
+            }
+
+            // очиста прошлых присваиваний
+            foreach (var room in rooms)
+            {
+                room.fractionIndex = -1; // -1 - отсутствие фракции
+            }
+
+            int totalRooms = CountNonCorridorRooms();
+            List<int> availableRooms = rooms.Where(room => !room.isCorridor).Select(room => room.id).ToList();
+            Dictionary<int, int> roomToFaction = new Dictionary<int, int>();
+            Dictionary<int, int> roomsTarget = fractionManager.CalculateRoomsForAllFractions(totalRooms);
+            System.Random random = new System.Random();
+
+            // логи - старт
+            Debug.Log($"Total rooms: {availableRooms.Count}");
+            foreach (var target in roomsTarget)
+            {
+                Debug.Log($"Fraction {fractionManager.fractions[target.Key].name} needs {target.Value} rooms");
+            }
+
+            foreach (var factionIndex in fractionManager.fractions.Select((f, idx) => idx))
+            {
+                if (availableRooms.Count == 0) break;
+
+                // стартовая комната
+                int startRoomIndex = random.Next(availableRooms.Count);
+                int startRoomId = availableRooms[startRoomIndex];
+                roomToFaction[startRoomId] = factionIndex;
+                availableRooms.RemoveAt(startRoomIndex);
+                Debug.Log($"Fraction {fractionManager.fractions[factionIndex].name} starts with room {startRoomId}");
+
+                // расширение
+                bool addedRoom;
+                do
+                {
+                    addedRoom = false;
+                    var ownedRooms = roomToFaction.Where(pair => pair.Value == factionIndex).Select(pair => pair.Key).ToList();
+
+                    foreach (var ownedRoomId in ownedRooms)
+                    {
+                        List<int> expandableRooms = new List<int>();
+
+                        // найти смежные свободые комнаты
+                        for (int i = 0; i < rooms.Length; i++)
+                        {
+                            if (ownedRoomId < connections.GetLength(0) && i < connections.GetLength(1) && connections[ownedRoomId, i] >= 0 && availableRooms.Contains(i) && !roomToFaction.ContainsKey(i))
+                            {
+                                expandableRooms.Add(i);
+                            }
+                        }
+
+                       // если найдена
+                        if (expandableRooms.Count > 0 && roomToFaction.Count(pair => pair.Value == factionIndex) < roomsTarget[factionIndex])
+                        {
+                            int newRoomId = expandableRooms[random.Next(expandableRooms.Count)];
+                            roomToFaction[newRoomId] = factionIndex;
+                            availableRooms.Remove(newRoomId);
+                            addedRoom = true;
+                        }
+                    }
+
+                    // если не найдена - присвоить случайную
+                    if (!addedRoom && availableRooms.Count > 0 && roomToFaction.Count(pair => pair.Value == factionIndex) < roomsTarget[factionIndex])
+                    {
+                        int randomRoomId = availableRooms[random.Next(availableRooms.Count)];
+                        roomToFaction[randomRoomId] = factionIndex;
+                        availableRooms.Remove(randomRoomId);
+                        addedRoom = true;
+                    }
+                } while (addedRoom && roomToFaction.Count(pair => pair.Value == factionIndex) < roomsTarget[factionIndex]);
+            }
+
+            // логи - финиш
+            foreach (var faction in fractionManager.fractions.Select((f, idx) => idx))
+            {
+                int roomCount = roomToFaction.Count(pair => pair.Value == faction);
+                Debug.Log($"Fraction {fractionManager.fractions[faction].name} has {roomCount} rooms");
+            }
+
+            // применить распределение к комнатам
+            foreach (var room in rooms)
+            {
+                if (roomToFaction.ContainsKey(room.id))
+                {
+                    room.fractionIndex = roomToFaction[room.id];
+                }
+            }
+        }
+
     }
 }
