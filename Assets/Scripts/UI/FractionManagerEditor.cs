@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEditorInternal;
 using UnityEditor.SceneManagement;
 using Unity.VisualScripting;
+using Assets.Scripts.Room;
 
 namespace Assets.Scripts.UI
 {
@@ -193,7 +194,7 @@ namespace Assets.Scripts.UI
             Debug.Log("Fractions:"); int i = 0;
             foreach (var fraction in manager.fractions)
             {
-                Debug.Log($"Fraction name: {fraction.name}, Territory coefficient: {fraction.territoryCoefficient}, Rooms: {manager.CalculateRoomsForFraction(20, i)}");
+                Debug.Log($"Fraction name: {fraction.name}, Territory coefficient: {fraction.territoryCoefficient}, Rooms: {manager.CalculateRoomsForFraction(13, i)}");
                 i++;
             }
         }
