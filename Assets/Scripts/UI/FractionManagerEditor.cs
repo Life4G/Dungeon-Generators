@@ -178,6 +178,7 @@ namespace Assets.Scripts.UI
                     relationProperty.InsertArrayElementAtIndex(i);
                     relationProperty.GetArrayElementAtIndex(i).FindPropertyRelative("fraction1Index").intValue = newRelationships[i].fraction1Index;
                     relationProperty.GetArrayElementAtIndex(i).FindPropertyRelative("fraction2Index").intValue = newRelationships[i].fraction2Index;
+                    relationProperty.GetArrayElementAtIndex(i).FindPropertyRelative("relationshipType").intValue = (int)newRelationships[i].relationshipType;
                 }
             }
 
