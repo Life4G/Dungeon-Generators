@@ -24,6 +24,11 @@ public class GridManager : MonoBehaviour
 
     private DungeonMap map;
 
+    public DungeonMap GetDungeonMap()
+    {
+        return map;
+    }
+
     /// <summary>
     /// Устанавливает текущий стиль комнаты, используя имя стиля.
     /// </summary>
@@ -424,7 +429,7 @@ public class GridManager : MonoBehaviour
     /// <summary>
     /// Инициализация и генерация начальной карты подземелья при старте.
     /// </summary>
-    void Start()
+    void Awake()
     {
         Reload();
     }
