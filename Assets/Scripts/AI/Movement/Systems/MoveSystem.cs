@@ -52,7 +52,7 @@ namespace ECS
                 ref var moveRequest = ref moveRequestStash.Get(entity);
 
                 // Генерация пути
-                List<Vector2Int> path = Pathfinding.FindPath(moveRequest.start, moveRequest.target, map);
+                List<Vector2Int> path = PathfindingAStar.FindPath(moveRequest.start, moveRequest.target, map);
 
                 if (path != null && path.Count > 0)
                 {
