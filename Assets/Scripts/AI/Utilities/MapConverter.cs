@@ -4,8 +4,40 @@ using UnityEngine;
 
 using Assets.Scripts.Map;
 
-public static class MapConverter
+public class MapConverter : MonoBehaviour
 {
+    private bool[,] passabilityMap;
+    public bool[,] Map => passabilityMap;
+
+    private void Start()
+    {
+        ConvertMap();
+    }
+
+    private void ConvertMap()
+    {
+        var gridManager = GameObject.FindObjectOfType<GridManager>();
+
+        if (gridManager != null)
+        {
+            var dungeonMap = gridManager.GetDungeonMap();
+
+            if (dungeonMap != null)
+            {
+                passabilityMap = ConvertToBoolArray(dungeonMap);
+                Debug.Log("Карта успешно конвертирована в MapConverter");
+            }
+            else
+            {
+                Debug.LogError("Карта подземелья не найдена в GridManager!");
+            }
+        }
+        else
+        {
+            Debug.LogError("GridManager не найден!");
+        }
+    }
+
     public static bool[,] ConvertToBoolArray(DungeonMap dungeonMap)
     {
         int width = dungeonMap.GetWidth();

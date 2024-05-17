@@ -12,44 +12,52 @@ namespace ECS
     [CreateAssetMenu(menuName = "ECS/Systems/" + nameof(MoveSystem))]
     public sealed class MoveSystem : UpdateSystem
     {
+        private Filter moveRequestFilter;
+        private Filter movingFilter;
 
-        public bool[,] map; // Ссылка на ваш игровой массив
+        private Stash<MoveRequest> moveRequestStash;
+        private Stash<MovingFlag> movingFlagStash;
+        private Stash<PositionComponent> positionStash;
+
+        public bool[,] map;
 
         public override void OnAwake()
         {
-            // Поиск объекта с компонентом GridManager
-            var gridManager = GameObject.FindObjectOfType<GridManager>();
+            // Инициализация фильтров
+            this.moveRequestFilter = this.World.Filter.With<MoveRequest>().Build();
+            this.movingFilter = this.World.Filter.With<MovingFlag>().Build();
 
-            if (gridManager != null)
+            // Инициализация стэшей компонентов
+            this.moveRequestStash = this.World.GetStash<MoveRequest>();
+            this.movingFlagStash = this.World.GetStash<MovingFlag>();
+            this.positionStash = this.World.GetStash<PositionComponent>();
+
+            var mapConverter = GameObject.FindObjectOfType<MapConverter>();
+
+            if (mapConverter != null)
             {
-                // Получение карты подземелья
-                var dungeonMap = gridManager.GetDungeonMap();
-
-                if (dungeonMap != null)
+                map = mapConverter.Map;
+                if (map != null)
                 {
-                    // Конвертация карты в булевый массив
-                    map = MapConverter.ConvertToBoolArray(dungeonMap);
-
-                    Debug.Log("Карта успешно конвертирована в системе перемещения");
+                    Debug.Log("Карта успешно получена в MoveSystem");
                 }
+                else
+                {
+                    Debug.LogError("Карта подземелья не найдена в MapConverter!");
+                }
+            }
+            else
+            {
+                Debug.LogError("MapConverter не найден!");
             }
         }
 
         public override void OnUpdate(float deltaTime)
         {
-            // Создание фильтров
-            var moveRequestFilter = this.World.Filter.With<MoveRequest>().Build();
-            var movingFilter = this.World.Filter.With<MovingFlag>().Build();
-
-            // Получение стэшей компонентов
-            var moveRequestStash = this.World.GetStash<MoveRequest>();
-            var movingFlagStash = this.World.GetStash<MovingFlag>();
-            var positionStash = this.World.GetStash<PositionComponent>();
-
             // Обработка новых запросов на перемещение
-            foreach (var entity in moveRequestFilter)
+            foreach (var entity in this.moveRequestFilter)
             {
-                ref var moveRequest = ref moveRequestStash.Get(entity);
+                ref var moveRequest = ref this.moveRequestStash.Get(entity);
 
                 // Генерация пути
                 List<Vector2Int> path = PathfindingAStar.FindPath(moveRequest.start, moveRequest.target, map);
@@ -63,18 +71,18 @@ namespace ECS
                     };
 
                     // Добавление компонента MovingFlag
-                    movingFlagStash.Set(entity, movingFlag);
+                    this.movingFlagStash.Set(entity, movingFlag);
                 }
 
                 // Удаление компонента MoveRequest после обработки
-                moveRequestStash.Remove(entity);
+                this.moveRequestStash.Remove(entity);
             }
 
             // Обработка сущностей, находящихся в процессе перемещения
-            foreach (var entity in movingFilter)
+            foreach (var entity in this.movingFilter)
             {
-                ref var movingFlag = ref movingFlagStash.Get(entity);
-                ref var positionComponent = ref positionStash.Get(entity);
+                ref var movingFlag = ref this.movingFlagStash.Get(entity);
+                ref var positionComponent = ref this.positionStash.Get(entity);
 
                 if (movingFlag.currentIndex < movingFlag.path.Count)
                 {
@@ -85,7 +93,7 @@ namespace ECS
                     if (movingFlag.currentIndex >= movingFlag.path.Count)
                     {
                         // Удаление флага перемещения при достижении цели
-                        movingFlagStash.Remove(entity);
+                        this.movingFlagStash.Remove(entity);
                     }
                 }
             }
