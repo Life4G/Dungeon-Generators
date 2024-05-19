@@ -142,6 +142,9 @@ public class GridManager : MonoBehaviour
 
                     DungeonRoom room1 = roomManager.GetRoomById(room1Index);
                     DungeonRoom room2 = roomManager.GetRoomById(room2Index);
+                    
+                    Vector2Int connectionPos1 = generator.GetGraph().GetCorridor(dungeonMap.tiles[x, y].roomIndex).GetPosById(room1Index);
+                    Vector2Int connectionPos2 = generator.GetGraph().GetCorridor(dungeonMap.tiles[x, y].roomIndex).GetPosById(room2Index);
 
                     RoomStyle style1 = roomStyleManager.GetRoomStyle(roomManager.GetRoomStyleId(room1Index));
                     RoomStyle style2 = roomStyleManager.GetRoomStyle(roomManager.GetRoomStyleId(room2Index));
@@ -189,8 +192,8 @@ public class GridManager : MonoBehaviour
                     {
                         TileBase tileToUse2 = null;
 
-                        float distanceToRoom1Center = Vector2.Distance(new Vector2(x, y), new Vector2(room1.centerX, room1.centerY));
-                        float distanceToRoom2Center = Vector2.Distance(new Vector2(x, y), new Vector2(room2.centerX, room2.centerY));
+                        float distanceToRoom1Center = Vector2.Distance(new Vector2(y, x), connectionPos1);
+                        float distanceToRoom2Center = Vector2.Distance(new Vector2(y, x), connectionPos2);
                         float totalDistance = distanceToRoom1Center + distanceToRoom2Center;
                         float blendFactor = 1.0f - (distanceToRoom1Center / totalDistance);
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Drawing;
 using UnityEngine;
 using UnityEngine.TextCore.LowLevel;
+using UnityEditorInternal;
 
 public class Graph
 {
@@ -16,7 +17,15 @@ public class Graph
         vertices = rooms.ToList();
         edges = Triangulation(maxWidth, maxHeigth);
         graphMap = CalcMap();
-        edges = SpanningTree();
+        List<GraphEdge> spanningTree = SpanningTree(edges);
+        edges.Except(spanningTree);
+        for(int i =0; i < UnityEngine.Random.Range(0, edges.Count); i++) 
+        {
+            int index = UnityEngine.Random.Range(0, edges.Count);
+            spanningTree.Add(edges[index]);
+            edges.RemoveAt(index);
+        }
+        edges = spanningTree;
         AdjustEdges();
         graphMap = CalcMap();
 
@@ -79,6 +88,52 @@ public class Graph
         }
         return neighbors;
     }
+    private void AdjustEdges()
+    {
+        foreach (GraphEdge edge in edges)
+        {
+            edge.AdjustPos(vertices[edge.idRoomFirst], vertices[edge.idRoomSecond]);
+        }
+    }
+    private int[,] CalcMap()
+    {
+        int[,] map;
+        if (graphMap == null)
+        {
+            map = new int[vertices.Count, vertices.Count];
+            for (int i = 0; i < vertices.Count; i++)
+                for (int j = 0; j < vertices.Count; j++)
+                    map[i, j] = -1;
+
+            for (int i = 0; i < edges.Count; i++)
+            {
+                map[edges[i].idRoomFirst, edges[i].idRoomSecond] = i;
+                map[edges[i].idRoomSecond, edges[i].idRoomFirst] = i;
+            }
+        }
+        else
+        {
+            map = graphMap;
+            for (int i = 0; i < vertices.Count; i++)
+                for (int j = 0; j < vertices.Count; j++)
+                    graphMap[i, j] = -1;
+
+            for (int i = 0; i < edges.Count; i++)
+            {
+                graphMap[edges[i].idRoomFirst, edges[i].idRoomSecond] = i;
+                graphMap[edges[i].idRoomSecond, edges[i].idRoomFirst] = i;
+            }
+        }
+        return map;
+    }
+    private void FinalizeMap()
+    {
+        for (int i = 0; i < vertices.Count; i++)
+            for (int j = 0; j < vertices.Count; j++)
+                if (graphMap[i, j] != -1)
+                    graphMap[i, j] += vertices.Count();
+    }
+
     private int minKey(int[] key, bool[] mstSet)
     {
         int min = int.MaxValue, min_index = -1;
@@ -92,7 +147,7 @@ public class Graph
 
         return min_index;
     }
-    private List<GraphEdge> SpanningTree()
+    private List<GraphEdge> SpanningTree(List<GraphEdge> edges)
     {
         int[] parent = new int[vertices.Count];
 
@@ -118,7 +173,7 @@ public class Graph
                     && edges[graphMap[u, v]].GetLength() < key[v])
                 {
                     parent[v] = u;
-                    key[v] = edges[graphMap[u, v]].GetLength();
+                    key[v] = (int)edges[graphMap[u, v]].GetLength();
                 }
         }
         List<GraphEdge> edgesNew = new List<GraphEdge>();
@@ -181,51 +236,6 @@ public class Graph
 
         return edges;
     }
-    private void AdjustEdges()
-    {
-        foreach (GraphEdge edge in edges)
-        {
-            edge.AdjustPos(vertices[edge.idRoomFirst], vertices[edge.idRoomSecond]);
-        }
-    }
-    private int[,] CalcMap()
-    {
-        int[,] map;
-        if (graphMap == null)
-        {
-            map = new int[vertices.Count, vertices.Count];
-            for (int i = 0; i < vertices.Count; i++)
-                for (int j = 0; j < vertices.Count; j++)
-                    map[i, j] = -1;
-
-            for (int i = 0; i < edges.Count; i++)
-            {
-                map[edges[i].idRoomFirst, edges[i].idRoomSecond] = i;
-                map[edges[i].idRoomSecond, edges[i].idRoomFirst] = i;
-            }
-        }
-        else
-        {
-            map = graphMap;
-            for (int i = 0; i < vertices.Count; i++)
-                for (int j = 0; j < vertices.Count; j++)
-                    graphMap[i, j] = -1;
-
-            for (int i = 0; i < edges.Count; i++)
-            {
-                graphMap[edges[i].idRoomFirst, edges[i].idRoomSecond] = i;
-                graphMap[edges[i].idRoomSecond, edges[i].idRoomFirst] = i;
-            }
-        }
-        return map;
-    }
-    private void FinalizeMap()
-    {
-        for (int i = 0; i < vertices.Count; i++)
-            for (int j = 0; j < vertices.Count; j++)
-                if (graphMap[i, j] != -1)
-                    graphMap[i, j] += vertices.Count();
-    }
 }
 
 public class GraphEdge
@@ -234,20 +244,22 @@ public class GraphEdge
     public int idRoomSecond;
     public Vector2Int posPoint1;
     public Vector2Int posPoint2;
-    private int length;
+    private float length;
     public GraphEdge(int idFirst, int idSecond)
     {
-        this.idRoomFirst = idFirst;
-        this.idRoomSecond = idSecond;
+        idRoomFirst = idFirst;
+        idRoomSecond = idSecond;
+        posPoint1 = Vector2Int.zero;
+        posPoint2 = Vector2Int.zero;
+        length = -1;
     }
     public GraphEdge(int idFirst, int idSecond, Vector2Int posPoint1, Vector2Int posPoint2)
     {
-        this.idRoomFirst = idFirst;
-        this.idRoomSecond = idSecond;
+        idRoomFirst = idFirst;
+        idRoomSecond = idSecond;
         this.posPoint1 = posPoint1;
         this.posPoint2 = posPoint2;
-        this.length = (int)Vector2.Distance(posPoint1, posPoint2);
-
+        length = Vector2.Distance(posPoint1, posPoint2);
     }
     public static bool operator ==(GraphEdge first, GraphEdge second)
     {
@@ -296,9 +308,17 @@ public class GraphEdge
     {
         return new Tuple<Vector2Int, Vector2Int>(posPoint1, posPoint2);
     }
-    public int GetLength()
+    public float GetLength()
     {
-        return (int)Vector2Int.Distance(posPoint1, posPoint2);
+        return length;
+    }
+    public Vector2Int GetPosById(int id)
+    {
+        if (id == idRoomFirst)
+            return posPoint1;
+        if (id == idRoomSecond)
+            return posPoint2;
+        return Vector2Int.zero;
     }
     public void SetPoses(Vector2Int posPoint1, Vector2Int posPoint2)
     {
@@ -307,7 +327,7 @@ public class GraphEdge
     }
     public void AdjustPos(Room room, Room roomOther)
     {
-        
+
         Vector2Int roomPos = room.GetPos();
         Vector2Int roomPosOther = roomOther.GetPosCenter();
         int newX = -1;
