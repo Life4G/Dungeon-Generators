@@ -13,4 +13,5 @@ namespace ECS{
         public List<Entity> visibleEntities;
         public float visionRange;
     }
+
 }

@@ -293,7 +293,7 @@ namespace Assets.Scripts.Room
         {
             foreach (DungeonRoom room in rooms)
             {
-                Debug.Log($"Room ID: {room.id}, Name: {room.name}, Size: {room.size}, Width: {room.width}, Height: {room.height}, Style ID: {room.styleId}, isCorridor: {room.isCorridor}");
+                //Debug.Log($"Room ID: {room.id}, Name: {room.name}, Size: {room.size}, Width: {room.width}, Height: {room.height}, Style ID: {room.styleId}, isCorridor: {room.isCorridor}");
             }
         }
 
@@ -325,47 +325,47 @@ namespace Assets.Scripts.Room
         /// </summary>
         public void DisplayRoomsInfoOnMap()
         {
-            // удалить старую инфу
-            ClearRoomsInfoFromMap();
+            //// удалить старую инфу
+            //ClearRoomsInfoFromMap();
 
-            GameObject textParent = new GameObject("RoomsInfo");
+            //GameObject textParent = new GameObject("RoomsInfo");
 
-            // случайные цвета
-            Color[] factionColors = new Color[fractionManager.fractions.Count];
-            for (int i = 0; i < fractionManager.fractions.Count; i++)
-            {
-                factionColors[i] = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
-            }
+            //// случайные цвета
+            //Color[] factionColors = new Color[fractionManager.fractions.Count];
+            //for (int i = 0; i < fractionManager.fractions.Count; i++)
+            //{
+            //    factionColors[i] = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
+            //}
 
-            foreach (DungeonRoom room in rooms)
-            {
-                GameObject textObj = new GameObject($"RoomInfo_{room.id}");
-                textObj.transform.SetParent(textParent.transform);
+            //foreach (DungeonRoom room in rooms)
+            //{
+            //    GameObject textObj = new GameObject($"RoomInfo_{room.id}");
+            //    textObj.transform.SetParent(textParent.transform);
 
-                Vector3 textPosition = new Vector3(room.centerX, room.centerY, 0);
-                textObj.transform.position = textPosition;
+            //    Vector3 textPosition = new Vector3(room.centerX, room.centerY, 0);
+            //    textObj.transform.position = textPosition;
 
-                TextMesh textMesh = textObj.AddComponent<TextMesh>();
+            //    TextMesh textMesh = textObj.AddComponent<TextMesh>();
 
-                string roomType = room.isCorridor ? "corridor" : "room";
-                string fractionName = room.fractionIndex >= 0 ? fractionManager.fractions[room.fractionIndex].name : "None";
-                textMesh.text = $"ID: {room.id} ({roomType})\nFraction: {fractionName}\nSize: {room.size}\nWidth: {room.width}\nHeight: {room.height}";
+            //    string roomType = room.isCorridor ? "corridor" : "room";
+            //    string fractionName = room.fractionIndex >= 0 ? fractionManager.fractions[room.fractionIndex].name : "None";
+            //    textMesh.text = $"ID: {room.id} ({roomType})\nFraction: {fractionName}\nSize: {room.size}\nWidth: {room.width}\nHeight: {room.height}";
 
-                // цвет
-                if (room.fractionIndex >= 0 && room.fractionIndex < factionColors.Length)
-                {
-                    textMesh.color = factionColors[room.fractionIndex];
-                }
-                else
-                {
-                    textMesh.color = Color.white; // без фракции или коридоры
-                }
+            //    // цвет
+            //    if (room.fractionIndex >= 0 && room.fractionIndex < factionColors.Length)
+            //    {
+            //        textMesh.color = factionColors[room.fractionIndex];
+            //    }
+            //    else
+            //    {
+            //        textMesh.color = Color.white; // без фракции или коридоры
+            //    }
 
-                textMesh.characterSize = 0.1f;
-                textMesh.anchor = TextAnchor.MiddleCenter;
-                textMesh.fontSize = 100;
-                textMesh.fontStyle = FontStyle.Bold;
-            }
+            //    textMesh.characterSize = 0.1f;
+            //    textMesh.anchor = TextAnchor.MiddleCenter;
+            //    textMesh.fontSize = 100;
+            //    textMesh.fontStyle = FontStyle.Bold;
+            //}
         }
 
         /// <summary>

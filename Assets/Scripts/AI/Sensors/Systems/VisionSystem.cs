@@ -22,12 +22,6 @@ namespace ECS
 
         public override void OnAwake()
         {
-            this.visionFilter = this.World.Filter.With<VisionComponent>().With<PositionComponent>().Build();
-            this.positionFilter = this.World.Filter.With<PositionComponent>().Build();
-
-            this.visionStash = this.World.GetStash<VisionComponent>();
-            this.positionStash = this.World.GetStash<PositionComponent>();
-
             var mapConverter = GameObject.FindObjectOfType<MapConverter>();
 
             if (mapConverter != null)
@@ -50,6 +44,12 @@ namespace ECS
 
         public override void OnUpdate(float deltaTime)
         {
+            this.visionFilter = this.World.Filter.With<VisionComponent>().With<PositionComponent>().Build();
+            this.positionFilter = this.World.Filter.With<PositionComponent>().Build();
+
+            this.visionStash = this.World.GetStash<VisionComponent>();
+            this.positionStash = this.World.GetStash<PositionComponent>();
+
             foreach (var visionEntity in this.visionFilter)
             {
                 ref var visionComponent = ref this.visionStash.Get(visionEntity);

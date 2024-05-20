@@ -2,6 +2,7 @@ using Scellecs.Morpeh;
 using UnityEngine;
 using Unity.IL2CPP.CompilerServices;
 
+
 namespace ECS
 {
     [System.Serializable]
@@ -12,4 +13,5 @@ namespace ECS
     {
         public Vector2Int position;
     }
+
 }
