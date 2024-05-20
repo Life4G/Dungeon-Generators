@@ -42,17 +42,35 @@ public class MapConverter : MonoBehaviour
     {
         int width = dungeonMap.GetWidth();
         int height = dungeonMap.GetHeight();
+        Debug.Log($"Width ={width}, height = {height}");
         bool[,] boolArray = new bool[width, height];
 
         for (int y = 0; y < height; y++)
         {
             for (int x = 0; x < width; x++)
             {
-                boolArray[x, y] = dungeonMap.tiles[x, y].isPassable;
+                if (dungeonMap.tiles[x, y].roomIndex >= 0)
+                    boolArray[x, y] = true;
+                else
+                    boolArray[x, y] = false;
             }
         }
 
         return boolArray;
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (passabilityMap == null) return;
+
+        for (int x = 0; x < passabilityMap.GetLength(0); x++)
+        {
+            for (int y = 0; y < passabilityMap.GetLength(1); y++)
+            {
+                Gizmos.color = passabilityMap[x, y] ? Color.green : Color.red;
+                Gizmos.DrawCube(new Vector3(x, y, 0), Vector3.one * 0.9f);
+            }
+        }
     }
 }
 

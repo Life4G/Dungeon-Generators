@@ -26,7 +26,18 @@ public class GridManager : MonoBehaviour
 
     public DungeonMap GetDungeonMap()
     {
+        if (map != null) Debug.Log("map != null");
+        for (int y = 0; y < map.GetHeight(); y++)
+        {
+            for (int x = 0; x < map.GetWidth(); x++)
+            {
+                DungeonTile tile = map.GetTile(x, y);
+                //boolArray[x, y] = tile.isPassable;
+                //Debug.Log($"Tile ({x}, {y}): isPassable = {tile.isPassable}");
+            }
+        }
         return map;
+
     }
 
     /// <summary>
