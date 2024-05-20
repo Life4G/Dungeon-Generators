@@ -49,28 +49,25 @@ public class MapConverter : MonoBehaviour
         {
             for (int x = 0; x < width; x++)
             {
-                if (dungeonMap.tiles[x, y].roomIndex >= 0)
-                    boolArray[x, y] = true;
-                else
-                    boolArray[x, y] = false;
+                boolArray[x, y] = dungeonMap.tiles[x, y].isPassable;
             }
         }
 
         return boolArray;
     }
 
-    private void OnDrawGizmos()
-    {
-        if (passabilityMap == null) return;
+    //private void OnDrawGizmos()
+    //{
+    //    if (passabilityMap == null) return;
 
-        for (int x = 0; x < passabilityMap.GetLength(0); x++)
-        {
-            for (int y = 0; y < passabilityMap.GetLength(1); y++)
-            {
-                Gizmos.color = passabilityMap[x, y] ? Color.green : Color.red;
-                Gizmos.DrawCube(new Vector3(x, y, 0), Vector3.one * 0.9f);
-            }
-        }
-    }
+    //    for (int x = 0; x < passabilityMap.GetLength(0); x++)
+    //    {
+    //        for (int y = 0; y < passabilityMap.GetLength(1); y++)
+    //        {
+    //            Gizmos.color = passabilityMap[x, y] ? Color.green : Color.red;
+    //            Gizmos.DrawCube(new Vector3(x, y, 0), Vector3.one * 0.9f);
+    //        }
+    //    }
+    //}
 }
 

@@ -195,10 +195,12 @@ namespace Assets.Scripts.Map
             {
                 for (int x = 0; x < width; x++)
                 {
-                    if (walls[x, y] != -1) tiles[x, y].roomIndex = walls[x, y];
+                    if (walls[x, y] != -1)
+                    { tiles[x, y].roomIndex = walls[x, y]; tiles[x, y].isPassable = false; }
+                    else tiles[x, y].isPassable = true;
                     tiles[x, y].hasAdjacentWall = false;
                     tiles[x, y].isCorner = false;
-                    tiles[x, y].isPassable = false;
+
                 }
             }
 
@@ -225,6 +227,7 @@ namespace Assets.Scripts.Map
                         else if (top) tiles[x, y].textureType = 7;              // верхняя стена
                         else if (bottom) tiles[x, y].textureType = 8;           // нижняя стена
                     }
+
                 }
             }
 
