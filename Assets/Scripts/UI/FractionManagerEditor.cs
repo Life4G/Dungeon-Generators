@@ -6,6 +6,7 @@ using UnityEditorInternal;
 using UnityEditor.SceneManagement;
 using Unity.VisualScripting;
 using Assets.Scripts.Room;
+using UnityEngine.Localization.SmartFormat.Core.Parsing;
 
 namespace Assets.Scripts.UI
 {
@@ -26,7 +27,7 @@ namespace Assets.Scripts.UI
             {
                 var element = fractionList.serializedProperty.GetArrayElementAtIndex(index);
                 rect.y += 2;
-                float halfWidth = rect.width * 0.5f;
+                float halfWidth = rect.width * 0.3f;
 
                 // имя фракции
                 string newName = EditorGUI.TextField(
@@ -41,6 +42,11 @@ namespace Assets.Scripts.UI
                     element.FindPropertyRelative("territoryCoefficient").floatValue
                 );
                 element.FindPropertyRelative("territoryCoefficient").floatValue = newCoefficient;
+
+                Color color = EditorGUI.ColorField(new Rect(rect.x + (halfWidth + 5) * 2, rect.y, halfWidth - 5, EditorGUIUtility.singleLineHeight), GUIContent.none,
+                    element.FindPropertyRelative("color").colorValue, false, false, false
+                    ) ; 
+                element.FindPropertyRelative("color").colorValue = color;
             };
 
             fractionList.elementHeight = EditorGUIUtility.singleLineHeight + 4;
@@ -67,6 +73,12 @@ namespace Assets.Scripts.UI
                 int fraction1Index = element.FindPropertyRelative("fraction1Index").intValue;
                 int fraction2Index = element.FindPropertyRelative("fraction2Index").intValue;
 
+                Color fraction1Color = fractionList.serializedProperty.GetArrayElementAtIndex(fraction1Index).FindPropertyRelative("color").colorValue;
+                Color fraction2Color = fractionList.serializedProperty.GetArrayElementAtIndex(fraction2Index).FindPropertyRelative("color").colorValue;
+
+
+
+
                 string fraction1Name = fraction1Index >= 0 && fraction1Index < fractionsProperty.arraySize
                                        ? fractionsProperty.GetArrayElementAtIndex(fraction1Index).FindPropertyRelative("name").stringValue
                                        : "None";
@@ -75,10 +87,12 @@ namespace Assets.Scripts.UI
                                        : "None";
 
                 float halfWidth = rect.width * 0.25f;
-
-                EditorGUI.LabelField(new Rect(rect.x, rect.y, halfWidth - 5, EditorGUIUtility.singleLineHeight), fraction1Name);
+                GUIStyle textStyle = new GUIStyle();
+                textStyle.normal.textColor = fraction1Color;
+                EditorGUI.LabelField(new Rect(rect.x, rect.y, halfWidth - 5, EditorGUIUtility.singleLineHeight), fraction1Name,textStyle);
                 EditorGUI.LabelField(new Rect(rect.x + halfWidth + 5, rect.y, halfWidth - 5, EditorGUIUtility.singleLineHeight), "-");
-                EditorGUI.LabelField(new Rect(rect.x + halfWidth * 2 + 5, rect.y, halfWidth - 5, EditorGUIUtility.singleLineHeight), fraction2Name);
+                textStyle.normal.textColor = fraction2Color;
+                EditorGUI.LabelField(new Rect(rect.x + halfWidth * 2 + 5, rect.y, halfWidth - 5, EditorGUIUtility.singleLineHeight), fraction2Name,textStyle);
 
                 // поле для изменения типа взаимотношений
                 EditorGUI.PropertyField(

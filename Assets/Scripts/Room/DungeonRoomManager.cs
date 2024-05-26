@@ -330,11 +330,12 @@ namespace Assets.Scripts.Room
 
             GameObject textParent = new GameObject("RoomsInfo");
 
-            // случайные цвета
+            // Уже не случайные цвета
             Color[] factionColors = new Color[fractionManager.fractions.Count];
             for (int i = 0; i < fractionManager.fractions.Count; i++)
             {
-                factionColors[i] = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
+                //factionColors[i] = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
+                factionColors[i] = fractionManager.fractions[i].color;
             }
 
             foreach (DungeonRoom room in rooms)
@@ -788,6 +789,10 @@ namespace Assets.Scripts.Room
                     room.fractionIndex = roomToFaction[room.id];
                 }
             }
+        }
+        public Color GetRoomFractionColor(int id)
+        {
+            return fractionManager.GetColorByIndex(rooms[id].fractionIndex);
         }
 
     }

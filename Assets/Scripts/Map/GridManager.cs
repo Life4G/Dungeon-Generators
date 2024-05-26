@@ -6,6 +6,7 @@ using System.Linq;
 using Assets.Scripts.Map;
 using TMPro;
 using Unity.VisualScripting;
+using Assets.Scripts.Fraction;
 
 public class GridManager : MonoBehaviour
 {
@@ -23,8 +24,7 @@ public class GridManager : MonoBehaviour
     [SerializeField]
     private DungeonRoomManager roomManager;
     private DungeonMap map;
-
-    private List<Vector3> gizmos;
+    private Graph graph;
 
     public DungeonMap GetDungeonMap()
     {
@@ -160,7 +160,7 @@ public class GridManager : MonoBehaviour
 
                     DungeonRoom room1 = roomManager.GetRoomById(room1Index);
                     DungeonRoom room2 = roomManager.GetRoomById(room2Index);
-                    
+
                     Vector2Int connectionPos1 = generator.GetGraph().GetCorridor(dungeonMap.tiles[x, y].roomIndex).GetPosById(room1Index);
                     Vector2Int connectionPos2 = generator.GetGraph().GetCorridor(dungeonMap.tiles[x, y].roomIndex).GetPosById(room2Index);
 
@@ -404,9 +404,9 @@ public class GridManager : MonoBehaviour
         Clear();
 
         map = new DungeonMap(generator.CreateDungeon(generator.GetSeed()));
-        gizmos = generator.GetGraph().GetGizmos();
+        graph = generator.GetGraph();
         //roomManager = new DungeonRoomManager(map, generator.graph.graphMap);
-        roomManager.Initialize(map, generator.GetGraph().GetGraphMap());
+        roomManager.Initialize(map, graph.GetGraphMap());
         roomManager.AssignRandomStylesToRooms(roomStyleManager);
         roomManager.AssignFractions();
 
@@ -414,7 +414,7 @@ public class GridManager : MonoBehaviour
         roomManager.ClearRoomsInfoFromMap();
         roomManager.DisplayRoomsInfoOnMap();
 
-        
+
         PaintFromDungeonMap(map);
 
         //----------------------------
@@ -430,9 +430,9 @@ public class GridManager : MonoBehaviour
         Clear();
 
         map = new DungeonMap(generator.CreateDungeon(seed));
-        gizmos = generator.GetGraph().GetGizmos();
+        graph = generator.GetGraph();
         //roomManager = new DungeonRoomManager(map, generator.graph.graphMap);
-        roomManager.Initialize(map, generator.GetGraph().GetGraphMap());
+        roomManager.Initialize(map, graph.GetGraphMap());
         roomManager.AssignRandomStylesToRooms(roomStyleManager);
         roomManager.AssignFractions();
 
@@ -456,13 +456,13 @@ public class GridManager : MonoBehaviour
     /// </summary>
     private void OnDrawGizmos()
     {
-        
-        
-        //Тупо но пока так   
-        for (int i = 0; gizmos !=null && i < gizmos.Count;i++)
+        //Тупо но пока так 
+        for (int i = 0; roomManager.rooms != null && i < roomManager.rooms.Length; i++)
         {
-            Gizmos.color = Color.red;
-            Gizmos.DrawSphere(gizmos[i], 1);
+            Gizmos.color = roomManager.GetRoomFractionColor(i);
+            if (!roomManager.rooms[i].isCorridor)
+                Gizmos.DrawSphere(new Vector3(roomManager.rooms[i].centerX, roomManager.rooms[i].centerY, 0), 2);
+
         }
     }
 }

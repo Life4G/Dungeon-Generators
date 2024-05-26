@@ -78,5 +78,13 @@ namespace Assets.Scripts.Fraction
             return roomsPerFraction;
         }
 
+        public Color GetColorByIndex(int fractionIndex)
+        {
+            if (fractionIndex == -1)
+                return Color.white;
+            else
+                return fractions[fractionIndex].color;
+        }
+
     }
 }

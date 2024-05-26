@@ -12,5 +12,6 @@ namespace Assets.Scripts.Fraction
         {
             public string name;                // имя фракции
             public float territoryCoefficient; // коэффициент распределения территорий
+            public Color color;
         }
 }

@@ -5,6 +5,7 @@ using System.Drawing;
 using UnityEngine;
 using UnityEngine.TextCore.LowLevel;
 using UnityEditorInternal;
+using Unity.VisualScripting;
 
 public class Graph
 {
@@ -60,6 +61,13 @@ public class Graph
     }
     public List<Vector3> GetGizmos()
     { return gizmoCentres; }
+    public Vector3 GetGizmoById(int id) 
+    {
+        if (id < vertices.Count)
+            return gizmoCentres[id];
+        else
+            return Vector3.back;
+    }
     public List<GraphEdge> GetCorridors()
     {
         return edges;
