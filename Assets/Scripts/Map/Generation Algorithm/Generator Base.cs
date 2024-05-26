@@ -16,7 +16,7 @@ public abstract class DungeonGeneratorBase : MonoBehaviour
     protected Graph graph;
 
     //Функция по генерации сида
-    protected int GenerateSeed()
+    public int GenerateSeed()
     {
         string text = "";
         //Выбираем рандомно 10 букв и кидаем их в строку
@@ -75,6 +75,10 @@ public abstract class DungeonGeneratorBase : MonoBehaviour
     public int GetSeed()
     {
         return seed;
+    }
+    public void SetSeed(int seed)
+    {
+        this.seed = seed;
     }
 
     public Graph GetGraph()

@@ -1,34 +1,46 @@
 using UnityEngine;
 using UnityEditor;
 using System.Text;
+using UnityEngine.UIElements;
+using Unity.VisualScripting;
 
 [CustomEditor(typeof(GridManager))]
 public class GridEditor : Editor
 {
-    int seed;
-    string seedString;
-    string roomIdString;
-    int roomId;
+    private static int seed = 0;
+    private string seedString;
+    private bool ask = true;
+
+    private void OnEnable()
+    {
+        GridManager manager = (GridManager)target;
+        seed = manager.generator.GetSeed();
+        seedString = seed.ToString();
+    }
+
     public override void OnInspectorGUI()
     {
         DrawDefaultInspector();
-
         GridManager manager = (GridManager)target;
+
         GUILayout.Label("Seed");
-        seedString = GUILayout.TextField(seedString);
-        if(GUILayout.Button("Regenerate"))
+        if (GUILayout.Button("Randomize seed"))
         {
-            if(int.TryParse(seedString,out seed))
-                manager.Reload(seed);
-            else
-            manager.Reload();
+            if (ask)
+            {
+
+            }
+            seed = manager.generator.GenerateSeed();
+            seedString = seed.ToString();
+            manager.generator.SetSeed(seed);
         }
-        GUILayout.Label("RoomId");
-        roomIdString = GUILayout.TextField(roomIdString);
-        if (GUILayout.Button("Validate"))
+        seedString = GUILayout.TextField(seedString);
+        ask = GUILayout.Toggle(ask, "Don't ask");
+     
+        if (GUILayout.Button("Generate"))
         {
-            if (int.TryParse(roomIdString, out roomId))
-                Debug.Log(manager.generator.GetGraph().GetRoom(roomId).Validate().ToString());
+            manager.generator.SetSeed(seed);
+            manager.Reload(seed);
         }
 
         if (GUILayout.Button("Output Graph"))
@@ -50,6 +62,32 @@ public class GridEditor : Editor
                 }
             }
             Debug.Log(output.ToString());
+        }
+    }
+}
+
+public class WarningWindow : MonoBehaviour
+{
+    private Rect windowRect;
+
+    WarningWindow(float x, float y, float width, float heigth)
+    {
+        windowRect = new Rect(x, y, width, heigth);
+    }
+
+    void OnGUI()
+    {
+        // Register the window. Notice the 3rd parameter
+        windowRect = GUI.ModalWindow(0, windowRect, DoMyWindow, "Warning");
+
+    }
+
+    // Make the contents of the window
+    void DoMyWindow(int windowID)
+    {
+        if (GUI.Button(new Rect(10, 20, 100, 20), "Hello World"))
+        {
+            print("Got a click");
         }
     }
 }

@@ -5,6 +5,7 @@ using UnityEngine.Tilemaps;
 using System.Linq;
 using Assets.Scripts.Map;
 using TMPro;
+using Unity.VisualScripting;
 
 public class GridManager : MonoBehaviour
 {
@@ -21,8 +22,9 @@ public class GridManager : MonoBehaviour
 
     [SerializeField]
     private DungeonRoomManager roomManager;
-
     private DungeonMap map;
+
+    private List<Vector3> gizmos;
 
     public DungeonMap GetDungeonMap()
     {
@@ -401,8 +403,8 @@ public class GridManager : MonoBehaviour
     {
         Clear();
 
-        map = new DungeonMap(generator.CreateDungeon());
-
+        map = new DungeonMap(generator.CreateDungeon(generator.GetSeed()));
+        gizmos = generator.GetGraph().GetGizmos();
         //roomManager = new DungeonRoomManager(map, generator.graph.graphMap);
         roomManager.Initialize(map, generator.GetGraph().GetGraphMap());
         roomManager.AssignRandomStylesToRooms(roomStyleManager);
@@ -412,6 +414,7 @@ public class GridManager : MonoBehaviour
         roomManager.ClearRoomsInfoFromMap();
         roomManager.DisplayRoomsInfoOnMap();
 
+        
         PaintFromDungeonMap(map);
 
         //----------------------------
@@ -427,7 +430,7 @@ public class GridManager : MonoBehaviour
         Clear();
 
         map = new DungeonMap(generator.CreateDungeon(seed));
-
+        gizmos = generator.GetGraph().GetGizmos();
         //roomManager = new DungeonRoomManager(map, generator.graph.graphMap);
         roomManager.Initialize(map, generator.GetGraph().GetGraphMap());
         roomManager.AssignRandomStylesToRooms(roomStyleManager);
@@ -446,5 +449,20 @@ public class GridManager : MonoBehaviour
     void Awake()
     {
         Reload();
+    }
+
+    /// <summary>
+    /// Отрисовка центров комнат для дебага
+    /// </summary>
+    private void OnDrawGizmos()
+    {
+        
+        
+        //Тупо но пока так   
+        for (int i = 0; gizmos !=null && i < gizmos.Count;i++)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawSphere(gizmos[i], 1);
+        }
     }
 }

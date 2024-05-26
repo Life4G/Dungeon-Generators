@@ -10,11 +10,18 @@ public class Graph
 {
     private readonly List<Room> vertices;
     private readonly List<GraphEdge> edges;
+    private readonly List<Vector3> gizmoCentres;
     private readonly int[,] graphMap;
 
     public Graph(List<Room> rooms, int maxWidth, int maxHeigth)
     {
         vertices = rooms.ToList();
+        gizmoCentres = new List<Vector3>();
+        for (int i = 0;i<rooms.Count;i++)
+        {
+            Vector2Int center = rooms[i].GetPosCenter();
+            gizmoCentres.Add(new Vector3(center.y,center.x,0));
+        }
         edges = Triangulation(maxWidth, maxHeigth);
         graphMap = CalcMap();
         List<GraphEdge> spanningTree = SpanningTree(edges);
@@ -51,6 +58,8 @@ public class Graph
     {
         return vertices;
     }
+    public List<Vector3> GetGizmos()
+    { return gizmoCentres; }
     public List<GraphEdge> GetCorridors()
     {
         return edges;
