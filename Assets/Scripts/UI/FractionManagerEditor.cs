@@ -44,7 +44,7 @@ namespace Assets.Scripts.UI
                 element.FindPropertyRelative("territoryCoefficient").floatValue = newCoefficient;
 
                 Color color = EditorGUI.ColorField(new Rect(rect.x + (halfWidth + 5) * 2, rect.y, halfWidth - 5, EditorGUIUtility.singleLineHeight), GUIContent.none,
-                    element.FindPropertyRelative("color").colorValue, true, false, false
+                    element.FindPropertyRelative("color").colorValue, true, true, false
                     ) ; 
                 element.FindPropertyRelative("color").colorValue = color;
             };
