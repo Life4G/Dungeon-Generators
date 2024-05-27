@@ -22,7 +22,7 @@ public class GridManager : MonoBehaviour
     private RoomStyle currentRoomStyle;
 
     [SerializeField]
-    private DungeonRoomManager roomManager;
+    public DungeonRoomManager roomManager;
     private DungeonMap map;
     private Graph graph;
 
@@ -435,6 +435,29 @@ public class GridManager : MonoBehaviour
         roomManager.Initialize(map, graph.GetGraphMap());
         roomManager.AssignRandomStylesToRooms(roomStyleManager);
         roomManager.AssignFractions();
+
+        roomManager.PrintRoomsInfo();
+        roomManager.ClearRoomsInfoFromMap();
+        roomManager.DisplayRoomsInfoOnMap();
+
+        PaintFromDungeonMap(map);
+    }
+
+    /// <summary>
+    /// Перезагружает и генерирует карту подземелья с использованием заданного сидов генерации.
+    /// </summary>
+    /// <param name="seedGeometry">Сид генерации карты</param>
+    /// <param name="seedFraction">Сид генерации фракций</param>
+    public void Reload(int seedGeometry, int seedFraction)
+    {
+        Clear();
+
+        map = new DungeonMap(generator.CreateDungeon(seedGeometry));
+        graph = generator.GetGraph();
+        //roomManager = new DungeonRoomManager(map, generator.graph.graphMap);
+        roomManager.Initialize(map, graph.GetGraphMap());
+        roomManager.AssignRandomStylesToRooms(roomStyleManager);
+        roomManager.AssignFractions(seedFraction);
 
         roomManager.PrintRoomsInfo();
         roomManager.ClearRoomsInfoFromMap();

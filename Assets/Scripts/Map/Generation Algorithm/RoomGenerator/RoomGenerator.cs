@@ -265,7 +265,7 @@ public class RoomGenerator : DungeonGeneratorBase
     private Room GenerateRandomRoom()
     {
         Room room = null;
-        switch (Random.Range(0, 6))
+        switch (Random.Range(0, 4))
         {
             case 0:
                 room = GenerateSquareRoom();
@@ -277,14 +277,14 @@ public class RoomGenerator : DungeonGeneratorBase
                 room = GenerateRombusRoom();
                 break;
             case 3:
-                room = GenerateCornerRoom();
-                break;
-            case 4:
-                room = GenerateTriangleRoom();
-                break;
-            case 5:
                 room = GeneratePolygonRoom();
                 break;
+                //case 4:
+                //    room = GenerateCornerRoom();
+                //    break;
+                //case 5:
+                //    room = GenerateTriangleRoom();
+                //    break;
 
         }
         Vector2Int pos = room.GetPos();
@@ -563,7 +563,7 @@ public class RoomGenerator : DungeonGeneratorBase
         for (int i = 0; i < 4; i++)
         {
             float a = Random.Range(3.1415f * i, 3.1415f / 2 * i);
-            for (int j = 0; j < pointsSpawnNum/4; j++)
+            for (int j = 0; j < pointsSpawnNum / 4; j++)
             {
 
                 float r = Random.Range(4, pointsSpawnRadius);

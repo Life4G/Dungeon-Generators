@@ -3,25 +3,49 @@ using UnityEditor;
 using System.Text;
 using UnityEngine.UIElements;
 using Unity.VisualScripting;
+using UnityEditor.EditorTools;
 
 [CustomEditor(typeof(GridManager))]
 public class GridEditor : Editor
 {
-    private static int seed = 0;
-    private string seedString;
+    private static int seedGeometry = 0;
+    private string seedGeometryString;
+    private static int seedFraction = 0;
+    private string seedFractionString;
+
     private bool ask = true;
 
     private void OnEnable()
     {
         GridManager manager = (GridManager)target;
-        seed = manager.generator.GetSeed();
-        seedString = seed.ToString();
+        seedGeometry = manager.generator.GetSeed();
+        seedGeometryString = seedGeometry.ToString();
     }
 
     public override void OnInspectorGUI()
     {
         DrawDefaultInspector();
         GridManager manager = (GridManager)target;
+
+        GUILayout.Label("Geometry seed");
+        if (GUILayout.Button("Randomize seed"))
+        {
+            if (ask)
+            {
+
+            }
+            seedGeometry = manager.generator.GenerateSeed();
+            seedGeometryString = seedGeometry.ToString();
+            manager.generator.SetSeed(seedGeometry);
+        }
+        seedGeometryString = GUILayout.TextField(seedGeometryString);
+        ask = GUILayout.Toggle(ask, "Don't ask");
+     
+        if (GUILayout.Button("Generate Geometry"))
+        {
+            manager.generator.SetSeed(seedGeometry);
+            manager.Reload(seedGeometry,seedFraction);
+        }
 
         GUILayout.Label("Seed");
         if (GUILayout.Button("Randomize seed"))
@@ -30,17 +54,18 @@ public class GridEditor : Editor
             {
 
             }
-            seed = manager.generator.GenerateSeed();
-            seedString = seed.ToString();
-            manager.generator.SetSeed(seed);
+            seedFraction = manager.roomManager.GenerateSeed();
+            seedFractionString = seedFraction.ToString();
+            manager.generator.SetSeed(seedFraction);
         }
-        seedString = GUILayout.TextField(seedString);
-        ask = GUILayout.Toggle(ask, "Don't ask");
-     
-        if (GUILayout.Button("Generate"))
+        seedFractionString = GUILayout.TextField(seedFractionString);
+
+        if (GUILayout.Button("Generate Factions"))
         {
-            manager.generator.SetSeed(seed);
-            manager.Reload(seed);
+            manager.roomManager.AssignFractions(seedFraction);
+            manager.roomManager.PrintRoomsInfo();
+            manager.roomManager.ClearRoomsInfoFromMap();
+            manager.roomManager.DisplayRoomsInfoOnMap();
         }
 
         if (GUILayout.Button("Output Graph"))

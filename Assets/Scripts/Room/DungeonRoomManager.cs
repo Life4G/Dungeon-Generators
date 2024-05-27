@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Assets.Scripts.Room
 {
@@ -16,6 +17,8 @@ namespace Assets.Scripts.Room
     {
         [SerializeField]
         private FractionManager fractionManager;
+
+        private int seed;
 
         public DungeonRoom[] rooms;
 
@@ -32,11 +35,24 @@ namespace Assets.Scripts.Room
         [SerializeField]
         private DistributionMethod distributionMethod;
 
+        public int GenerateSeed()
+        {
+            string text = "";
+            for (int i = 0; i < 10; i++)
+            {
+                text += "abcdefghijklmnpqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ0123456789"[UnityEngine.Random.Range(0, "abcdefghijklmnpqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ0123456789".Length)].ToString();
+            }
+            return ((text == "") ? 0 : text.GetHashCode());
+        }
+
         /// <summary>
         /// Вызов распределения фракций в зависимости от выбранного метода в distributionMethod.
         /// </summary>
         public void AssignFractions()
         {
+            Random.State state = Random.state;
+
+            Random.InitState(GenerateSeed());
             switch (distributionMethod)
             {
                 case DistributionMethod.Sequential:
@@ -52,6 +68,33 @@ namespace Assets.Scripts.Room
                     AssignFractionsToRoomsParallelGraphBased(graph);
                     break;
             }
+            Random.state = state;
+        }
+        
+        /// <summary>
+        /// Вызов распределения фракций в зависимости от выбранного метода в distributionMethod.
+        /// </summary>
+        public void AssignFractions(int seed)
+        {
+            Random.State state = Random.state;
+
+            Random.InitState(seed);
+            switch (distributionMethod)
+            {
+                case DistributionMethod.Sequential:
+                    AssignFractionsToRoomsSequentially();
+                    break;
+                case DistributionMethod.Random:
+                    AssignFractionsToRoomsRandomly();
+                    break;
+                case DistributionMethod.SequentiallyGraphBased:
+                    AssignFractionsToRoomsSequentiallyGraphBased(graph);
+                    break;
+                case DistributionMethod.ParallelGraphBased:
+                    AssignFractionsToRoomsParallelGraphBased(graph);
+                    break;
+            }
+            Random.state = state;
         }
 
         // Не вычисляет центры
@@ -555,8 +598,6 @@ namespace Assets.Scripts.Room
                 .Select(x => x.Index)
                 .ToList();
 
-            System.Random random = new System.Random();
-
             foreach (var pair in fractionRoomCounts)
             {
                 int fractionIndex = pair.Key;
@@ -571,7 +612,7 @@ namespace Assets.Scripts.Room
                     }
 
                     // случайный индекс из доступных комнат
-                    int randomIndex = random.Next(availableRoomIndexes.Count);
+                    int randomIndex = Random.Range(0, availableRoomIndexes.Count);
                     int roomIndex = availableRoomIndexes[randomIndex];
                     availableRoomIndexes.RemoveAt(randomIndex);
 
@@ -603,7 +644,7 @@ namespace Assets.Scripts.Room
             Dictionary<int, int> roomToFaction = new Dictionary<int, int>();
             List<int> activeFactions = fractionManager.fractions.Select((f, idx) => idx).ToList();
             Dictionary<int, int> roomsTarget = fractionManager.CalculateRoomsForAllFractions(totalRooms);
-            System.Random random = new System.Random();
+            
 
             // логи - старт
             Debug.Log($"Total rooms: {availableRooms.Count}");
@@ -616,7 +657,7 @@ namespace Assets.Scripts.Room
             foreach (var factionIndex in activeFactions.ToList())
             {
                 if (availableRooms.Count == 0) break;
-                int roomIndex = random.Next(availableRooms.Count);
+                int roomIndex = Random.Range(0,availableRooms.Count);
                 int roomId = availableRooms[roomIndex];
                 roomToFaction[roomId] = factionIndex;
                 availableRooms.RemoveAt(roomIndex);
@@ -650,14 +691,14 @@ namespace Assets.Scripts.Room
 
                     if (expandableRooms.Count > 0)
                     {
-                        int newRoomId = expandableRooms[random.Next(expandableRooms.Count)];
+                        int newRoomId = expandableRooms[Random.Range(0, expandableRooms.Count)];
                         roomToFaction[newRoomId] = factionIndex;
                         availableRooms.Remove(newRoomId);
                         addedAnyRoom = true;
                     }
                     else if (!foundExpandable && availableRooms.Count > 0) // если не найдено свободных соседей, назначить случайную комнату
                     {
-                        int randomRoomId = availableRooms[random.Next(availableRooms.Count)];
+                        int randomRoomId = availableRooms[Random.Range(0, availableRooms.Count)];
                         roomToFaction[randomRoomId] = factionIndex;
                         availableRooms.Remove(randomRoomId);
                         addedAnyRoom = true;
@@ -713,7 +754,7 @@ namespace Assets.Scripts.Room
             List<int> availableRooms = rooms.Where(room => !room.isCorridor).Select(room => room.id).ToList();
             Dictionary<int, int> roomToFaction = new Dictionary<int, int>();
             Dictionary<int, int> roomsTarget = fractionManager.CalculateRoomsForAllFractions(totalRooms);
-            System.Random random = new System.Random();
+          
 
             // логи - старт
             Debug.Log($"Total rooms: {availableRooms.Count}");
@@ -727,7 +768,7 @@ namespace Assets.Scripts.Room
                 if (availableRooms.Count == 0) break;
 
                 // стартовая комната
-                int startRoomIndex = random.Next(availableRooms.Count);
+                int startRoomIndex = Random.Range(0, availableRooms.Count);
                 int startRoomId = availableRooms[startRoomIndex];
                 roomToFaction[startRoomId] = factionIndex;
                 availableRooms.RemoveAt(startRoomIndex);
@@ -756,7 +797,7 @@ namespace Assets.Scripts.Room
                        // если найдена
                         if (expandableRooms.Count > 0 && roomToFaction.Count(pair => pair.Value == factionIndex) < roomsTarget[factionIndex])
                         {
-                            int newRoomId = expandableRooms[random.Next(expandableRooms.Count)];
+                            int newRoomId = expandableRooms[Random.Range(0, expandableRooms.Count)];
                             roomToFaction[newRoomId] = factionIndex;
                             availableRooms.Remove(newRoomId);
                             addedRoom = true;
@@ -766,7 +807,7 @@ namespace Assets.Scripts.Room
                     // если не найдена - присвоить случайную
                     if (!addedRoom && availableRooms.Count > 0 && roomToFaction.Count(pair => pair.Value == factionIndex) < roomsTarget[factionIndex])
                     {
-                        int randomRoomId = availableRooms[random.Next(availableRooms.Count)];
+                        int randomRoomId = availableRooms[Random.Range(0, availableRooms.Count)];
                         roomToFaction[randomRoomId] = factionIndex;
                         availableRooms.Remove(randomRoomId);
                         addedRoom = true;
