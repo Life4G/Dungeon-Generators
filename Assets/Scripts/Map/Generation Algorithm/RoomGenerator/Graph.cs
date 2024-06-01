@@ -7,13 +7,37 @@ using UnityEngine.TextCore.LowLevel;
 using UnityEditorInternal;
 using Unity.VisualScripting;
 
+/// <summary>
+/// Класс, представляющий граф комнат подземелья.
+/// </summary>
 public class Graph
 {
+    /// <summary>
+    /// Список вершин графа, представляющих комнаты.
+    /// </summary>
     private readonly List<Room> vertices;
+
+    /// <summary>
+    /// Список ребер графа.
+    /// </summary>
     private readonly List<GraphEdge> edges;
+
+    /// <summary>
+    /// Список центров комнат для Gizmo.
+    /// </summary>
     private readonly List<Vector3> gizmoCentres;
+
+    /// <summary>
+    /// Матрица смежности графа.
+    /// </summary>
     private readonly int[,] graphMap;
 
+    /// <summary>
+    /// Конструктор графа.
+    /// </summary>
+    /// <param name="rooms">Список комнат.</param>
+    /// <param name="maxWidth">Максимальная ширина карты.</param>
+    /// <param name="maxHeight">Максимальная высота карты.</param>
     public Graph(List<Room> rooms, int maxWidth, int maxHeigth)
     {
         vertices = rooms.ToList();
@@ -39,28 +63,68 @@ public class Graph
 
         FinalizeMap();
     }
+
+    /// <summary>
+    /// Проверяет, смежны ли две комнаты.
+    /// </summary>
+    /// <param name="room">Идентификатор первой комнаты.</param>
+    /// <param name="roomOther">Идентификатор второй комнаты.</param>
+    /// <returns>True - комнаты смежны, иначе - False.</returns>
     public bool IsAdjucent(int room, int roomOther)
     {
         return edges.Contains(new GraphEdge(room, roomOther));
     }
+
+    /// <summary>
+    /// Проверяет, является ли идентификатор комнаты валидным.
+    /// </summary>
+    /// <param name="id">Идентификатор комнаты.</param>
+    /// <returns>True - идентификатор валиден, иначе - False.</returns>
     public bool IsRoom(int id)
     {
         return id < vertices.Count;
     }
+
+    /// <summary>
+    /// Проверяет, является ли комната по идентификатору коридором.
+    /// </summary>
+    /// <param name="id">Идентификатор комнаты.</param>
+    /// <returns>True - идентификатор коридора, иначе - False.</returns>
     public bool IsCorridor(int id)
     {
         return id >= vertices.Count;
     }
+
+    /// <summary>
+    /// Возвращает матрицу смежности графа.
+    /// </summary>
+    /// <returns>Матрица смежности графа.</returns>
     public int[,] GetGraphMap()
     {
         return graphMap;
     }
+
+    /// <summary>
+    /// Возвращает список комнат.
+    /// </summary>
+    /// <returns>Список комнат.</returns>
     public List<Room> GetRooms()
     {
         return vertices;
     }
+
+    /// <summary>
+    /// Возвращает список центров комнат для Gizmo.
+    /// </summary>
+    /// <returns>Список центров комнат.</returns>
     public List<Vector3> GetGizmos()
     { return gizmoCentres; }
+
+    /// <summary>
+    /// Возвращает центр комнаты для Gizmo по идентификатору.
+    /// </summary>
+    /// <param name="id">Идентификатор комнаты.</param>
+    /// <returns>Центр комнаты.</returns>
     public Vector3 GetGizmoById(int id) 
     {
         if (id < vertices.Count)
@@ -68,14 +132,31 @@ public class Graph
         else
             return Vector3.back;
     }
+
+    /// <summary>
+    /// Возвращает список коридоров графа.
+    /// </summary>
+    /// <returns>Список коридоров.</returns>
     public List<GraphEdge> GetCorridors()
     {
         return edges;
     }
+
+    /// <summary>
+    /// Возвращает идентификаторы комнат, соединенных ребром.
+    /// </summary>
+    /// <param name="id">Идентификатор ребра.</param>
+    /// <returns>Кортеж идентификаторов комнат.</returns>
     public Tuple<int, int> GetRoomsFromEdge(int id)
     {
         return edges[id - vertices.Count].GetRoomsIds();
     }
+
+    /// <summary>
+    /// Возвращает коридор по его идентификатору.
+    /// </summary>
+    /// <param name="id">Идентификатор коридора.</param>
+    /// <returns>Коридор.</returns>
     public GraphEdge GetCorridor(int id)
     {
         if (id - vertices.Count < 0)
@@ -83,6 +164,12 @@ public class Graph
         else
             return edges[id - vertices.Count];
     }
+
+    /// <summary>
+    /// Возвращает комнату по ее идентификатору.
+    /// </summary>
+    /// <param name="id">Идентификатор комнаты.</param>
+    /// <returns>Комната.</returns>
     public Room GetRoom(int id)
     {
         if (id >= vertices.Count)
@@ -91,10 +178,22 @@ public class Graph
         else
             return vertices[id];
     }
+
+    /// <summary>
+    /// Возвращает координаты ребра.
+    /// </summary>
+    /// <param name="id">Идентификатор ребра.</param>
+    /// <returns>Кортеж координат ребра.</returns>
     public Tuple<Vector2Int, Vector2Int> GetEdgeCoords(int id)
     {
         return edges[id - vertices.Count].GetCoords();
     }
+
+    /// <summary>
+    /// Возвращает список соседних комнат для заданной комнаты.
+    /// </summary>
+    /// <param name="room">Идентификатор комнаты.</param>
+    /// <returns>Список соседних комнат.</returns>
     public List<int> GetNeighbors(int room)
     {
         List<int> neighbors = new List<int>();
@@ -105,6 +204,11 @@ public class Graph
         }
         return neighbors;
     }
+
+    //???
+    /// <summary>
+    /// Корректирует позиции ребер.
+    /// </summary>
     private void AdjustEdges()
     {
         foreach (GraphEdge edge in edges)
@@ -112,6 +216,11 @@ public class Graph
             edge.AdjustPos(vertices[edge.idRoomFirst], vertices[edge.idRoomSecond]);
         }
     }
+
+    /// <summary>
+    /// Вычисляет матрицу смежности графа.
+    /// </summary>
+    /// <returns>Матрица смежности графа.</returns>
     private int[,] CalcMap()
     {
         int[,] map;
@@ -143,6 +252,10 @@ public class Graph
         }
         return map;
     }
+
+    /// <summary>
+    /// Завершает построение карты.
+    /// </summary>
     private void FinalizeMap()
     {
         for (int i = 0; i < vertices.Count; i++)
@@ -151,6 +264,13 @@ public class Graph
                     graphMap[i, j] += vertices.Count();
     }
 
+    //???
+    /// <summary>
+    /// Находит вершину с минимальным ключом, которая не включена в MST.
+    /// </summary>
+    /// <param name="key">Массив ключей.</param>
+    /// <param name="mstSet"> - - -.</param>
+    /// <returns>Индекс вершины с минимальным ключом.</returns>
     private int minKey(int[] key, bool[] mstSet)
     {
         int min = int.MaxValue, min_index = -1;
@@ -164,6 +284,12 @@ public class Graph
 
         return min_index;
     }
+
+    /// <summary>
+    /// Строит остовное дерево графа.
+    /// </summary>
+    /// <param name="edges">Список ребер графа.</param>
+    /// <returns>Список ребер остовного дерева.</returns>
     private List<GraphEdge> SpanningTree(List<GraphEdge> edges)
     {
         int[] parent = new int[vertices.Count];
@@ -198,6 +324,13 @@ public class Graph
             edgesNew.Add(edges[graphMap[i, parent[i]]]);
         return edgesNew;
     }
+
+    /// <summary>
+    /// Выполняет триангуляцию графа.
+    /// </summary>
+    /// <param name="maxWidth">Максимальная ширина карты.</param>
+    /// <param name="maxHeigth">Максимальная высота карты.</param>
+    /// <returns>Список ребер триангуляции.</returns>
     private List<GraphEdge> Triangulation(int maxWidth, int maxHeigth)
     {
         List<GraphEdge> edges = new List<GraphEdge>();
@@ -255,13 +388,41 @@ public class Graph
     }
 }
 
+/// <summary>
+/// Класс, представляющий ребро графа.
+/// </summary>
 public class GraphEdge
 {
+    /// <summary>
+    /// Идентификатор первой комнаты.
+    /// </summary>
     public int idRoomFirst;
+
+    /// <summary>
+    /// Идентификатор второй комнаты.
+    /// </summary>
     public int idRoomSecond;
+
+    /// <summary>
+    /// Позиция первой точки ребра.
+    /// </summary>
     public Vector2Int posPoint1;
+
+    /// <summary>
+    /// Позиция второй точки ребра.
+    /// </summary>
     public Vector2Int posPoint2;
+
+    /// <summary>
+    /// Длина ребра.
+    /// </summary>
     private float length;
+
+    /// <summary>
+    /// Конструктор ребра графа.
+    /// </summary>
+    /// <param name="idFirst">Идентификатор первой комнаты.</param>
+    /// <param name="idSecond">Идентификатор второй комнаты.</param>
     public GraphEdge(int idFirst, int idSecond)
     {
         idRoomFirst = idFirst;
@@ -270,6 +431,14 @@ public class GraphEdge
         posPoint2 = Vector2Int.zero;
         length = -1;
     }
+
+    /// <summary>
+    /// Конструктор ребра графа с указанием позиций точек.
+    /// </summary>
+    /// <param name="idFirst">Идентификатор первой комнаты.</param>
+    /// <param name="idSecond">Идентификатор второй комнаты.</param>
+    /// <param name="posPoint1">Позиция первой точки.</param>
+    /// <param name="posPoint2">Позиция второй точки.</param>
     public GraphEdge(int idFirst, int idSecond, Vector2Int posPoint1, Vector2Int posPoint2)
     {
         idRoomFirst = idFirst;
@@ -278,15 +447,29 @@ public class GraphEdge
         this.posPoint2 = posPoint2;
         length = Vector2.Distance(posPoint1, posPoint2);
     }
+
+    /// <summary>
+    /// Оператор сравнения ребер графа.
+    /// </summary>
     public static bool operator ==(GraphEdge first, GraphEdge second)
     {
         return first.idRoomFirst == second.idRoomFirst && first.idRoomSecond == second.idRoomSecond
             || first.idRoomFirst == second.idRoomSecond && first.idRoomSecond == second.idRoomFirst;
     }
+
+    /// <summary>
+    /// Оператор неравенства ребер графа.
+    /// </summary>
     public static bool operator !=(GraphEdge first, GraphEdge second)
     {
         return !(first == second);
     }
+
+    /// <summary>
+    /// Проверяет равенство текущего ребра с другим.
+    /// </summary>
+    /// <param name="other">Другое ребро.</param>
+    /// <returns>True - ребра равны, иначе - False.</returns>
     public override bool Equals(object other)
     {
         if (!(other is GraphEdge))
@@ -296,19 +479,42 @@ public class GraphEdge
 
         return Equals((GraphEdge)other);
     }
+
+    /// <summary>
+    /// Проверяет равенство текущего ребра с другим.
+    /// </summary>
+    /// <param name="other">Другое ребро.</param>
+    /// <returns>True - ребра равны, иначе - False.</returns>
     public bool Equals(GraphEdge other)
     {
         return idRoomFirst == other.idRoomFirst && idRoomSecond == other.idRoomSecond
             || idRoomFirst == other.idRoomSecond && idRoomSecond == other.idRoomFirst;
     }
+
+    /// <summary>
+    /// Возвращает хэш-код ребра.
+    /// </summary>
+    /// <returns>Хэш-код ребра.</returns>
     public override int GetHashCode()
     {
         return idRoomFirst.GetHashCode() ^ (idRoomSecond.GetHashCode() << 2);
     }
+
+    /// <summary>
+    /// Проверяет, содержит ли ребро указанную комнату.
+    /// </summary>
+    /// <param name="idRoom">Идентификатор комнаты.</param>
+    /// <returns>True - ребро содержит комнату, иначе - False.</returns>
     public bool Contains(int idRoom)
     {
         return idRoom == idRoomFirst || idRoom == idRoomSecond;
     }
+
+    /// <summary>
+    /// Возвращает идентификатор соседней комнаты.
+    /// </summary>
+    /// <param name="idRoom">Идентификатор комнаты.</param>
+    /// <returns>Идентификатор соседней комнаты.</returns>
     public int GetRoomNeighbor(int idRoom)
     {
         if (idRoom == idRoomFirst)
@@ -317,18 +523,39 @@ public class GraphEdge
             return idRoomFirst;
         return -1;
     }
+
+    /// <summary>
+    /// Возвращает кортеж идентификаторов комнат, соединенных ребром.
+    /// </summary>
+    /// <returns>Кортеж идентификаторов комнат.</returns>
     public Tuple<int, int> GetRoomsIds()
     {
         return new Tuple<int, int>(idRoomFirst, idRoomSecond);
     }
+
+    /// <summary>
+    /// Возвращает кортеж позиций точек ребра.
+    /// </summary>
+    /// <returns>Кортеж позиций точек ребра.</returns>
     public Tuple<Vector2Int, Vector2Int> GetCoords()
     {
         return new Tuple<Vector2Int, Vector2Int>(posPoint1, posPoint2);
     }
+
+    /// <summary>
+    /// Возвращает длину ребра.
+    /// </summary>
+    /// <returns>Длина ребра.</returns>
     public float GetLength()
     {
         return length;
     }
+
+    /// <summary>
+    /// Возвращает позицию точки по идентификатору комнаты.
+    /// </summary>
+    /// <param name="id">Идентификатор комнаты.</param>
+    /// <returns>Позиция точки.</returns>
     public Vector2Int GetPosById(int id)
     {
         if (id == idRoomFirst)
@@ -337,11 +564,23 @@ public class GraphEdge
             return posPoint2;
         return Vector2Int.zero;
     }
+
+    /// <summary>
+    /// Устанавливает позиции точек ребра.
+    /// </summary>
+    /// <param name="posPoint1">Позиция первой точки.</param>
+    /// <param name="posPoint2">Позиция второй точки.</param>
     public void SetPoses(Vector2Int posPoint1, Vector2Int posPoint2)
     {
         this.posPoint1 = posPoint1;
         this.posPoint2 = posPoint2;
     }
+
+    /// <summary>
+    /// Корректирует позиции ребра на основе позиций комнат.
+    /// </summary>
+    /// <param name="room">Первая комната.</param>
+    /// <param name="roomOther">Вторая комната.</param>
     public void AdjustPos(Room room, Room roomOther)
     {
 
@@ -392,11 +631,29 @@ public class GraphEdge
     }
 
 }
+
+/// <summary>
+/// Класс, представляющий треугольник для триангуляции.
+/// </summary>
 public class Triangle
 {
+    /// <summary>
+    /// Массив ребер треугольника.
+    /// </summary>
     public GraphEdge[] edges;
+
+    /// <summary>
+    /// Описанная окружность треугольника.
+    /// </summary>
     public CircumCircle circle;
 
+    /// <summary>
+    /// Конструктор треугольника с указанием позиций точек и идентификаторов ребер.
+    /// </summary>
+    /// <param name="posPoint1">Позиция первой точки.</param>
+    /// <param name="posPoint2">Позиция второй точки.</param>
+    /// <param name="posPoint3">Позиция третьей точки.</param>
+    /// <param name="edgesId">Массив идентификаторов ребер.</param>
     public Triangle(Vector2Int posPoint1, Vector2Int posPoint2, Vector2Int posPoint3, int[] edgesId)
     {
         edges = new GraphEdge[3]
@@ -407,6 +664,13 @@ public class Triangle
         };
         circle = new CircumCircle(posPoint1, posPoint2, posPoint3);
     }
+
+    /// <summary>
+    /// Конструктор треугольника с указанием позиций точек.
+    /// </summary>
+    /// <param name="posPoint1">Позиция первой точки.</param>
+    /// <param name="posPoint2">Позиция второй точки.</param>
+    /// <param name="posPoint3">Позиция третьей точки.</param>
     public Triangle(Vector2Int posPoint1, Vector2Int posPoint2, Vector2Int posPoint3)
     {
         edges = new GraphEdge[3]
@@ -418,6 +682,13 @@ public class Triangle
         circle = new CircumCircle(posPoint1, posPoint2, posPoint3);
 
     }
+
+    /// <summary>
+    /// Конструктор треугольника с указанием ребра и позиции точки.
+    /// </summary>
+    /// <param name="edge">Ребро треугольника.</param>
+    /// <param name="point">Позиция точки.</param>
+    /// <param name="vertexId">Идентификатор вершины.</param>
     public Triangle(GraphEdge edge, Vector2Int point, int vertexId)
     {
         edges = new GraphEdge[3]
@@ -429,6 +700,13 @@ public class Triangle
         circle = new CircumCircle(edge.posPoint1, edge.posPoint2, point);
 
     }
+
+    /// <summary>
+    /// Создает супер-треугольник, охватывающий всю карту.
+    /// </summary>
+    /// <param name="maxWidth">Максимальная ширина карты.</param>
+    /// <param name="maxHeight">Максимальная высота карты.</param>
+    /// <returns>Супер-треугольник.</returns>
     public static Triangle SuperTriangle(int maxWidth, int maxHeigth)
     {
         int margin = 1000;
@@ -438,6 +716,12 @@ public class Triangle
         return new Triangle(point1, point2, point3);
 
     }
+
+    /// <summary>
+    /// Проверяет, находится ли точка внутри описанной окружности треугольника.
+    /// </summary>
+    /// <param name="vertex">Позиция точки.</param>
+    /// <returns>True - точка находится внутри, иначе - False.</returns>
     public bool InCircle(Vector2Int vertex)
     {
         if ((vertex.x - circle.center.x) * (vertex.x - circle.center.x) + (vertex.y - circle.center.y) * (vertex.y - circle.center.y) <= circle.radius * circle.radius)
@@ -445,6 +729,12 @@ public class Triangle
         else
             return false;
     }
+
+    /// <summary>
+    /// Проверяет, содержит ли треугольник указанное ребро.
+    /// </summary>
+    /// <param name="edge">Ребро.</param>
+    /// <returns>True, - треугольник содержит ребро, иначе - False.</returns>
     public bool Contains(GraphEdge edge)
     {
         foreach (GraphEdge edgeTrianlge in edges)
@@ -454,6 +744,11 @@ public class Triangle
         }
         return false;
     }
+
+    /// <summary>
+    /// Проверяет, является ли треугольник супер-треугольником.
+    /// </summary>
+    /// <returns>True - треугольник является супер-треугольником, иначе - False.</returns>
     public bool SuperTriangleCheck()
     {
         foreach (GraphEdge edge in edges)
@@ -463,15 +758,39 @@ public class Triangle
         }
         return false;
     }
+
+    /// <summary>
+    /// Проверяет, содержит ли треугольник указанную точку.
+    /// </summary>
+    /// <param name="point">Точка.</param>
+    /// <returns>True - если треугольник содержит точку, иначе - False.</returns>
     public bool ContainsPoint(Vector2Int point)
     {
         return circle.ContainsPoint(point);
     }
 }
+
+/// <summary>
+/// Класс, представляющий описанную окружность треугольника.
+/// </summary>
 public class CircumCircle
 {
+    /// <summary>
+    /// Центр окружности.
+    /// </summary>
     public Vector2 center;
+
+    /// <summary>
+    /// Радиус окружности.
+    /// </summary>
     public float radius;
+
+    /// <summary>
+    /// Конструктор окружности, описывающей треугольник.
+    /// </summary>
+    /// <param name="posPoint1">Позиция первой точки.</param>
+    /// <param name="posPoint2">Позиция второй точки.</param>
+    /// <param name="posPoint3">Позиция третьей точки.</param>
     public CircumCircle(Vector2 posPoint1, Vector2 posPoint2, Vector2 posPoint3)
     {
         var dA = posPoint1.x * posPoint1.x + posPoint1.y * posPoint1.y;
@@ -489,6 +808,12 @@ public class CircumCircle
         center = new Vector2(aux1 / div, aux2 / div);
         radius = Vector2.Distance(center, posPoint1);
     }
+
+    /// <summary>
+    /// Проверяет, содержит ли окружность указанную точку.
+    /// </summary>
+    /// <param name="point">Точка.</param>
+    /// <returns>True - окружность содержит точку, иначе - False.</returns>
     public bool ContainsPoint(Vector2 point)
     {
         if (Vector2.Distance(center, point) <= radius)

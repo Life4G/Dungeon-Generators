@@ -10,22 +10,49 @@ using Assets.Scripts.Fraction;
 
 public class GridManager : MonoBehaviour
 {
+    /// <summary>
+    /// Менеджер стилей комнат.
+    /// </summary>
     [SerializeField]
     private RoomStyleManager roomStyleManager;
 
+    /// <summary>
+    /// Базовый генератор подземелий.
+    /// </summary>
     [SerializeField]
     public DungeonGeneratorBase generator;
 
+    /// <summary>
+    /// Тайлмап для отрисовки карты.
+    /// </summary>
     [SerializeField]
     public Tilemap tilemap;
 
+    /// <summary>
+    /// Текущий стиль комнаты.
+    /// </summary>
     private RoomStyle currentRoomStyle;
 
+    /// <summary>
+    /// Менеджер комнат подземелья.
+    /// </summary>
     [SerializeField]
     public DungeonRoomManager roomManager;
+
+    /// <summary>
+    /// Карта подземелья.
+    /// </summary>
     private DungeonMap map;
+
+    /// <summary>
+    /// Граф подземелья.
+    /// </summary>
     private Graph graph;
 
+    /// <summary>
+    /// Возвращает текущую карту подземелья.
+    /// </summary>
+    /// <returns>Объект карты подземелья.</returns>
     public DungeonMap GetDungeonMap()
     {
         if (map != null) Debug.Log("map != null");
@@ -444,10 +471,10 @@ public class GridManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Перезагружает и генерирует карту подземелья с использованием заданного сидов генерации.
+    /// Перезагружает и генерирует карту подземелья с использованием заданных сидов генерации.
     /// </summary>
-    /// <param name="seedGeometry">Сид генерации карты</param>
-    /// <param name="seedFraction">Сид генерации фракций</param>
+    /// <param name="seedGeometry">Сид генерации карты.</param>
+    /// <param name="seedFraction">Сид генерации фракций.</param>
     public void Reload(int seedGeometry, int seedFraction)
     {
         Clear();

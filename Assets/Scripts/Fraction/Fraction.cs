@@ -7,11 +7,25 @@ using UnityEngine;
 
 namespace Assets.Scripts.Fraction
 {
-        [System.Serializable]
-        public class Fraction
-        {
-            public string name;                // имя фракции
-            public float territoryCoefficient; // коэффициент распределения территорий
-            public Color color;
-        }
+    /// <summary>
+    /// Фракция.
+    /// </summary>
+    [System.Serializable]
+    public class Fraction
+    {
+        /// <summary>
+        /// Имя фракции.
+        /// </summary>
+        public string name;
+
+        /// <summary>
+        /// Коэффициент распределения территорий.
+        /// </summary>
+        public float territoryCoefficient;
+
+        /// <summary>
+        /// Цвет фракции.
+        /// </summary>
+        public Color color;
+    }
 }

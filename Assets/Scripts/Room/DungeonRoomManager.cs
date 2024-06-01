@@ -15,15 +15,30 @@ namespace Assets.Scripts.Room
     /// </summary>
     public class DungeonRoomManager : MonoBehaviour
     {
+        /// <summary>
+        /// Менеджер фракций.
+        /// </summary>
         [SerializeField]
         private FractionManager fractionManager;
 
+        /// <summary>
+        /// Сид для генератора случайных чисел.
+        /// </summary>
         private int seed;
 
+        /// <summary>
+        /// Массив комнат подземелья.
+        /// </summary>
         public DungeonRoom[] rooms;
 
+        /// <summary>
+        /// Граф комнат подземелья.
+        /// </summary>
         private int[,] graph;
 
+        /// <summary>
+        /// Методы распределения фракций по комнатам.
+        /// </summary>
         public enum DistributionMethod
         {
             Sequential,
@@ -32,9 +47,16 @@ namespace Assets.Scripts.Room
             ParallelGraphBased      // параллельное
         }
 
+        /// <summary>
+        /// Метод распределения фракций.
+        /// </summary>
         [SerializeField]
         private DistributionMethod distributionMethod;
 
+        /// <summary>
+        /// Генерирует случайное число, которое используется в качестве сида.
+        /// </summary>
+        /// <returns>Случайное число.</returns>
         public int GenerateSeed()
         {
             string text = "";
@@ -480,6 +502,10 @@ namespace Assets.Scripts.Room
             return nonCorridorRoomIndices;
         }
 
+        /// <summary>
+        /// Инициализация графа коридоров.
+        /// </summary>
+        /// <param name="corridorsGraph">Граф коридоров.</param>
         public void InitializeGraph(int[,] corridorsGraph)
         {
             if (corridorsGraph == null)
@@ -501,8 +527,6 @@ namespace Assets.Scripts.Room
                 }
             }
         }
-
-
 
         /// <summary>
         /// Последовательное присваивание комнатам, не являющимся коридорами, индексы фракций на основе их коэффициентов.
@@ -831,6 +855,12 @@ namespace Assets.Scripts.Room
                 }
             }
         }
+
+        /// <summary>
+        /// Возвращает цвет фракции комнаты по ее идентификатору.
+        /// </summary>
+        /// <param name="id">Идентификатор комнаты.</param>
+        /// <returns>Цвет фракции.</returns>
         public Color GetRoomFractionColor(int id)
         {
             return fractionManager.GetColorByIndex(rooms[id].fractionIndex);

@@ -7,6 +7,9 @@ using UnityEngine;
 
 namespace Assets.Scripts.Fraction
 {
+    /// <summary>
+    /// Типы отношений между фракциями.
+    /// </summary>
     public enum RelationshipType
     {
         Neutral,
@@ -19,7 +22,14 @@ namespace Assets.Scripts.Fraction
     /// </summary>
     public class FractionManager : MonoBehaviour
     {
+        /// <summary>
+        /// Список всех фракций.
+        /// </summary>
         public List<Fraction> fractions;
+
+        /// <summary>
+        /// Список отношений между фракциями.
+        /// </summary>
         public List<FractionRelationship> relationships;
 
         /// <summary>
@@ -45,6 +55,11 @@ namespace Assets.Scripts.Fraction
             }
         }
 
+        /// <summary>
+        /// Рассчитывает количество комнат для каждой фракции на основе их коэффициентов.
+        /// </summary>
+        /// <param name="totalRooms">Общее количество некоридорных комнат.</param>
+        /// <returns>Словарь, где ключ - индекс фракции, значение - количество комнат.</returns>
         public Dictionary<int, int> CalculateRoomsForAllFractions(int totalRooms)
         {
             float totalCoefficients = fractions.Sum(f => f.territoryCoefficient);
@@ -78,6 +93,11 @@ namespace Assets.Scripts.Fraction
             return roomsPerFraction;
         }
 
+        /// <summary>
+        /// Получает цвет фракции по индексу.
+        /// </summary>
+        /// <param name="fractionIndex">Индекс фракции в списке.</param>
+        /// <returns>Цвет фракции. Если индекс равен -1, возвращается белый цвет.</returns>
         public Color GetColorByIndex(int fractionIndex)
         {
             if (fractionIndex == -1)

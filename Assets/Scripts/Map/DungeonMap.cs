@@ -9,7 +9,7 @@ namespace Assets.Scripts.Map
 {
     public class DungeonMap
     {
-        public DungeonTile[,] tiles; // массив плиток подземелья
+        public DungeonTile[,] tiles;
 
         /// <summary>
         /// Конструктор по размеру карты.

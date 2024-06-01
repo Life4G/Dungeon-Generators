@@ -14,6 +14,9 @@ namespace Assets.Scripts.Room
     /// </summary>
     public class RoomStyleManager : MonoBehaviour
     {
+        /// <summary>
+        /// Список стилей комнат.
+        /// </summary>
         [SerializeField]
         private List<RoomStyle> roomStyles;
 

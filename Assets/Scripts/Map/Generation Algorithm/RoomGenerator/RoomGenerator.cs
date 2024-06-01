@@ -7,28 +7,78 @@ using static SetOperations;
 using Unity.VisualScripting;
 using System.Linq;
 
+/// <summary>
+/// Класс генерации комнат подземелья.
+/// </summary>
 public class RoomGenerator : DungeonGeneratorBase
 {
+    /// <summary>
+    /// Минимальное количество комнат.
+    /// </summary>
     [SerializeField]
     private int roomNumberMin = 4;
+
+    /// <summary>
+    /// Максимальное количество комнат.
+    /// </summary>
     [SerializeField]
     private int roomNumberMax = 6;
+
+    /// <summary>
+    /// Максимальный размер комнаты.
+    /// </summary>
     [SerializeField]
     private int roomSizeMax = 16;
+
+    /// <summary>
+    /// Проверять ли соединения между комнатами.
+    /// </summary>
     [SerializeField]
     private bool checkConnection = true;
 
+    /// <summary>
+    /// Максимальная высота карты.
+    /// </summary>
     public int mapMaxHeight = 512;
+
+    /// <summary>
+    /// Максимальная ширина карты.
+    /// </summary>
     public int mapMaxWidth = 512;
+
+    /// <summary>
+    /// Радиус спавна комнат.
+    /// </summary>
     private int roomSpawnRadius = 60;
+
+    /// <summary>
+    /// Карта подземелья.
+    /// </summary>
     private int[,] map;
+
+    /// <summary>
+    /// Увеличение радиуса спавна.
+    /// </summary>
     private int spawnIncreaseRadius = 0;
+
+    /// <summary>
+    /// Учитывать ли количество комнат.
+    /// </summary>
     private bool careAboutRoomCount = false;
 
+    /// <summary>
+    /// Генерация подземелья.
+    /// </summary>
+    /// <returns>Сгенерированная карта подземелья.</returns>
     protected override int[,] GenerateDungeon()
     {
         return Run();
     }
+
+    /// <summary>
+    /// Запуск генерации подземелья.
+    /// </summary>
+    /// <returns>Сгенерированная карта подземелья.</returns>
     protected int[,] Run()
     {
         map = new int[mapMaxWidth, mapMaxHeight];
@@ -182,8 +232,27 @@ public class RoomGenerator : DungeonGeneratorBase
         DrawCorridors(graph.GetCorridors(), rooms.Count);
         return map;
     }
+
+    /// <summary>
+    /// Преобразует дробное число в целое, отбрасывая дробную часть.
+    /// </summary>
+    /// <param name="x">Дробное число.</param>
+    /// <returns>Целое число.</returns>
     private int ipart(double x) { return (int)x; }
+
+    /// <summary>
+    /// Округляет дробное число до ближайшего целого.
+    /// </summary>
+    /// <param name="x">Дробное число.</param>
+    /// <returns>Округленное целое число.</returns>
     private int round(double x) { return ipart(x + 0.5); }
+
+    //???
+    /// <summary>
+    /// Рисует коридоры между комнатами.
+    /// </summary>
+    /// <param name="corridors">Список коридоров.</param>
+    /// <param name="offset">Смещение для идентификаторов.</param>
     private void DrawCorridors(List<GraphEdge> corridors, int offset)
     {
         for (int index = 0; index < corridors.Count; index++)
@@ -262,6 +331,11 @@ public class RoomGenerator : DungeonGeneratorBase
             }
         }
     }
+
+    /// <summary>
+    /// Генерирует случайную комнату.
+    /// </summary>
+    /// <returns>Сгенерированная комната.</returns>
     private Room GenerateRandomRoom()
     {
         Room room = null;
@@ -297,6 +371,11 @@ public class RoomGenerator : DungeonGeneratorBase
             mapMaxHeight += pos.y + size.Height;
         return room;
     }
+
+    /// <summary>
+    /// Генерирует квадратную комнату.
+    /// </summary>
+    /// <returns>Сгенерированная квадратная комната.</returns>
     private Room GenerateSquareRoom()
     {
         int roomWidth = Random.Range(6, roomSizeMax + 1);
@@ -311,6 +390,11 @@ public class RoomGenerator : DungeonGeneratorBase
             }
         return new Room(CalculateRoomPos(), roomWidth, roomHeight, tilePositions);
     }
+
+    /// <summary>
+    /// Генерирует комнату в форме многоугольника.
+    /// </summary>
+    /// <returns>Сгенерированная комната в форме многоугольника.</returns>
     private Room GeneratePolygonRoom()
     {
         int pointsSpawnRadius = 16;
@@ -365,6 +449,11 @@ public class RoomGenerator : DungeonGeneratorBase
         }
         return new Room(CalculateRoomPos(), maxX, maxY, tilePositions);
     }
+
+    /// <summary>
+    /// Генерирует круглую комнату.
+    /// </summary>
+    /// <returns>Сгенерированная круглая комната.</returns>
     private Room GenerateCircleRoom()
     {
         int roomRadius = Random.Range(4, roomSizeMax / 2 + 1);
@@ -410,6 +499,11 @@ public class RoomGenerator : DungeonGeneratorBase
         }
         return new Room(CalculateRoomPos(), sizeX, sizeY, tiles);
     }
+
+    /// <summary>
+    /// Генерирует ромбовидную комнату.
+    /// </summary>
+    /// <returns>Сгенерированная ромбовидная комната.</returns>
     private Room GenerateRombusRoom()
     {
         int roomRadius = Random.Range(6, roomSizeMax / 2 + 1);
@@ -429,6 +523,11 @@ public class RoomGenerator : DungeonGeneratorBase
             }
         return new Room(CalculateRoomPos(), sizeX, sizeY, tiles);
     }
+
+    /// <summary>
+    /// Генерирует угловую комнату.
+    /// </summary>
+    /// <returns>Сгенерированная угловая комната.</returns>
     protected Room GenerateCornerRoom()
     {
         int roomRadius = Random.Range(6, roomSizeMax + 1);
@@ -481,6 +580,11 @@ public class RoomGenerator : DungeonGeneratorBase
         }
         return new Room(CalculateRoomPos(), sizeX, sizeY, tiles);
     }
+
+    /// <summary>
+    /// Генерирует треугольную комнату.
+    /// </summary>
+    /// <returns>Сгенерированная треугольная комната.</returns>
     protected Room GenerateTriangleRoom()
     {
         int roomRadius = Random.Range(6, roomSizeMax / 2 + 1);
@@ -543,6 +647,11 @@ public class RoomGenerator : DungeonGeneratorBase
         }
         return new Room(CalculateRoomPos(), sizeX, sizeY, tiles);
     }
+
+    /// <summary>
+    /// Вычисляет позицию для комнаты.
+    /// </summary>
+    /// <returns>Позиция для комнаты.</returns>
     private Vector2Int CalculateRoomPos()
     {
         float t = 2 * Mathf.PI * Random.Range(0f, 0.9f);
@@ -554,6 +663,13 @@ public class RoomGenerator : DungeonGeneratorBase
             r = u;
         return new Vector2Int(Mathf.RoundToInt(roomSpawnRadius * r * Mathf.Cos(t)) + roomSpawnRadius, Mathf.RoundToInt(roomSpawnRadius * r * Mathf.Sin(t)) + roomSpawnRadius);
     }
+
+    /// <summary>
+    /// Генерирует набор точек для многоугольной комнаты.
+    /// </summary>
+    /// <param name="pointsSpawnRadius">Радиус спавна точек.</param>
+    /// <param name="pointsSpawnNum">Количество точек.</param>
+    /// <returns>Список точек.</returns>
     private List<Vector2Int> GenerateSetOfPoints(int pointsSpawnRadius, int pointsSpawnNum)
     {
         List<Vector2Int> points = new List<Vector2Int>();
@@ -608,6 +724,14 @@ public class RoomGenerator : DungeonGeneratorBase
         }
         return polygon.Take(k - 1).ToList();
     }
+
+    /// <summary>
+    /// Проверяет возможность выполнения операций над комнатами.
+    /// </summary>
+    /// <param name="room">Первая комната.</param>
+    /// <param name="roomOther">Вторая комната.</param>
+    /// <param name="isSub">Флаг подмножества.</param>
+    /// <returns>Тип операции.</returns>
     private Operations TryOperations(Room room, Room roomOther, bool isSub)
     {
         Operations op = Operations.None;
@@ -659,6 +783,14 @@ public class RoomGenerator : DungeonGeneratorBase
         }
         return op;
     }
+
+    /// <summary>
+    /// Выполняет операцию над комнатами.
+    /// </summary>
+    /// <param name="room">Первая комната.</param>
+    /// <param name="roomOther">Вторая комната.</param>
+    /// <param name="operation">Тип операции.</param>
+    /// <returns>Успех выполнения операции.</returns>
     private bool TryOperation(Room room, Room roomOther, Operations operation)
     {
         Room roomTest;
@@ -693,6 +825,14 @@ public class RoomGenerator : DungeonGeneratorBase
         }
         return false;
     }
+
+    /// <summary>
+    /// Проверяет, находится ли точка внутри многоугольника.
+    /// </summary>
+    /// <param name="x">X координата точки.</param>
+    /// <param name="y">Y координата точки.</param>
+    /// <param name="points">Список точек многоугольника.</param>
+    /// <returns>True - точка внутри многоугольника, иначе - False.</returns>
     private bool IsInsidePolygon(int x, int y, List<Vector2Int> points)
     {
         bool res = false;
@@ -702,8 +842,15 @@ public class RoomGenerator : DungeonGeneratorBase
         return res;
     }
 }
+
+/// <summary>
+/// Класс для выполнения операций над множествами.
+/// </summary>
 public static class SetOperations
 {
+    /// <summary>
+    /// Перечисление типов операций.
+    /// </summary>
     public enum Operations
     {
         None,
@@ -713,14 +860,28 @@ public static class SetOperations
         DifferenceBA,
         SymmetricDifference,
     }
+
+    /// <summary>
+    /// Возвращает случайную операцию.
+    /// </summary>
+    /// <returns>Тип операции.</returns>
     public static Operations GetRandomOperation()
     {
         return (Operations)Random.Range(1, 4);
     }
+
+    /// <summary>
+    /// Возвращает случайную операцию для подмножества.
+    /// </summary>
+    /// <returns>Тип операции.</returns>
     public static Operations GetRandomSubOperation()
     {
         return (Operations)Random.Range(2, 4);
     }
+
+    /// <summary>
+    /// Список всех операций.
+    /// </summary>
     public static readonly List<Operations> GetOperationsList = new List<Operations>
     {
         Operations.Intersect,
@@ -730,11 +891,14 @@ public static class SetOperations
         Operations.SymmetricDifference
 
     };
+
+    /// <summary>
+    /// Список операций для подмножеств.
+    /// </summary>
     public static readonly List<Operations> GetSubOperationsList = new List<Operations>
     {
         Operations.Union,
         Operations.DifferenceAB,
         Operations.DifferenceBA,
     };
-
 }
