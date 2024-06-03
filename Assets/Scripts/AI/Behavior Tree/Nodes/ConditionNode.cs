@@ -1,28 +1,24 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using Scellecs.Morpeh;
+using XNode;
+using UnityEngine;
 
-// Узел условия
+[CreateNodeMenu("BehaviorTree/ConditionNode")]
 public class ConditionNode : BehaviorTreeNode
 {
-    private Func<Entity, bool> condition; // Делегат для условия
+    [Input(connectionType = ConnectionType.Override)] public bool input; // Входной порт для соединений
 
-    public ConditionNode(Func<Entity, bool> condition)
-    {
-        this.condition = condition;
-    }
+    [SerializeField] private ConditionDelegate conditionDelegate;
 
     public override NodeState Execute(Entity entity)
     {
-        if (condition(entity))
+        if (conditionDelegate == null)
         {
-            currentState = NodeState.SUCCESS;
+            return NodeState.FAILURE;
         }
         else
         {
-            currentState = NodeState.FAILURE;
+            return conditionDelegate.Check(entity) ? NodeState.SUCCESS : NodeState.FAILURE;
         }
-        return currentState;
     }
 }

@@ -1,12 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+using System;
 using Scellecs.Morpeh;
+using UnityEngine;
 using ECS;
 
-public static class ConditionDelegates
+[CreateAssetMenu(fileName = "HasVisibleTargets", menuName = "BehaviorTree/ConditionDelegates/HasVisibleTargets")]
+public class HasVisibleTargets : ConditionDelegate
 {
-    public static bool HasVisibleTargets(Entity entity)
+    public override bool Check(Entity entity)
     {
         var visionStash = World.Default.GetStash<VisionComponent>();
 

@@ -1,22 +1,24 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using Scellecs.Morpeh;
+using XNode;
+using UnityEngine;
 
-// Узел действия с поддержкой различных состояний выполнения
+[CreateNodeMenu("BehaviorTree/ActionNode")]
 public class ActionNode : BehaviorTreeNode
 {
-    private Func<Entity, NodeState> action; // Делегат для действия с возвратом состояния
+    [Input(connectionType = ConnectionType.Override)] public bool input; // Входной порт для соединений
 
-    public ActionNode(Func<Entity, NodeState> action)
-    {
-        this.action = action;
-    }
+    [SerializeField] private ActionDelegate actionDelegate;
 
     public override NodeState Execute(Entity entity)
     {
-        currentState = action(entity);
-        return currentState;
+        if (actionDelegate == null)
+        {
+            return NodeState.FAILURE;
+        }
+        else
+        {
+            return actionDelegate.Execute(entity);
+        }
     }
 }
-

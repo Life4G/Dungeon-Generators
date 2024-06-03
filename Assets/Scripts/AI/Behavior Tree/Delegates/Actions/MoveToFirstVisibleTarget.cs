@@ -1,27 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+using System;
 using Scellecs.Morpeh;
+using UnityEngine;
 using ECS;
 
-public static class ActionDelegates
+[CreateAssetMenu(fileName = "MoveToFirstVisibleTarget", menuName = "BehaviorTree/ActionDelegates/MoveToFirstVisibleTarget")]
+public class MoveToFirstVisibleTarget : ActionDelegate
 {
-    public static NodeState Wander(Entity entity)
-    {
-        var wanderStash = World.Default.GetStash<WanderComponent>();
-
-        if (!wanderStash.Has(entity))
-        {
-            wanderStash.Add(entity, new WanderComponent());
-        }
-
-        return NodeState.RUNNING;
-    }
-
-
-
-
-    public static NodeState MoveToFirstVisibleTarget(Entity entity)
+    public override NodeState Execute(Entity entity)
     {
         var visionStash = World.Default.GetStash<VisionComponent>();
         var moveRequestStash = World.Default.GetStash<MoveRequest>();
@@ -46,7 +31,6 @@ public static class ActionDelegates
 
         if (movingFlagStash.Has(entity))
         {
-            // Проверяем текущее состояние перемещения
             ref var currentPosition = ref positionStash.Get(entity);
 
             if (currentPosition.position == targetPosition.position)
@@ -61,7 +45,6 @@ public static class ActionDelegates
         }
         else
         {
-            // Инициализация запроса на перемещение
             var moveRequest = new MoveRequest
             {
                 start = positionComponent.position,

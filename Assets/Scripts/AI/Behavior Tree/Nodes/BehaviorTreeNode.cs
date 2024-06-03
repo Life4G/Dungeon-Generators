@@ -1,18 +1,34 @@
-using System.Collections;
 using System.Collections.Generic;
 using Scellecs.Morpeh;
+using XNode;
+using UnityEngine;
 
-
-// Базовый абстрактный класс для всех узлов дерева
-public abstract class BehaviorTreeNode : IBehaviorTreeNode
+public abstract class BehaviorTreeNode : Node, IBehaviorTreeNode
 {
-    protected NodeState currentState;
-
-    public BehaviorTreeNode()
-    {
-        currentState = NodeState.RUNNING;
-    }
+    protected List<BehaviorTreeNode> connectedNodes;
 
     public abstract NodeState Execute(Entity entity); // Обязательная реализация метода выполнения
-}
 
+    public void Initialize()
+    {
+        connectedNodes = GetConnectedNodes();
+    }
+
+    // Метод для получения значений дочерних узлов
+    protected List<BehaviorTreeNode> GetConnectedNodes()
+    {
+        List<BehaviorTreeNode> nodes = new List<BehaviorTreeNode>();
+        NodePort outputPort = GetOutputPort("output");
+        if (outputPort != null)
+        {
+            foreach (NodePort connection in outputPort.GetConnections())
+            {
+                if (connection.node is BehaviorTreeNode node)
+                {
+                    nodes.Add(node);
+                }
+            }
+        }
+        return nodes;
+    }
+}

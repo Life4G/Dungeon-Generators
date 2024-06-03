@@ -146,6 +146,7 @@ namespace ECS
             }
         }
 
+
         private Vector2Int GetRandomAdjacentPosition(Vector2Int currentPosition)
         {
             List<Vector2Int> adjacentPositions = new List<Vector2Int>();

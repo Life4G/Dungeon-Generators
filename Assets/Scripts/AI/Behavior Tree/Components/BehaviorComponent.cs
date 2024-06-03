@@ -1,6 +1,7 @@
 using Scellecs.Morpeh;
 using UnityEngine;
 using Unity.IL2CPP.CompilerServices;
+using XNode;
 
 namespace ECS
 {
@@ -10,8 +11,6 @@ namespace ECS
     [Il2CppSetOption(Option.DivideByZeroChecks, false)]
     public struct BehaviorComponent : IComponent
     {
-        public IBehaviorTreeNode rootNode; // Ссылка на корень дерева поведения
+        public BehaviorTreeGraph behaviorTree; // Ссылка на граф дерева поведения
     }
-
-
 }

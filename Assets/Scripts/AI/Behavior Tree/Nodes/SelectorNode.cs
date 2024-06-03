@@ -1,35 +1,23 @@
-using System.Collections;
 using System.Collections.Generic;
 using Scellecs.Morpeh;
+using XNode;
 
+[CreateNodeMenu("BehaviorTree/SelectorNode")]
 public class SelectorNode : BehaviorTreeNode
 {
-    private List<IBehaviorTreeNode> children = new List<IBehaviorTreeNode>();
-
-    public SelectorNode(IEnumerable<IBehaviorTreeNode> children)
-    {
-        this.children.AddRange(children);
-    }
+    [Input(connectionType = ConnectionType.Override)] public bool input; // Входной порт для соединений
+    [Output(connectionType = ConnectionType.Multiple)] public bool output; // Выходной порт для соединений
 
     public override NodeState Execute(Entity entity)
     {
-        bool isAnyChildRunning = false;
-
-        foreach (var child in children)
+        foreach (var child in connectedNodes)
         {
             var state = child.Execute(entity);
-            if (state == NodeState.SUCCESS)
+            if (state != NodeState.FAILURE)
             {
-                currentState = NodeState.SUCCESS;
-                return currentState;
-            }
-            if (state == NodeState.RUNNING)
-            {
-                isAnyChildRunning = true;
+                return state; // Возвращает то же состояние, что и дочерний узел
             }
         }
-
-        currentState = isAnyChildRunning ? NodeState.RUNNING : NodeState.FAILURE;
-        return currentState;
+        return NodeState.FAILURE; // Если все узлы возвращают Failure, возвращает Failure
     }
 }
