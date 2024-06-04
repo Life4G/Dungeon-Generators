@@ -89,7 +89,6 @@ public class SceneObjectEditor : Editor
                 EditorGUI.LabelField(rect, "Scene Objects");
             };
 
-
         }
 
 

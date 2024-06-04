@@ -19,12 +19,6 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
   edges:
   - {fileID: 0}
   - {fileID: 0}
@@ -33,23 +27,10 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
   gizmoCentres:
-  - {x: 69, y: 106, z: 0}
-  - {x: 34, y: 30, z: 0}
-  - {x: 27, y: 109, z: 0}
-  - {x: 39, y: 94, z: 0}
-  - {x: 9, y: 51, z: 0}
-  - {x: 53, y: 62, z: 0}
-  - {x: 125, y: 68, z: 0}
-  - {x: 35, y: 55, z: 0}
-  - {x: 60, y: 9, z: 0}
-  - {x: 90, y: 57, z: 0}
-  - {x: 104, y: 76, z: 0}
-  - {x: 69, y: 23, z: 0}
+  - {x: 83, y: 35, z: 0}
+  - {x: 47, y: 22, z: 0}
+  - {x: 38, y: 79, z: 0}
+  - {x: 97, y: 21, z: 0}
+  - {x: 83, y: 83, z: 0}
+  - {x: 90, y: 104, z: 0}

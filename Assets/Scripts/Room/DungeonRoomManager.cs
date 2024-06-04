@@ -68,6 +68,15 @@ namespace Assets.Scripts.Room
         }
 
         /// <summary>
+        /// Позволяет установить сид.
+        /// </summary>
+        /// <param name="seed"></param>
+        public void SetSeed(int seed)
+        {
+            this.seed = seed;
+        }
+
+        /// <summary>
         /// Вызов распределения фракций в зависимости от выбранного метода в distributionMethod.
         /// </summary>
         public void AssignFractions()

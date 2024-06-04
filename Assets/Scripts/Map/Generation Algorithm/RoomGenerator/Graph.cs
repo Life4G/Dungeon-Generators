@@ -192,7 +192,7 @@ public class Graph : ScriptableObject
     /// Возвращает список коридоров графа.
     /// </summary>
     /// <returns>Список коридоров.</returns>
-    public List<GraphEdge> GetCorridors()
+    public List<Corridor> GetCorridors()
     {
         return edges;
     }
@@ -212,7 +212,7 @@ public class Graph : ScriptableObject
     /// </summary>
     /// <param name="id">Идентификатор коридора.</param>
     /// <returns>Коридор.</returns>
-    public GraphEdge GetCorridor(int id)
+    public Corridor GetCorridor(int id)
     {
         if (id - vertices.Count < 0)
             return null;
@@ -345,7 +345,7 @@ public class Graph : ScriptableObject
     /// </summary>
     /// <param name="edges">Список ребер графа.</param>
     /// <returns>Список ребер остовного дерева.</returns>
-    private List<GraphEdge> SpanningTree(List<GraphEdge> edges)
+    private List<Corridor> SpanningTree(List<Corridor> edges)
     {
         int[] parent = new int[vertices.Count];
 
@@ -386,7 +386,7 @@ public class Graph : ScriptableObject
     /// <param name="maxWidth">Максимальная ширина карты.</param>
     /// <param name="maxHeigth">Максимальная высота карты.</param>
     /// <returns>Список ребер триангуляции.</returns>
-    private List<GraphEdge> Triangulation(int maxWidth, int maxHeigth)
+    private List<Corridor> Triangulation(int maxWidth, int maxHeigth)
     {
         List<Corridor> edges = new List<Corridor>();
 
@@ -770,7 +770,7 @@ public class Triangle
     /// <param name="edge">Ребро треугольника.</param>
     /// <param name="point">Позиция точки.</param>
     /// <param name="vertexId">Идентификатор вершины.</param>
-    public Triangle(GraphEdge edge, Vector2Int point, int vertexId)
+    public Triangle(Corridor edge, Vector2Int point, int vertexId)
     {
         edges = new Corridor[3]
         {
@@ -816,7 +816,7 @@ public class Triangle
     /// </summary>
     /// <param name="edge">Ребро.</param>
     /// <returns>True, - треугольник содержит ребро, иначе - False.</returns>
-    public bool Contains(GraphEdge edge)
+    public bool Contains(Corridor edge)
     {
         foreach (Corridor edgeTrianlge in edges)
         {

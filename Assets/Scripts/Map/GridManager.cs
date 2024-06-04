@@ -61,7 +61,7 @@ public class GridManager : MonoBehaviour
             for (int x = 0; x < map.GetWidth(); x++)
             {
                 DungeonTile tile = map.GetTile(x, y);
-                //boolArray[x, y] = tile.isPassable;
+                //boolArray[y, x] = tile.isPassable;
                 //Debug.Log($"Tile ({x}, {y}): isPassable = {tile.isPassable}");
             }
         }
@@ -116,7 +116,7 @@ public class GridManager : MonoBehaviour
         {
             for (int x = 0; x < array.GetLength(0); x++)
             {
-                int roomIndex = array[x, y];
+                int roomIndex = array[y, x];
                 if (roomIndex >= 0)
                 {
                     currentRoomStyle = roomStyleManager.GetRoomStyle(roomManager.GetRoomStyleId(roomIndex));
@@ -139,10 +139,10 @@ public class GridManager : MonoBehaviour
         {
             for (int x = 0; x < dungeonMap.GetWidth(); x++)
             {
-                int textureType = dungeonMap.tiles[x, y].textureType;
-                if (dungeonMap.tiles[x, y].roomIndex >= 0 && generator.GetGraph().IsRoom(dungeonMap.tiles[x, y].roomIndex))
+                int textureType = dungeonMap.tiles[y, x].textureType;
+                if (dungeonMap.tiles[y, x].roomIndex >= 0 && generator.GetGraph().IsRoom(dungeonMap.tiles[y, x].roomIndex))
                 {
-                    currentRoomStyle = roomStyleManager.GetRoomStyle(roomManager.GetRoomStyleId(dungeonMap.tiles[x, y].roomIndex));
+                    currentRoomStyle = roomStyleManager.GetRoomStyle(roomManager.GetRoomStyleId(dungeonMap.tiles[y, x].roomIndex));
                     Vector3Int tilePosition = new Vector3Int(x, y, 0);
                     TileBase tileToUse = null;
 
@@ -178,18 +178,15 @@ public class GridManager : MonoBehaviour
                     }
                     tilemap.SetTile(tilePosition, tileToUse);
                 }
-                else if (dungeonMap.tiles[x, y].roomIndex >= 0 && generator.GetGraph().IsCorridor(dungeonMap.tiles[x, y].roomIndex))
+                else if (dungeonMap.tiles[y, x].roomIndex >= 0 && generator.GetGraph().IsCorridor(dungeonMap.tiles[y, x].roomIndex))
                 {
-                    List<int> roomIndices = FindConnectedRoomsIndices(dungeonMap.tiles[x, y].roomIndex, generator.GetGraph().GetGraphMap());
+                    List<int> roomIndices = FindConnectedRoomsIndices(dungeonMap.tiles[y, x].roomIndex, generator.GetGraph().GetGraphMap());
 
                     int room1Index = roomIndices[0];
                     int room2Index = roomIndices[1];
 
-                    DungeonRoom room1 = roomManager.GetRoomById(room1Index);
-                    DungeonRoom room2 = roomManager.GetRoomById(room2Index);
-
-                    Vector2Int connectionPos1 = generator.GetGraph().GetCorridor(dungeonMap.tiles[x, y].roomIndex).GetPosById(room1Index);
-                    Vector2Int connectionPos2 = generator.GetGraph().GetCorridor(dungeonMap.tiles[x, y].roomIndex).GetPosById(room2Index);
+                    Vector2Int connectionPos1 = generator.GetGraph().GetCorridor(dungeonMap.tiles[y, x].roomIndex).GetPosById(room1Index);
+                    Vector2Int connectionPos2 = generator.GetGraph().GetCorridor(dungeonMap.tiles[y, x].roomIndex).GetPosById(room2Index);
 
                     RoomStyle style1 = roomStyleManager.GetRoomStyle(roomManager.GetRoomStyleId(room1Index));
                     RoomStyle style2 = roomStyleManager.GetRoomStyle(roomManager.GetRoomStyleId(room2Index));
@@ -237,8 +234,8 @@ public class GridManager : MonoBehaviour
                     {
                         TileBase tileToUse2 = null;
 
-                        float distanceToRoom1Center = Vector2.Distance(new Vector2(y, x), connectionPos1);
-                        float distanceToRoom2Center = Vector2.Distance(new Vector2(y, x), connectionPos2);
+                        float distanceToRoom1Center = Vector2.Distance(new Vector2(x, y), connectionPos1);
+                        float distanceToRoom2Center = Vector2.Distance(new Vector2(x, y), connectionPos2);
                         float totalDistance = distanceToRoom1Center + distanceToRoom2Center;
                         float blendFactor = 1.0f - (distanceToRoom1Center / totalDistance);
 

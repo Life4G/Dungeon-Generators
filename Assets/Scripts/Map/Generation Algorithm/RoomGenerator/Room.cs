@@ -9,7 +9,7 @@ public class Room : ScriptableObject
     /// <summary>
     /// Позиция комнаты на карте.
     /// </summary>
-    public Vector2Int massRoomPos;
+    public Vector2Int pos;
 
     /// <summary>
     /// Ширина комнаты.
@@ -37,13 +37,18 @@ public class Room : ScriptableObject
     private static readonly int tilesMin = 8;
 
     /// <summary>
+    /// Максимальное количество плиток для валидной комнаты.
+    /// </summary>
+    private static readonly int tilesMax = 16;
+
+    /// <summary>
     /// Конструктор комнаты.
     /// </summary>
     /// <param name="massRoomPos">Позиция комнаты.</param>
     /// <param name="sizeX">Ширина комнаты.</param>
     /// <param name="sizeY">Высота комнаты.</param>
     /// <param name="tiles">Плитки комнаты.</param>
-    public Room(Vector2Int massRoomPos, int sizeX, int sizeY, int[,] tiles)
+    public static Room Copy(Room room)
     {
         Room copy = CreateInstance<Room>();
         copy.InitCopy(room);

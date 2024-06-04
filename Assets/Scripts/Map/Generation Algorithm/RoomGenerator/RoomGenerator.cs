@@ -269,7 +269,7 @@ public class RoomGenerator : DungeonGeneratorBase
     /// </summary>
     /// <param name="corridors">Список коридоров.</param>
     /// <param name="offset">Смещение для идентификаторов.</param>
-    private void DrawCorridors(List<GraphEdge> corridors, int offset)
+    private void DrawCorridors(List<Corridor> corridors, int offset)
     {
         for (int index = 0; index < corridors.Count; index++)
         {
