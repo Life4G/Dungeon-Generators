@@ -7,6 +7,9 @@ using Assets.Scripts.Map;
 using TMPro;
 using Unity.VisualScripting;
 using Assets.Scripts.Fraction;
+using UnityEditor;
+using UnityEditor.Localization.Plugins.XLIFF.V12;
+using UnityEngine.Profiling.Memory.Experimental;
 
 public class GridManager : MonoBehaviour
 {
@@ -14,7 +17,8 @@ public class GridManager : MonoBehaviour
     private RoomStyleManager roomStyleManager;
 
     [SerializeField]
-    public DungeonGeneratorBase generator;
+    public RoomGenerator generator;
+    private Graph graph;
 
     [SerializeField]
     public Tilemap tilemap;
@@ -24,7 +28,11 @@ public class GridManager : MonoBehaviour
     [SerializeField]
     public DungeonRoomManager roomManager;
     private DungeonMap map;
-    private Graph graph;
+
+    [SerializeField]
+    public SceneObjectManager sceneObjectManager;
+
+
 
     public DungeonMap GetDungeonMap()
     {
@@ -112,10 +120,10 @@ public class GridManager : MonoBehaviour
         {
             for (int x = 0; x < dungeonMap.GetWidth(); x++)
             {
-                int textureType = dungeonMap.tiles[x, y].textureType;
-                if (dungeonMap.tiles[x, y].roomIndex >= 0 && generator.GetGraph().IsRoom(dungeonMap.tiles[x, y].roomIndex))
+                int textureType = dungeonMap.tiles[y, x].textureType;
+                if (dungeonMap.tiles[y, x].roomIndex >= 0 && generator.GetGraph().IsRoom(dungeonMap.tiles[y, x].roomIndex))
                 {
-                    currentRoomStyle = roomStyleManager.GetRoomStyle(roomManager.GetRoomStyleId(dungeonMap.tiles[x, y].roomIndex));
+                    currentRoomStyle = roomStyleManager.GetRoomStyle(roomManager.GetRoomStyleId(dungeonMap.tiles[y, x].roomIndex));
                     Vector3Int tilePosition = new Vector3Int(x, y, 0);
                     TileBase tileToUse = null;
 
@@ -151,9 +159,9 @@ public class GridManager : MonoBehaviour
                     }
                     tilemap.SetTile(tilePosition, tileToUse);
                 }
-                else if (dungeonMap.tiles[x, y].roomIndex >= 0 && generator.GetGraph().IsCorridor(dungeonMap.tiles[x, y].roomIndex))
+                else if (dungeonMap.tiles[y, x].roomIndex >= 0 && generator.GetGraph().IsCorridor(dungeonMap.tiles[y, x].roomIndex))
                 {
-                    List<int> roomIndices = FindConnectedRoomsIndices(dungeonMap.tiles[x, y].roomIndex, generator.GetGraph().GetGraphMap());
+                    List<int> roomIndices = FindConnectedRoomsIndices(dungeonMap.tiles[y, x].roomIndex, generator.GetGraph().GetGraphMap());
 
                     int room1Index = roomIndices[0];
                     int room2Index = roomIndices[1];
@@ -161,8 +169,8 @@ public class GridManager : MonoBehaviour
                     DungeonRoom room1 = roomManager.GetRoomById(room1Index);
                     DungeonRoom room2 = roomManager.GetRoomById(room2Index);
 
-                    Vector2Int connectionPos1 = generator.GetGraph().GetCorridor(dungeonMap.tiles[x, y].roomIndex).GetPosById(room1Index);
-                    Vector2Int connectionPos2 = generator.GetGraph().GetCorridor(dungeonMap.tiles[x, y].roomIndex).GetPosById(room2Index);
+                    Vector2Int connectionPos1 = generator.GetGraph().GetCorridor(dungeonMap.tiles[y, x].roomIndex).GetPosById(room1Index);
+                    Vector2Int connectionPos2 = generator.GetGraph().GetCorridor(dungeonMap.tiles[y, x].roomIndex).GetPosById(room2Index);
 
                     RoomStyle style1 = roomStyleManager.GetRoomStyle(roomManager.GetRoomStyleId(room1Index));
                     RoomStyle style2 = roomStyleManager.GetRoomStyle(roomManager.GetRoomStyleId(room2Index));
@@ -210,8 +218,8 @@ public class GridManager : MonoBehaviour
                     {
                         TileBase tileToUse2 = null;
 
-                        float distanceToRoom1Center = Vector2.Distance(new Vector2(y, x), connectionPos1);
-                        float distanceToRoom2Center = Vector2.Distance(new Vector2(y, x), connectionPos2);
+                        float distanceToRoom1Center = Vector2.Distance(new Vector2(x, y), connectionPos1);
+                        float distanceToRoom2Center = Vector2.Distance(new Vector2(x, y), connectionPos2);
                         float totalDistance = distanceToRoom1Center + distanceToRoom2Center;
                         float blendFactor = 1.0f - (distanceToRoom1Center / totalDistance);
 
@@ -427,6 +435,7 @@ public class GridManager : MonoBehaviour
     /// <param name="seed">Сид генерации карты.</param>
     public void Reload(int seed)
     {
+
         Clear();
 
         map = new DungeonMap(generator.CreateDungeon(seed));
@@ -471,6 +480,7 @@ public class GridManager : MonoBehaviour
     /// </summary>
     void Awake()
     {
+
         Reload();
     }
 
@@ -479,12 +489,13 @@ public class GridManager : MonoBehaviour
     /// </summary>
     private void OnDrawGizmos()
     {
-        //Тупо но пока так 
-        for (int i = 0; roomManager.rooms != null && i < roomManager.rooms.Length; i++)
+        if (graph == null)
+            graph = AssetDatabase.LoadAssetAtPath<Graph>("Assets/Scripts/Scriptable Objects/Generators/Geometry/Graph Data.asset");
+        List<Vector3> gizmos = graph.GetGizmos();
+        for (int i = 0; i < gizmos.Count; i++)
         {
             Gizmos.color = roomManager.GetRoomFractionColor(i);
-            if (!roomManager.rooms[i].isCorridor)
-                Gizmos.DrawSphere(new Vector3(roomManager.rooms[i].centerX, roomManager.rooms[i].centerY, 0), 2);
+            Gizmos.DrawSphere(new Vector3(gizmos[i].x, gizmos[i].y, 0), 2);
 
         }
     }

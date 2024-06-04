@@ -10,9 +10,10 @@ public abstract class DungeonGeneratorBase : MonoBehaviour
     protected Vector2Int startPosition = Vector2Int.zero;
     //Сид
     [SerializeField]
-    protected int seed = 0;
+    protected int seed;
     [SerializeField]
     public WallsGenerator wallsGenerator;
+    [SerializeField]
     protected Graph graph;
 
     //Функция по генерации сида

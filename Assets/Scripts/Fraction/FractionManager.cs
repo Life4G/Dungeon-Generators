@@ -80,10 +80,9 @@ namespace Assets.Scripts.Fraction
 
         public Color GetColorByIndex(int fractionIndex)
         {
-            if (fractionIndex == -1)
+            if (fractionIndex == -1 || fractions == null)
                 return Color.white;
-            else
-                return fractions[fractionIndex].color;
+            return fractions[fractionIndex].color;
         }
 
     }

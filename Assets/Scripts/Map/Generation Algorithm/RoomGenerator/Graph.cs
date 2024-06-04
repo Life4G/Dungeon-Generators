@@ -6,28 +6,60 @@ using UnityEngine;
 using UnityEngine.TextCore.LowLevel;
 using UnityEditorInternal;
 using Unity.VisualScripting;
+using UnityEditor;
 
-public class Graph
+[CreateAssetMenu(fileName = "Graph Data", menuName = "Graph", order = 52)]
+public class Graph : ScriptableObject
 {
-    private readonly List<Room> vertices;
-    private readonly List<GraphEdge> edges;
-    private readonly List<Vector3> gizmoCentres;
-    private readonly int[,] graphMap;
+    [SerializeField]
+    private List<Room> vertices;
+    [SerializeField]
+    private List<Corridor> edges;
+    [SerializeField]
+    private List<Vector3> gizmoCentres;
+    [SerializeField]
+    private int[,] graphMap;
 
-    public Graph(List<Room> rooms, int maxWidth, int maxHeigth)
+    //public Graph(List<Room> rooms, int maxWidth, int maxHeigth)
+    //{
+    //    vertices = rooms.ToList();
+    //    gizmoCentres = new List<Vector3>();
+    //    for (int i = 0; i < rooms.Count; i++)
+    //    {
+    //        Vector2Int center = rooms[i].GetPosCenter();
+    //        gizmoCentres.Add(new Vector3(center.y, center.x, 0));
+    //    }
+    //    edges = Triangulation(maxWidth, maxHeigth);
+    //    graphMap = CalcMap();
+    //    List<Corridor> spanningTree = SpanningTree(edges);
+    //    edges.Except(spanningTree);
+    //    for (int i = 0; i < UnityEngine.Random.Range(0, edges.Count); i++)
+    //    {
+    //        int index = UnityEngine.Random.Range(0, edges.Count);
+    //        spanningTree.Add(edges[index]);
+    //        edges.RemoveAt(index);
+    //    }
+    //    edges = spanningTree;
+    //    AdjustEdges();
+    //    graphMap = CalcMap();
+
+    //    FinalizeMap();
+    //}
+
+    private void Init(List<Room> rooms, int maxWidth, int maxHeigth)
     {
         vertices = rooms.ToList();
         gizmoCentres = new List<Vector3>();
-        for (int i = 0;i<rooms.Count;i++)
+        for (int i = 0; i < rooms.Count; i++)
         {
             Vector2Int center = rooms[i].GetPosCenter();
-            gizmoCentres.Add(new Vector3(center.y,center.x,0));
+            gizmoCentres.Add(new Vector3(center.x, center.y, 0));
         }
         edges = Triangulation(maxWidth, maxHeigth);
         graphMap = CalcMap();
-        List<GraphEdge> spanningTree = SpanningTree(edges);
+        List<Corridor> spanningTree = SpanningTree(edges);
         edges.Except(spanningTree);
-        for(int i =0; i < UnityEngine.Random.Range(0, edges.Count); i++) 
+        for (int i = 0; i < UnityEngine.Random.Range(0, edges.Count); i++)
         {
             int index = UnityEngine.Random.Range(0, edges.Count);
             spanningTree.Add(edges[index]);
@@ -36,12 +68,38 @@ public class Graph
         edges = spanningTree;
         AdjustEdges();
         graphMap = CalcMap();
-
+        List<String> roomJson = new List<string>();
+        foreach (Room vertex in vertices)
+        {
+            roomJson.Add(JsonUtility.ToJson(vertex));
+        }
         FinalizeMap();
+    }
+    public static Graph CreateGraph(List<Room> rooms, int maxWidth, int maxHeigth)
+    {
+
+        Graph graph = CreateInstance<Graph>();
+        graph.Init(rooms, maxWidth, maxHeigth);
+        AssetDatabase.CreateAsset(graph, "Assets/Scripts/Scriptable Objects/Generators/Geometry/Graph Data.asset");
+
+        return graph;
+    }
+    public void OnEnable() //On Reload
+    {
+        Debug.Log("OnEnable");
+
+    }
+    public void ConvertToFile()
+    {
+        JsonUtility.ToJson(vertices);
+    }
+    public void ConvertToGraph()
+    {
+
     }
     public bool IsAdjucent(int room, int roomOther)
     {
-        return edges.Contains(new GraphEdge(room, roomOther));
+        return edges.Contains(Corridor.CreateCorridor(room, roomOther));
     }
     public bool IsRoom(int id)
     {
@@ -61,14 +119,14 @@ public class Graph
     }
     public List<Vector3> GetGizmos()
     { return gizmoCentres; }
-    public Vector3 GetGizmoById(int id) 
+    public Vector3 GetGizmoById(int id)
     {
         if (id < vertices.Count)
             return gizmoCentres[id];
         else
             return Vector3.back;
     }
-    public List<GraphEdge> GetCorridors()
+    public List<Corridor> GetCorridors()
     {
         return edges;
     }
@@ -76,7 +134,7 @@ public class Graph
     {
         return edges[id - vertices.Count].GetRoomsIds();
     }
-    public GraphEdge GetCorridor(int id)
+    public Corridor GetCorridor(int id)
     {
         if (id - vertices.Count < 0)
             return null;
@@ -107,7 +165,7 @@ public class Graph
     }
     private void AdjustEdges()
     {
-        foreach (GraphEdge edge in edges)
+        foreach (Corridor edge in edges)
         {
             edge.AdjustPos(vertices[edge.idRoomFirst], vertices[edge.idRoomSecond]);
         }
@@ -164,7 +222,7 @@ public class Graph
 
         return min_index;
     }
-    private List<GraphEdge> SpanningTree(List<GraphEdge> edges)
+    private List<Corridor> SpanningTree(List<Corridor> edges)
     {
         int[] parent = new int[vertices.Count];
 
@@ -193,14 +251,14 @@ public class Graph
                     key[v] = (int)edges[graphMap[u, v]].GetLength();
                 }
         }
-        List<GraphEdge> edgesNew = new List<GraphEdge>();
+        List<Corridor> edgesNew = new List<Corridor>();
         for (int i = 1; i < vertices.Count; i++)
             edgesNew.Add(edges[graphMap[i, parent[i]]]);
         return edgesNew;
     }
-    private List<GraphEdge> Triangulation(int maxWidth, int maxHeigth)
+    private List<Corridor> Triangulation(int maxWidth, int maxHeigth)
     {
-        List<GraphEdge> edges = new List<GraphEdge>();
+        List<Corridor> edges = new List<Corridor>();
 
         List<Vector2Int> points = new List<Vector2Int>();
         for (int i = 0; i < vertices.Count; i++)
@@ -211,17 +269,17 @@ public class Graph
         for (int vertId = 0; vertId < points.Count; vertId++)
         {
             List<Triangle> badTriangles = new List<Triangle>();
-            List<GraphEdge> badEdges = new List<GraphEdge>();
+            List<Corridor> badEdges = new List<Corridor>();
             foreach (Triangle triangle in triangles)
             {
                 if (triangle.ContainsPoint(points[vertId]))
                 {
                     badTriangles.Add(triangle);
-                    foreach (GraphEdge badEdge in triangle.edges)
+                    foreach (Corridor badEdge in triangle.edges)
                         badEdges.Add(badEdge);
                 }
             }
-            List<GraphEdge> polygon = new List<GraphEdge>();
+            List<Corridor> polygon = new List<Corridor>();
             for (int i = 0; i < badEdges.Count; i++)
             {
                 bool isUnique = true;
@@ -240,13 +298,13 @@ public class Graph
             {
                 triangles.Remove(badTriangle);
             }
-            foreach (GraphEdge edge in polygon)
+            foreach (Corridor edge in polygon)
             {
                 triangles.Add(new Triangle(edge, points[vertId], vertId));
             }
         }
         foreach (Triangle triangle in triangles)
-            foreach (GraphEdge edge in triangle.edges)
+            foreach (Corridor edge in triangle.edges)
                 if (!edge.Contains(-1) && !edge.Contains(-2) && !edge.Contains(-3) && !edges.Contains(edge))
                     edges.Add(edge);
 
@@ -255,14 +313,36 @@ public class Graph
     }
 }
 
-public class GraphEdge
+
+public class Corridor : ScriptableObject
 {
+    [SerializeField]
     public int idRoomFirst;
+    [SerializeField]
     public int idRoomSecond;
+    [SerializeField]
     public Vector2Int posPoint1;
+    [SerializeField]
     public Vector2Int posPoint2;
+    [SerializeField]
     private float length;
-    public GraphEdge(int idFirst, int idSecond)
+    //public Corridor(int idFirst, int idSecond)
+    //{
+    //    idRoomFirst = idFirst;
+    //    idRoomSecond = idSecond;
+    //    posPoint1 = Vector2Int.zero;
+    //    posPoint2 = Vector2Int.zero;
+    //    length = -1;
+    //}
+    //public Corridor(int idFirst, int idSecond, Vector2Int posPoint1, Vector2Int posPoint2)
+    //{
+    //    idRoomFirst = idFirst;
+    //    idRoomSecond = idSecond;
+    //    this.posPoint1 = posPoint1;
+    //    this.posPoint2 = posPoint2;
+    //    length = Vector2.Distance(posPoint1, posPoint2);
+    //}
+    private void Init(int idFirst, int idSecond)
     {
         idRoomFirst = idFirst;
         idRoomSecond = idSecond;
@@ -270,7 +350,7 @@ public class GraphEdge
         posPoint2 = Vector2Int.zero;
         length = -1;
     }
-    public GraphEdge(int idFirst, int idSecond, Vector2Int posPoint1, Vector2Int posPoint2)
+    private void Init(int idFirst, int idSecond, Vector2Int posPoint1, Vector2Int posPoint2)
     {
         idRoomFirst = idFirst;
         idRoomSecond = idSecond;
@@ -278,25 +358,38 @@ public class GraphEdge
         this.posPoint2 = posPoint2;
         length = Vector2.Distance(posPoint1, posPoint2);
     }
-    public static bool operator ==(GraphEdge first, GraphEdge second)
+    public static Corridor CreateCorridor(int idFirst, int idSecond)
+    {
+        Corridor corridor = CreateInstance<Corridor>();
+        corridor.Init(idFirst, idSecond);
+        return corridor;
+    }
+    public static Corridor CreateCorridor(int idFirst, int idSecond, Vector2Int posPoint1, Vector2Int posPoint2)
+    {
+        Corridor corridor = CreateInstance<Corridor>();
+        corridor.Init(idFirst, idSecond, posPoint1, posPoint2);
+        return corridor;
+    }
+
+    public static bool operator ==(Corridor first, Corridor second)
     {
         return first.idRoomFirst == second.idRoomFirst && first.idRoomSecond == second.idRoomSecond
             || first.idRoomFirst == second.idRoomSecond && first.idRoomSecond == second.idRoomFirst;
     }
-    public static bool operator !=(GraphEdge first, GraphEdge second)
+    public static bool operator !=(Corridor first, Corridor second)
     {
         return !(first == second);
     }
     public override bool Equals(object other)
     {
-        if (!(other is GraphEdge))
+        if (!(other is Corridor))
         {
             return false;
         }
 
-        return Equals((GraphEdge)other);
+        return Equals((Corridor)other);
     }
-    public bool Equals(GraphEdge other)
+    public bool Equals(Corridor other)
     {
         return idRoomFirst == other.idRoomFirst && idRoomSecond == other.idRoomSecond
             || idRoomFirst == other.idRoomSecond && idRoomSecond == other.idRoomFirst;
@@ -394,37 +487,37 @@ public class GraphEdge
 }
 public class Triangle
 {
-    public GraphEdge[] edges;
+    public Corridor[] edges;
     public CircumCircle circle;
 
     public Triangle(Vector2Int posPoint1, Vector2Int posPoint2, Vector2Int posPoint3, int[] edgesId)
     {
-        edges = new GraphEdge[3]
+        edges = new Corridor[3]
         {
-            new GraphEdge(edgesId[0], edgesId[1],posPoint1, posPoint2 ),
-            new GraphEdge(edgesId[1], edgesId[2],posPoint2, posPoint3) ,
-            new GraphEdge(edgesId[2], edgesId[0],posPoint3, posPoint1 )
+             Corridor.CreateCorridor(edgesId[0], edgesId[1],posPoint1, posPoint2 ),
+             Corridor.CreateCorridor(edgesId[1], edgesId[2],posPoint2, posPoint3) ,
+             Corridor.CreateCorridor(edgesId[2], edgesId[0],posPoint3, posPoint1 )
         };
         circle = new CircumCircle(posPoint1, posPoint2, posPoint3);
     }
     public Triangle(Vector2Int posPoint1, Vector2Int posPoint2, Vector2Int posPoint3)
     {
-        edges = new GraphEdge[3]
+        edges = new Corridor[3]
         {
-            new GraphEdge(-1, -2,posPoint1, posPoint2 ),
-            new GraphEdge(-2, -3,posPoint2, posPoint3) ,
-            new GraphEdge(-3, -1,posPoint3, posPoint1 )
+            Corridor.CreateCorridor(-1, -2,posPoint1, posPoint2 ),
+            Corridor.CreateCorridor(-2, -3,posPoint2, posPoint3) ,
+            Corridor.CreateCorridor(-3, -1,posPoint3, posPoint1 )
         };
         circle = new CircumCircle(posPoint1, posPoint2, posPoint3);
 
     }
-    public Triangle(GraphEdge edge, Vector2Int point, int vertexId)
+    public Triangle(Corridor edge, Vector2Int point, int vertexId)
     {
-        edges = new GraphEdge[3]
+        edges = new Corridor[3]
         {
-            new GraphEdge(edge.idRoomFirst, edge.idRoomSecond,edge.posPoint1, edge.posPoint2),
-            new GraphEdge(edge.idRoomSecond, vertexId,edge.posPoint2, point) ,
-            new GraphEdge(vertexId, edge.idRoomFirst,point, edge.posPoint1)
+            Corridor.CreateCorridor(edge.idRoomFirst, edge.idRoomSecond,edge.posPoint1, edge.posPoint2),
+            Corridor.CreateCorridor(edge.idRoomSecond, vertexId,edge.posPoint2, point) ,
+            Corridor.CreateCorridor(vertexId, edge.idRoomFirst,point, edge.posPoint1)
         };
         circle = new CircumCircle(edge.posPoint1, edge.posPoint2, point);
 
@@ -445,9 +538,9 @@ public class Triangle
         else
             return false;
     }
-    public bool Contains(GraphEdge edge)
+    public bool Contains(Corridor edge)
     {
-        foreach (GraphEdge edgeTrianlge in edges)
+        foreach (Corridor edgeTrianlge in edges)
         {
             if (edgeTrianlge == edge)
                 return true;
@@ -456,7 +549,7 @@ public class Triangle
     }
     public bool SuperTriangleCheck()
     {
-        foreach (GraphEdge edge in edges)
+        foreach (Corridor edge in edges)
         {
             if (edge.idRoomFirst < 0 || edge.idRoomSecond < 0)
                 return true;

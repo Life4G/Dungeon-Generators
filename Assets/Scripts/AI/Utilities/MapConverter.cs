@@ -49,7 +49,7 @@ public class MapConverter : MonoBehaviour
         {
             for (int x = 0; x < width; x++)
             {
-                boolArray[x, y] = dungeonMap.tiles[x, y].isPassable;
+                boolArray[y, x] = dungeonMap.tiles[y, x].isPassable;
             }
         }
 

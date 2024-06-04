@@ -18,10 +18,13 @@ namespace Assets.Scripts.Room
         [SerializeField]
         private FractionManager fractionManager;
 
+        [SerializeField]
         private int seed;
-
+        
+        [SerializeField]
         public DungeonRoom[] rooms;
-
+        
+        [SerializeField]
         private int[,] graph;
 
         public enum DistributionMethod
@@ -51,8 +54,8 @@ namespace Assets.Scripts.Room
         public void AssignFractions()
         {
             Random.State state = Random.state;
-
-            Random.InitState(GenerateSeed());
+            seed = GenerateSeed();
+            Random.InitState(seed);
             switch (distributionMethod)
             {
                 case DistributionMethod.Sequential:
@@ -77,7 +80,7 @@ namespace Assets.Scripts.Room
         public void AssignFractions(int seed)
         {
             Random.State state = Random.state;
-
+            this.seed = seed;
             Random.InitState(seed);
             switch (distributionMethod)
             {
@@ -113,7 +116,7 @@ namespace Assets.Scripts.Room
                 {
                     for (int x = 0; x < floorMap.GetLength(0); x++)
                     {
-                        int roomId = floorMap[x, y];
+                        int roomId = floorMap[y, x];
                         if (roomId > -1)
                         {
                             if (!roomTiles.ContainsKey(roomId))
@@ -833,8 +836,18 @@ namespace Assets.Scripts.Room
         }
         public Color GetRoomFractionColor(int id)
         {
-            return fractionManager.GetColorByIndex(rooms[id].fractionIndex);
+            if (rooms == null)
+                return Color.white;
+            return fractionManager.GetColorByIndex(GetRoomById(id).fractionIndex);
         }
+        public int GetSeed()
+        {
+            return seed;
+        }
+        public void SetSeed(int seed)
+        {
+            this.seed = seed;
+        }    
 
     }
 }

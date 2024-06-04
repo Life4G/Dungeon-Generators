@@ -77,8 +77,6 @@ namespace Assets.Scripts.UI
                 Color fraction2Color = fractionList.serializedProperty.GetArrayElementAtIndex(fraction2Index).FindPropertyRelative("color").colorValue;
 
 
-
-
                 string fraction1Name = fraction1Index >= 0 && fraction1Index < fractionsProperty.arraySize
                                        ? fractionsProperty.GetArrayElementAtIndex(fraction1Index).FindPropertyRelative("name").stringValue
                                        : "None";

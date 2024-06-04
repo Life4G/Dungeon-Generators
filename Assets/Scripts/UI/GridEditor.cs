@@ -20,6 +20,8 @@ public class GridEditor : Editor
         GridManager manager = (GridManager)target;
         seedGeometry = manager.generator.GetSeed();
         seedGeometryString = seedGeometry.ToString();
+        seedFraction = manager.roomManager.GenerateSeed();
+        seedFractionString = seedFraction.ToString();
     }
 
     public override void OnInspectorGUI()
@@ -28,7 +30,7 @@ public class GridEditor : Editor
         GridManager manager = (GridManager)target;
 
         GUILayout.Label("Geometry seed");
-        if (GUILayout.Button("Randomize seed"))
+        if (GUILayout.Button("Randomize Geometry seed"))
         {
             if (ask)
             {
@@ -44,11 +46,11 @@ public class GridEditor : Editor
         if (GUILayout.Button("Generate Geometry"))
         {
             manager.generator.SetSeed(seedGeometry);
-            manager.Reload(seedGeometry,seedFraction);
+            manager.Reload(seedGeometry);
         }
 
         GUILayout.Label("Seed");
-        if (GUILayout.Button("Randomize seed"))
+        if (GUILayout.Button("Randomize Faction seed"))
         {
             if (ask)
             {
@@ -56,7 +58,7 @@ public class GridEditor : Editor
             }
             seedFraction = manager.roomManager.GenerateSeed();
             seedFractionString = seedFraction.ToString();
-            manager.generator.SetSeed(seedFraction);
+            manager.roomManager.SetSeed(seedFraction);
         }
         seedFractionString = GUILayout.TextField(seedFractionString);
 

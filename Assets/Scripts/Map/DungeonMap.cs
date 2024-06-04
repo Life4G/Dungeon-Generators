@@ -34,7 +34,7 @@ namespace Assets.Scripts.Map
             {
                 for (int x = 0; x < width; x++)
                 {
-                    tiles[x, y] = new DungeonTile();    // roomIndex = -1
+                    tiles[y, x] = new DungeonTile();    // roomIndex = -1
                 }
             }
         }
@@ -52,7 +52,7 @@ namespace Assets.Scripts.Map
 
             if (x >= 0 && y >= 0 && x < width && y < height)
             {
-                return tiles[x, y];
+                return tiles[y, x];
             }
             return null; // если координаты вне карты
         }
@@ -106,14 +106,14 @@ namespace Assets.Scripts.Map
                 {
                     bool isAdjacentToWall = IsAdjacentToWall(roomIndices, x, y, width, height);
                     bool isCorner = IsCorner(roomIndices, x, y, width, height);
-                    bool isPassable = roomIndices[x, y] != -1;
+                    bool isPassable = roomIndices[y, x] != -1;
 
-                    tiles[x, y] = new DungeonTile();
-                    tiles[x, y].textureType = 0;    // пол
-                    tiles[x, y].roomIndex = roomIndices[x, y];
-                    tiles[x, y].hasAdjacentWall = isAdjacentToWall;
-                    tiles[x, y].isCorner = isCorner;
-                    tiles[x, y].isPassable = isPassable;
+                    tiles[y, x] = new DungeonTile();
+                    tiles[y, x].textureType = 0;    // пол
+                    tiles[y, x].roomIndex = roomIndices[y, x];
+                    tiles[y, x].hasAdjacentWall = isAdjacentToWall;
+                    tiles[y, x].isCorner = isCorner;
+                    tiles[y, x].isPassable = isPassable;
                 }
             }
         }
@@ -127,7 +127,7 @@ namespace Assets.Scripts.Map
         /// <param name="width">Ширина  карты.</param>
         /// <param name="height">Высота карты.</param>
         /// <returns>True - тайл находится у стены. False - тайл не находится у стены.</returns>
-        private bool IsAdjacentToWall(int[,] roomIndices, int x, int y, int width, int height)
+        private bool IsAdjacentToWall(int[,] roomIndices, int y, int x, int width, int height)
         {
             return (x > 0 && roomIndices[x - 1, y] == -1) ||
                    (x < width - 1 && roomIndices[x + 1, y] == -1) ||
@@ -144,7 +144,7 @@ namespace Assets.Scripts.Map
         /// <param name="width">Ширина  карты.</param>
         /// <param name="height">Высота карты.</param>
         /// <returns>True - тайл угловой. False - тайл не угловой.</returns>
-        private bool IsCorner(int[,] roomIndices, int x, int y, int width, int height)
+        private bool IsCorner(int[,] roomIndices, int y, int x, int width, int height)
         {
             return (x > 0 && y > 0 && roomIndices[x - 1, y - 1] == -1) ||
                    (x < width - 1 && y > 0 && roomIndices[x + 1, y - 1] == -1) ||
@@ -167,14 +167,14 @@ namespace Assets.Scripts.Map
                 {
                     bool isAdjacentToWall = IsAdjacentToWall(roomIndices, x, y, width, height);
                     bool isCorner = IsCorner(roomIndices, x, y, width, height);
-                    bool isPassable = roomIndices[x, y] != -1;
+                    bool isPassable = roomIndices[y, x] != -1;
 
-                    if (tiles[x, y] != null)
+                    if (tiles[y, x] != null)
                     {
-                        tiles[x, y].roomIndex = roomIndices[x, y];
-                        tiles[x, y].hasAdjacentWall = isAdjacentToWall;
-                        tiles[x, y].isCorner = isCorner;
-                        tiles[x, y].isPassable = isPassable;
+                        tiles[y, x].roomIndex = roomIndices[y, x];
+                        tiles[y, x].hasAdjacentWall = isAdjacentToWall;
+                        tiles[y, x].isCorner = isCorner;
+                        tiles[y, x].isPassable = isPassable;
                     }
                 }
             }
@@ -195,11 +195,11 @@ namespace Assets.Scripts.Map
             {
                 for (int x = 0; x < width; x++)
                 {
-                    if (walls[x, y] != -1)
-                    { tiles[x, y].roomIndex = walls[x, y]; tiles[x, y].isPassable = false; }
-                    else tiles[x, y].isPassable = true;
-                    tiles[x, y].hasAdjacentWall = false;
-                    tiles[x, y].isCorner = false;
+                    if (walls[y, x] != -1)
+                    { tiles[y, x].roomIndex = walls[y, x]; tiles[y, x].isPassable = false; }
+                    else tiles[y, x].isPassable = true;
+                    tiles[y, x].hasAdjacentWall = false;
+                    tiles[y, x].isCorner = false;
 
                 }
             }
@@ -208,24 +208,24 @@ namespace Assets.Scripts.Map
             {
                 for (int x = 0; x < width; x++)
                 {
-                    if (walls[x, y] != -1)
+                    if (walls[y, x] != -1)
                     {
-                        tiles[x, y].textureType = 0; // пол
+                        tiles[y, x].textureType = 0; // пол
 
-                        bool top = y + 1 < height && walls[x, y + 1] == -1;
-                        bool bottom = y - 1 >= 0 && walls[x, y - 1] == -1;
-                        bool left = x - 1 >= 0 && walls[x - 1, y] == -1;
-                        bool right = x + 1 < width && walls[x + 1, y] == -1;
+                        bool top = y + 1 < height && walls[y + 1, x] == -1;
+                        bool bottom = y - 1 >= 0 && walls[y - 1, x] == -1;
+                        bool left = x - 1 >= 0 && walls[y, x - 1] == -1;
+                        bool right = x + 1 < width && walls[y, x + 1] == -1;
 
-                        if (left && top) tiles[x, y].textureType = 1;           // верхний левый угол
-                        else if (right && top) tiles[x, y].textureType = 2;     // верхний правый угол
-                        else if (left && bottom) tiles[x, y].textureType = 3;   // нижний левый угол
-                        else if (right && bottom) tiles[x, y].textureType = 4;  // нижний правый угол
+                        if (left && top) tiles[y, x].textureType = 1;           // верхний левый угол
+                        else if (right && top) tiles[y, x].textureType = 2;     // верхний правый угол
+                        else if (left && bottom) tiles[y, x].textureType = 3;   // нижний левый угол
+                        else if (right && bottom) tiles[y, x].textureType = 4;  // нижний правый угол
 
-                        else if (left) tiles[x, y].textureType = 5;             // левая стена
-                        else if (right) tiles[x, y].textureType = 6;            // правая стена
-                        else if (top) tiles[x, y].textureType = 7;              // верхняя стена
-                        else if (bottom) tiles[x, y].textureType = 8;           // нижняя стена
+                        else if (left) tiles[y, x].textureType = 5;             // левая стена
+                        else if (right) tiles[y, x].textureType = 6;            // правая стена
+                        else if (top) tiles[y, x].textureType = 7;              // верхняя стена
+                        else if (bottom) tiles[y, x].textureType = 8;           // нижняя стена
                     }
 
                 }
@@ -243,7 +243,7 @@ namespace Assets.Scripts.Map
         {
             if (x >= 0 && x < this.tiles.GetLength(0) && y >= 0 && y < this.tiles.GetLength(1))
             {
-                return this.tiles[x, y].roomIndex >= 0;
+                return this.tiles[y, x].roomIndex >= 0;
             }
             return false;
         }

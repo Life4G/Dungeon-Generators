@@ -30,7 +30,7 @@ public class WallsGenerator
         {
             for (int x = 0; x < width; x++)
             {
-                wallArray[x, y] = -1;
+                wallArray[y, x] = -1;
             }
         }
 
@@ -39,7 +39,7 @@ public class WallsGenerator
         {
             for (int x = 0; x < width; x++)
             {
-                if (floorArray[x, y] != -1) // если на этой позиции есть пол
+                if (floorArray[y, x] != -1) // если на этой позиции есть пол
                 {
                     foreach (Vector2Int direction in AllDirections)
                     {
@@ -50,9 +50,9 @@ public class WallsGenerator
                         if (neighbourX >= 0 && neighbourX < width && neighbourY >= 0 && neighbourY < height)
                         {
                             // если рядом нет пола
-                            if (floorArray[neighbourX, neighbourY] == -1 && wallArray[neighbourX, neighbourY] == -1)
+                            if (floorArray[neighbourY, neighbourX] == -1 && wallArray[neighbourY, neighbourX] == -1)
                             {
-                                wallArray[neighbourX, neighbourY] = floorArray[x, y]; // присвоить стиль стены, как у пола
+                                wallArray[neighbourY, neighbourX] = floorArray[y, x]; // присвоить стиль стены, как у пола
                             }
                         }
                     }
@@ -79,7 +79,7 @@ public class WallsGenerator
         {
             for (int x = 0; x < width; x++)
             {
-                wallArray[x, y] = -1;
+                wallArray[y, x] = -1;
             }
         }
 
@@ -88,7 +88,7 @@ public class WallsGenerator
         {
             for (int x = 0; x < width; x++)
             {
-                if (dungeonMap.tiles[x, y].roomIndex != -1) // если на этой позиции есть пол
+                if (dungeonMap.tiles[y, x].roomIndex != -1) // если на этой позиции есть пол
                 {
                     foreach (Vector2Int direction in AllDirections)
                     {
@@ -99,9 +99,9 @@ public class WallsGenerator
                         if (neighbourX >= 0 && neighbourX < width && neighbourY >= 0 && neighbourY < height)
                         {
                             // если рядом нет пола
-                            if (dungeonMap.tiles[neighbourX, neighbourY].roomIndex == -1 && wallArray[neighbourX, neighbourY] == -1)
+                            if (dungeonMap.tiles[neighbourY, neighbourX].roomIndex == -1 && wallArray[neighbourY, neighbourX] == -1)
                             {
-                                wallArray[neighbourX, neighbourY] = dungeonMap.tiles[x, y].roomIndex; // присвоить стиль стены, как у пола
+                                wallArray[neighbourY, neighbourX] = dungeonMap.tiles[y, x].roomIndex; // присвоить стиль стены, как у пола
                             }
                         }
                     }
