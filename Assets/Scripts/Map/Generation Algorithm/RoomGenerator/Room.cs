@@ -6,40 +6,53 @@ using UnityEngine;
 
 public class Room : ScriptableObject
 {
-    [SerializeField]
-    public Vector2Int pos;
-    [SerializeField]
-    private int sizeX, sizeY;
-    [SerializeField]
+    /// <summary>
+    /// Позиция комнаты на карте.
+    /// </summary>
+    public Vector2Int massRoomPos;
+
+    /// <summary>
+    /// Ширина комнаты.
+    /// </summary>
+    private int sizeX;
+
+    /// <summary>
+    /// Высота комнаты.
+    /// </summary>
+    private int sizeY;
+
+    /// <summary>
+    /// Двумерный массив, представляющий плитки комнаты.
+    /// </summary>
     private int[,] tiles;
-    [SerializeField]
+
+    /// <summary>
+    /// Флаг, указывающий, является ли комната валидной (допустимой).
+    /// </summary>
     private bool valid;
-    private int tilesMin = 8;
-    private int tilesMax = 16;
 
-    //public Room(Vector2Int massRoomPos, int sizeX, int sizeY, int[,] tiles)
-    //{
-    //    this.massRoomPos = massRoomPos;
-    //    this.sizeX = sizeX;
-    //    this.sizeY = sizeY;
-    //    this.tiles = tiles;
-    //    this.valid = false;
-    //}
-    //public Room(Room room)
-    //{
-    //    massRoomPos = new Vector2Int(massRoomPos.x, massRoomPos.y);
-    //    sizeX = room.sizeX;
-    //    sizeY = room.sizeY;
-    //    tiles = room.tiles.Clone() as int[,];
-    //    valid = false;
-    //}
+    /// <summary>
+    /// Минимальное количество плиток для валидной комнаты.
+    /// </summary>
+    private static readonly int tilesMin = 8;
 
-    public static Room Copy(Room room)
+    /// <summary>
+    /// Конструктор комнаты.
+    /// </summary>
+    /// <param name="massRoomPos">Позиция комнаты.</param>
+    /// <param name="sizeX">Ширина комнаты.</param>
+    /// <param name="sizeY">Высота комнаты.</param>
+    /// <param name="tiles">Плитки комнаты.</param>
+    public Room(Vector2Int massRoomPos, int sizeX, int sizeY, int[,] tiles)
     {
         Room copy = CreateInstance<Room>();
         copy.InitCopy(room);
         return copy;
     }
+    /// <summary>
+    /// Генерирует случайную комнату.
+    /// </summary>
+    /// <returns>Сгенерированная комната.</returns>
     public static Room CreateRandomRoom(Vector2Int pos)
     {
         Room room = CreateInstance<Room>();
@@ -336,6 +349,14 @@ public class Room : ScriptableObject
         tiles = room.tiles.Clone() as int[,];
         valid = false;
     }
+
+    /// <summary>
+    /// Проверяет, находится ли точка внутри многоугольника.
+    /// </summary>
+    /// <param name="x">X координата точки.</param>
+    /// <param name="y">Y координата точки.</param>
+    /// <param name="points">Список точек многоугольника.</param>
+    /// <returns>True - точка внутри многоугольника, иначе - False.</returns>
     private bool IsInsidePolygon(int x, int y, List<Vector2Int> points)
     {
         bool res = false;
@@ -399,53 +420,115 @@ public class Room : ScriptableObject
         return polygon.Take(k - 1).ToList();
     }
 
+
+    /// <summary>
+    /// Возвращает позицию комнаты.
+    /// </summary>
+    /// <returns>Позиция комнаты.</returns>
     public Vector2Int GetPos()
     {
         return pos;
     }
+
+    /// <summary>
+    /// Возвращает позицию центра комнаты.
+    /// </summary>
+    /// <returns>Позиция центра комнаты.</returns>
     public Vector2Int GetPosCenter()
     {
         return new Vector2Int(pos.x + sizeX / 2, pos.y + sizeY / 2); ;
     }
+
+    /// <summary>
+    /// Возвращает размер комнаты.
+    /// </summary>
+    /// <returns>Размер комнаты.</returns>
     public Size GetSize()
     {
         return new Size(sizeX, sizeY);
     }
+
+    /// <summary>
+    /// Устанавливает позицию комнаты.
+    /// </summary>
+    /// <param name="x">X координата.</param>
+    /// <param name="y">Y координата.</param>
     public void SetPos(int x, int y)
     {
         pos = new Vector2Int(x, y);
     }
+
+    /// <summary>
+    /// Устанавливает позицию комнаты.
+    /// </summary>
+    /// <param name="pos">Позиция комнаты.</param>
     public void SetPos(Vector2Int pos)
     {
         this.pos = pos;
     }
+
+    /// <summary>
+    /// Возвращает плитки комнаты.
+    /// </summary>
+    /// <returns>Плитки комнаты.</returns>
     public int[,] GetTiles()
     {
         return tiles;
     }
+
+    /// <summary>
+    /// Устанавливает плитки комнаты.
+    /// </summary>
+    /// <param name="positions">Плитки комнаты.</param>
     public void SetTiles(int[,] positions)
     {
         tiles = positions;
     }
+
+    /// <summary>
+    /// Возвращает валидность комнаты.
+    /// </summary>
+    /// <returns>Валидность комнаты.</returns>
     public bool GetValidation()
     {
         return valid;
     }
+
+    /// <summary>
+    /// Устанавливает валидность комнаты.
+    /// </summary>
+    /// <param name="validation">Флаг валидности.</param>
     public void SetValidation(bool validation)
     {
         valid = validation;
     }
+
+    /// <summary>
+    /// Устанавливает размер комнаты.
+    /// </summary>
+    /// <param name="width">Ширина комнаты.</param>
+    /// <param name="height">Высота комнаты.</param>
     public void SetSize(int width, int height)
     {
         sizeX = width;
         sizeY = height;
     }
+
+    /// <summary>
+    /// Устанавливает размер комнаты.
+    /// </summary>
+    /// <param name="size">Размер комнаты.</param>
     public void SetSize(int size)
     {
         sizeX = size;
         sizeY = size;
     }
-    //Функция проверки пересечения
+
+    /// <summary>
+    /// Проверяет пересечение с другой комнатой.
+    /// </summary>
+    /// <param name="other">Другая комната.</param>
+    /// <returns>True - комнаты пересекаются, иначе - False.</returns>
     public bool CheckIntersection(Room other)
     {
         if (this == null || other == null)
@@ -469,6 +552,12 @@ public class Room : ScriptableObject
 
         return false;
     }
+
+    /// <summary>
+    /// Проверяет, является ли данная комната подмножеством другой комнаты.
+    /// </summary>
+    /// <param name="other">Другая комната.</param>
+    /// <returns>True - данная комната является подмножеством, иначе - False.</returns>
     public bool IsProperSubsetOf(Room other)
     {
         int collisonX1 = Mathf.Max(pos.x, other.pos.x);
@@ -480,7 +569,11 @@ public class Room : ScriptableObject
             return false;
         return true;
     }
-    //Операция пересечения с другой комнатой
+
+    /// <summary>
+    /// Операция пересечения с другой комнатой.
+    /// </summary>
+    /// <param name="other">Другая комната.</param>
     public void Intersect(Room other)
     {
         int collisonX1 = Mathf.Max(pos.x, other.pos.x);
@@ -505,7 +598,11 @@ public class Room : ScriptableObject
         sizeX = sizeXNew;
         sizeY = sizeYNew;
     }
-    //Операция объединения с другой комнатой
+
+    /// <summary>
+    /// Операция объединения с другой комнатой.
+    /// </summary>
+    /// <param name="other">Другая комната.</param>
     public void Union(Room other)
     {
         Vector2Int roomPosNew = Vector2Int.Min(pos, other.pos);
@@ -542,7 +639,11 @@ public class Room : ScriptableObject
         sizeY = sizeNewY;
         pos = roomPosNew;
     }
-    //Операция разности с другой комнатой
+
+    /// <summary>
+    /// Операция разности с другой комнатой.
+    /// </summary>
+    /// <param name="other">Другая комната.</param>
     public void Difference(Room other)
     {
         int collisonX1 = Mathf.Max(pos.x, other.pos.x);
@@ -558,7 +659,11 @@ public class Room : ScriptableObject
             }
 
     }
-    //Операция симметричной разности с другой комнатой
+
+    /// <summary>
+    /// Операция симметричной разности с другой комнатой.
+    /// </summary>
+    /// <param name="other">Другая комната.</param>
     public void SymmetricDifference(Room other)
     {
         int collisonX1 = Mathf.Max(pos.x, other.pos.x);
@@ -576,6 +681,11 @@ public class Room : ScriptableObject
                 }
             }
     }
+
+    /// <summary>
+    /// Проверяет валидность комнаты.
+    /// </summary>
+    /// <returns>True - комната валидна, иначе - False.</returns>
     public bool Validate()
     {
         if (this == null)
@@ -634,6 +744,14 @@ public class Room : ScriptableObject
             return true;
         return false;
     }
+
+    /// <summary>
+    /// Проверяет, находится ли плитка внутри комнаты.
+    /// </summary>
+    /// <param name="x">X координата плитки.</param>
+    /// <param name="y">Y координата плитки.</param>
+    /// <param name="tilesToCheck">Массив плиток для проверки.</param>
+    /// <returns>True - плитка находится внутри комнаты, иначе - False.</returns>
     private bool IsInside(int x, int y, int[,] tilesToCheck)
     {
         if (x >= 0 && y >= 0 && x < tilesToCheck.GetLength(1) && y < tilesToCheck.GetLength(0))
@@ -641,6 +759,12 @@ public class Room : ScriptableObject
         else
             return false;
     }
+
+    /// <summary>
+    /// Проверяет соединение с другой комнатой.
+    /// </summary>
+    /// <param name="other">Другая комната.</param>
+    /// <returns>True - комнаты соединены, иначе - False.</returns>
     public bool CheckConnection(Room other)
     {
         if (this == null || other == null)
@@ -721,5 +845,4 @@ public class Room : ScriptableObject
             return true;
         return false;
     }
-
 }

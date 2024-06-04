@@ -15,18 +15,30 @@ namespace Assets.Scripts.Room
     /// </summary>
     public class DungeonRoomManager : MonoBehaviour
     {
+        /// <summary>
+        /// Менеджер фракций.
+        /// </summary>
         [SerializeField]
         private FractionManager fractionManager;
 
-        [SerializeField]
+        /// <summary>
+        /// Сид для генератора случайных чисел.
+        /// </summary>
         private int seed;
-        
-        [SerializeField]
+
+        /// <summary>
+        /// Массив комнат подземелья.
+        /// </summary>
         public DungeonRoom[] rooms;
-        
-        [SerializeField]
+
+        /// <summary>
+        /// Граф комнат подземелья.
+        /// </summary>
         private int[,] graph;
 
+        /// <summary>
+        /// Методы распределения фракций по комнатам.
+        /// </summary>
         public enum DistributionMethod
         {
             Sequential,
@@ -35,9 +47,16 @@ namespace Assets.Scripts.Room
             ParallelGraphBased      // параллельное
         }
 
+        /// <summary>
+        /// Метод распределения фракций.
+        /// </summary>
         [SerializeField]
         private DistributionMethod distributionMethod;
 
+        /// <summary>
+        /// Генерирует случайное число, которое используется в качестве сида.
+        /// </summary>
+        /// <returns>Случайное число.</returns>
         public int GenerateSeed()
         {
             string text = "";
@@ -54,8 +73,8 @@ namespace Assets.Scripts.Room
         public void AssignFractions()
         {
             Random.State state = Random.state;
-            seed = GenerateSeed();
-            Random.InitState(seed);
+
+            Random.InitState(GenerateSeed());
             switch (distributionMethod)
             {
                 case DistributionMethod.Sequential:
@@ -80,7 +99,7 @@ namespace Assets.Scripts.Room
         public void AssignFractions(int seed)
         {
             Random.State state = Random.state;
-            this.seed = seed;
+
             Random.InitState(seed);
             switch (distributionMethod)
             {
@@ -116,7 +135,7 @@ namespace Assets.Scripts.Room
                 {
                     for (int x = 0; x < floorMap.GetLength(0); x++)
                     {
-                        int roomId = floorMap[y, x];
+                        int roomId = floorMap[x, y];
                         if (roomId > -1)
                         {
                             if (!roomTiles.ContainsKey(roomId))
@@ -483,6 +502,10 @@ namespace Assets.Scripts.Room
             return nonCorridorRoomIndices;
         }
 
+        /// <summary>
+        /// Инициализация графа коридоров.
+        /// </summary>
+        /// <param name="corridorsGraph">Граф коридоров.</param>
         public void InitializeGraph(int[,] corridorsGraph)
         {
             if (corridorsGraph == null)
@@ -504,8 +527,6 @@ namespace Assets.Scripts.Room
                 }
             }
         }
-
-
 
         /// <summary>
         /// Последовательное присваивание комнатам, не являющимся коридорами, индексы фракций на основе их коэффициентов.
@@ -834,20 +855,16 @@ namespace Assets.Scripts.Room
                 }
             }
         }
+
+        /// <summary>
+        /// Возвращает цвет фракции комнаты по ее идентификатору.
+        /// </summary>
+        /// <param name="id">Идентификатор комнаты.</param>
+        /// <returns>Цвет фракции.</returns>
         public Color GetRoomFractionColor(int id)
         {
-            if (rooms == null)
-                return Color.white;
-            return fractionManager.GetColorByIndex(GetRoomById(id).fractionIndex);
+            return fractionManager.GetColorByIndex(rooms[id].fractionIndex);
         }
-        public int GetSeed()
-        {
-            return seed;
-        }
-        public void SetSeed(int seed)
-        {
-            this.seed = seed;
-        }    
 
     }
 }

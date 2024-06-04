@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class WallsGenerator
 {
+    /// <summary>
+    /// Все возможные направления для проверки соседних плиток.
+    /// </summary>
     private static readonly Vector2Int[] AllDirections = {
         new Vector2Int(0, 1),   // вверх
         new Vector2Int(1, 1),   // вверх-вправо

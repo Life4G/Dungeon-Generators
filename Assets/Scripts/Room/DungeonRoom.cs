@@ -12,16 +12,55 @@ namespace Assets.Scripts.Room
     /// </summary>
     public class DungeonRoom
     {
-        public int id;              // идентификатор комнаты
-        public string name;         // имя комнаты
-        public int size;            // размер комнаты (кол-во плиток пола)
-        public int width;           // ширина комнаты
-        public int height;          // высота комнаты
-        public int styleId;         // идентификатор стиля комнаты
-        public float centerX;       // X координата центра комнаты
-        public float centerY;       // Y координата центра комнаты
-        public bool isCorridor;     // является ли коридором
-        public int fractionIndex;    // индекс фракции, которой принадлежит комната
+        /// <summary>
+        /// Идентификатор комнаты.
+        /// </summary>
+        public int id;
+
+        /// <summary>
+        /// Имя комнаты.
+        /// </summary>
+        public string name;
+
+        /// <summary>
+        /// Размер комнаты (количество плиток пола).
+        /// </summary>
+        public int size;
+
+        /// <summary>
+        /// Ширина комнаты.
+        /// </summary>
+        public int width;
+
+        /// <summary>
+        /// Высота комнаты.
+        /// </summary>
+        public int height;
+
+        /// <summary>
+        /// Идентификатор стиля комнаты.
+        /// </summary>
+        public int styleId;
+
+        /// <summary>
+        /// X координата центра комнаты.
+        /// </summary>
+        public float centerX;
+
+        /// <summary>
+        /// Y координата центра комнаты.
+        /// </summary>
+        public float centerY;
+
+        /// <summary>
+        /// Является ли комната коридором.
+        /// </summary>
+        public bool isCorridor;
+
+        /// <summary>
+        /// Индекс фракции, которой принадлежит комната.
+        /// </summary>
+        public int fractionIndex;
 
         /// <summary>
         /// Конструктор по умолчанию.

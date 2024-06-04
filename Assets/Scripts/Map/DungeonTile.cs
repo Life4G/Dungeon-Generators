@@ -8,11 +8,30 @@ namespace Assets.Scripts.Map
 {
     public class DungeonTile
     {
-        public int roomIndex { get; set; }           // индекс комнаты
-        public int  textureType {  get; set; }       // тип текстуры
-        public bool hasAdjacentWall { get; set; }    // наличиие стенки рядом
-        public bool isCorner { get; set; }           // угловая ли плитка
-        public bool isPassable { get; set; }         // проходима ли плитка
+        /// <summary>
+        /// Индекс комнаты которой принадлежит плитка.
+        /// </summary>
+        public int roomIndex { get; set; }
+
+        /// <summary>
+        /// Тип текстуры плитки.
+        /// </summary>
+        public int textureType { get; set; }
+
+        /// <summary>
+        /// Указывает, есть ли стена рядом с плиткой.
+        /// </summary>
+        public bool hasAdjacentWall { get; set; }
+
+        /// <summary>
+        /// Угловая ли это плитка.
+        /// </summary>
+        public bool isCorner { get; set; }
+
+        /// <summary>
+        /// Проходима ли плитка.
+        /// </summary>
+        public bool isPassable { get; set; }
 
         /// <summary>
         /// Конструктор по умолчанию

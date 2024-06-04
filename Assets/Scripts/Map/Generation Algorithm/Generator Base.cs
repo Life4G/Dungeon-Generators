@@ -2,21 +2,43 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-//Базовый класс для генераторов от которого наследуются все остальные
+/// <summary>
+/// Базовый класс для генераторов подземелий, от которого наследуются все остальные.
+/// </summary>
 public abstract class DungeonGeneratorBase : MonoBehaviour
 {
-    //Стартовая позиция равная 0 (можно поменять из редактора)
+    /// <summary>
+    /// Стартовая позиция, равная 0 (меняется в редакторе).
+    /// </summary>
     [SerializeField]
     protected Vector2Int startPosition = Vector2Int.zero;
-    //Сид
+
+    /// <summary>
+    /// Сид для генерации случайных чисел.
+    /// </summary>
     [SerializeField]
-    protected int seed;
+    protected int seed = 0;
+
+    /// <summary>
+    /// Генератор стен.
+    /// </summary>
     [SerializeField]
     public WallsGenerator wallsGenerator;
-    [SerializeField]
+
+    /// <summary>
+    /// Граф комнат подземелья.
+    /// </summary>
     protected Graph graph;
 
-    //Функция по генерации сида
+    /// <summary>
+    /// Массив, содержащий координаты всех плиток.
+    /// </summary>
+    protected int[,] resultPositions;
+
+    /// <summary>
+    /// Генератор сида.
+    /// </summary>
+    /// <returns>Случайный сид.</returns>
     public int GenerateSeed()
     {
         string text = "";
@@ -28,10 +50,11 @@ public abstract class DungeonGeneratorBase : MonoBehaviour
         //строку преобразовываем в хешкод
         return ((text == "") ? 0 : text.GetHashCode());
     }
-    //массив в котором валяются все плитки (а вернее их координаты)
-    protected int[,] resultPositions;
 
-    //Функция создания данжа которая вызывается по нажатию кнопки
+    /// <summary>
+    /// Генерирует подземелье.
+    /// </summary>
+    /// <returns>Массив плиток подземелья.</returns>
     public int[,] CreateDungeon()
     {
         seed = GenerateSeed();
@@ -48,7 +71,11 @@ public abstract class DungeonGeneratorBase : MonoBehaviour
         return resultPositions;
     }
 
-    //Функция создания данжа которая вызывается по нажатию кнопки (на этот раз есть сид)
+    /// <summary>
+    /// Генерация подземелья по заданному сиду.
+    /// </summary>
+    /// <param name="seed">Сид для генерации подземелья.</param>
+    /// <returns>Массив плиток подземелья.</returns>
     public int[,] CreateDungeon(int seed)
     {
         this.seed = seed;
@@ -65,7 +92,10 @@ public abstract class DungeonGeneratorBase : MonoBehaviour
         return resultPositions;
     }
 
-    //Обстрактная функция которая создана другими объектами (наследники обязаны overridить эту функцию иначе жопа генерации ведь всё вкусное там)
+    /// <summary>
+    /// Абстрактная функция для генерации подземелья, которую должны реализовать наследники.
+    /// </summary>
+    /// <returns>Массив координат плиток подземелья.</returns>
     protected abstract int[,] GenerateDungeon();
 
     public virtual int GetRoomStyle(int id)
@@ -73,23 +103,41 @@ public abstract class DungeonGeneratorBase : MonoBehaviour
         return 1;
     }
 
+    /// <summary>
+    /// Возвращает текущий сид.
+    /// </summary>
+    /// <returns>Текущий сид.</returns>
     public int GetSeed()
     {
         return seed;
     }
+
+    /// <summary>
+    /// Устанавливает сид для генерации.
+    /// </summary>
+    /// <param name="seed">Сид для генерации.</param>
     public void SetSeed(int seed)
     {
         this.seed = seed;
     }
 
+    /// <summary>
+    /// Возвращает граф комнат подземелья.
+    /// </summary>
+    /// <returns>Граф комнат подземелья.</returns>
     public Graph GetGraph()
     { return graph; }
 
 }
 
-//Статический класс который возвращает рандомное движение (вверх вниз и т.д)
+/// <summary>
+/// Статический класс, который возвращает случайное направление (вверх, вниз и т.д.).
+/// </summary>
 public static class Direction2D
 {
+    /// <summary>
+    /// Список направлений.
+    /// </summary>
     public static List<Vector2Int> cardinalDirectionsList = new List<Vector2Int>
     {
         new Vector2Int(0, 1),
@@ -98,10 +146,20 @@ public static class Direction2D
         new Vector2Int(-1, 0)
     };
 
+    /// <summary>
+    /// Возвращает случайное направление.
+    /// </summary>
+    /// <returns>Случайное направление.</returns>
     public static Vector2Int GetRandomCardinalDirection()
     {
         return cardinalDirectionsList[Random.Range(0, cardinalDirectionsList.Count)];
     }
+
+    /// <summary>
+    /// Возвращает новые позиции на основе текущей позиции и направлений.
+    /// </summary>
+    /// <param name="pos">Текущая позиция.</param>
+    /// <returns>Список новых позиций.</returns>
     public static List<Vector2Int> GetNewCardinalPosesFromPos(Vector2Int pos)
     {
         List<Vector2Int> newPoses = new List<Vector2Int>();
@@ -111,5 +169,4 @@ public static class Direction2D
         }
         return newPoses;
     }
-
 }

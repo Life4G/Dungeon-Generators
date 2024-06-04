@@ -7,27 +7,95 @@ using UnityEngine.Tilemaps;
 [System.Serializable]
 public class RoomStyle : MonoBehaviour
 {
-    public string         styleName;                  // имя стиля комнаты 
+    /// <summary>
+    /// Имя стиля комнаты.
+    /// </summary>
+    public string styleName;
 
-    public List<TileBase> floorTile;                  // тайл пола
-    public List<TileBase> leftFloorTile;              // тайл левого пола
-    public List<TileBase> topFloorTile;               // тайл верхнего пола
-    public List<TileBase> rightFloorTile;             // тайл правого пола
-    public List<TileBase> bottomFloorTile;            // тайл нижнего пола
-    public List<TileBase> topLeftFloorTile;           // тайл верхнего левого угла пола
-    public List<TileBase> topRightFloorTile;          // тайл верхнего правого угла пола
-    public List<TileBase> bottomLeftFloorTile;        // тайл нижнего левого угла пола
-    public List<TileBase> bottomRightFloorTile;       // тайл нижнего правого угла пола
+    /// <summary>
+    /// Тайл пола.
+    /// </summary>
+    public List<TileBase> floorTile;
 
+    /// <summary>
+    /// Тайл левого пола.
+    /// </summary>
+    public List<TileBase> leftFloorTile;
 
-    public List<TileBase> leftWallTile;               // тайл левой стены
-    public List<TileBase> rightWallTile;              // тайл правой стены
-    public List<TileBase> bottomWallTile;             // тайл нижней стены
-    public List<TileBase> topWallTile;                // тайл верхней стены
-    public List<TileBase> topLeftCornerTile;          // тайл левого верхнего угла
-    public List<TileBase> topRightCornerTile;         // тайл правого верхнего угла
-    public List<TileBase> bottomLeftCornerTile;       // тайл левого нижнего угла
-    public List<TileBase> bottomRightCornerTile;      // тайл правого нижнего угла
+    /// <summary>
+    /// Тайл верхнего пола.
+    /// </summary>
+    public List<TileBase> topFloorTile;
+
+    /// <summary>
+    /// Тайл правого пола.
+    /// </summary>
+    public List<TileBase> rightFloorTile;
+
+    /// <summary>
+    /// Тайл нижнего пола.
+    /// </summary>
+    public List<TileBase> bottomFloorTile;
+
+    /// <summary>
+    /// Тайл верхнего левого угла пола.
+    /// </summary>
+    public List<TileBase> topLeftFloorTile;
+
+    /// <summary>
+    /// Тайл верхнего правого угла пола.
+    /// </summary>
+    public List<TileBase> topRightFloorTile;
+
+    /// <summary>
+    /// Тайл нижнего левого угла пола.
+    /// </summary>
+    public List<TileBase> bottomLeftFloorTile;
+
+    /// <summary>
+    /// Тайл нижнего правого угла пола.
+    /// </summary>
+    public List<TileBase> bottomRightFloorTile;
+
+    /// <summary>
+    /// Тайл левой стены.
+    /// </summary>
+    public List<TileBase> leftWallTile;
+
+    /// <summary>
+    /// Тайл правой стены.
+    /// </summary>
+    public List<TileBase> rightWallTile;
+
+    /// <summary>
+    /// Тайл нижней стены.
+    /// </summary>
+    public List<TileBase> bottomWallTile;
+
+    /// <summary>
+    /// Тайл верхней стены.
+    /// </summary>
+    public List<TileBase> topWallTile;
+
+    /// <summary>
+    /// Тайл левого верхнего угла.
+    /// </summary>
+    public List<TileBase> topLeftCornerTile;
+
+    /// <summary>
+    /// Тайл правого верхнего угла.
+    /// </summary>
+    public List<TileBase> topRightCornerTile;
+
+    /// <summary>
+    /// Тайл левого нижнего угла.
+    /// </summary>
+    public List<TileBase> bottomLeftCornerTile;
+
+    /// <summary>
+    /// Тайл правого нижнего угла.
+    /// </summary>
+    public List<TileBase> bottomRightCornerTile;
 
     /// <summary>
     /// Конструктор по умолчанию.

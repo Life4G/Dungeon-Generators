@@ -12,9 +12,19 @@ namespace Assets.Scripts.Fraction
     [System.Serializable]
     public class FractionRelationship
     {
-        public int fraction1Index;                   // ссылка на фракцию
-        public int fraction2Index;                   // ссылка на фракцию
-        public RelationshipType relationshipType;    // тип отношения
+        /// <summary>
+        /// Индекс первой фракции.
+        /// </summary>
+        public int fraction1Index;
 
+        /// <summary>
+        /// Индекс второй фракции.
+        /// </summary>
+        public int fraction2Index;
+
+        /// <summary>
+        /// Тип взаимоотношения между фракциями.
+        /// </summary>
+        public RelationshipType relationshipType;
     }
 }
