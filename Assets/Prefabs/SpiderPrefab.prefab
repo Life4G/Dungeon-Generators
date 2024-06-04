@@ -30,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 2118564232435299310}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 81.509, y: 49.504, z: 0.20466903}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 7, y: 7, z: 7}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -92,7 +92,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   serializedData:
     visibleEntities: []
-    visionRange: 10
+    visionRange: 25
 --- !u!212 &3199000389661809622
 SpriteRenderer:
   m_ObjectHideFlags: 0

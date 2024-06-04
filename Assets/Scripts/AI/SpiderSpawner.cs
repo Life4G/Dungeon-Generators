@@ -10,19 +10,17 @@ public class SpiderSpawner : MonoBehaviour
     public GameObject spiderPrefab; // Префаб паука
     public DungeonRoomManager dungeonRoomManager; // Ссылка на менеджер комнат
 
-    private List<Vector2Int> roomCenters; // Список центров комнат
+    public int n; 
 
-    private BehaviorTreeBuilder BTBuilder;
+    private List<Vector2Int> roomCenters; // Список центров комнат
 
     void Start()
     {
         // Получение центров всех комнат
         roomCenters = GetRoomCenters(dungeonRoomManager.rooms);
 
-        BTBuilder = GameObject.FindObjectOfType<BehaviorTreeBuilder>();
-
         // Спавн пауков в случайных комнатах
-        SpawnSpiders(8); // Например, спавним 5 пауков
+        SpawnSpiders(n); // Например, спавним 5 пауков
     }
 
     private List<Vector2Int> GetRoomCenters(DungeonRoom[] rooms)

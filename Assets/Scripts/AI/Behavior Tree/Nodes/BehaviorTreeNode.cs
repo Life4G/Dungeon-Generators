@@ -5,7 +5,14 @@ using UnityEngine;
 
 public abstract class BehaviorTreeNode : Node, IBehaviorTreeNode
 {
+    public int executionOrder; // Порядок выполнения узла
+
     protected List<BehaviorTreeNode> connectedNodes;
+
+    public BehaviorTreeNode()
+    {
+        // Инициализация, если необходимо
+    }
 
     public abstract NodeState Execute(Entity entity); // Обязательная реализация метода выполнения
 
@@ -14,7 +21,7 @@ public abstract class BehaviorTreeNode : Node, IBehaviorTreeNode
         connectedNodes = GetConnectedNodes();
     }
 
-    // Метод для получения значений дочерних узлов
+    // Метод для получения и сортировки дочерних узлов по порядку выполнения
     protected List<BehaviorTreeNode> GetConnectedNodes()
     {
         List<BehaviorTreeNode> nodes = new List<BehaviorTreeNode>();
@@ -29,6 +36,13 @@ public abstract class BehaviorTreeNode : Node, IBehaviorTreeNode
                 }
             }
         }
+        // Сортировка узлов по порядку выполнения
+        nodes.Sort((x, y) => x.executionOrder.CompareTo(y.executionOrder));
         return nodes;
+    }
+
+    public override object GetValue(NodePort port)
+    {
+        return null; // Вернуть null, так как узлы не возвращают значений
     }
 }

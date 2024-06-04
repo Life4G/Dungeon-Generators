@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Scellecs.Morpeh;
 using XNode;
+using UnityEngine;
 
 [CreateNodeMenu("BehaviorTree/SelectorNode")]
 public class SelectorNode : BehaviorTreeNode
@@ -10,6 +11,7 @@ public class SelectorNode : BehaviorTreeNode
 
     public override NodeState Execute(Entity entity)
     {
+        Debug.Log("Selector");
         foreach (var child in connectedNodes)
         {
             var state = child.Execute(entity);

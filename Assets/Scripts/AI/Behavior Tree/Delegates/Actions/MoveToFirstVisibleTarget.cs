@@ -2,16 +2,17 @@ using System;
 using Scellecs.Morpeh;
 using UnityEngine;
 using ECS;
+using System.Collections.Generic;
 
 [CreateAssetMenu(fileName = "MoveToFirstVisibleTarget", menuName = "BehaviorTree/ActionDelegates/MoveToFirstVisibleTarget")]
 public class MoveToFirstVisibleTarget : ActionDelegate
 {
     public override NodeState Execute(Entity entity)
     {
+        Debug.Log("Move to visible target");
         var visionStash = World.Default.GetStash<VisionComponent>();
-        var moveRequestStash = World.Default.GetStash<MoveRequest>();
+        var moveStash = World.Default.GetStash<MoveComponent>();
         var positionStash = World.Default.GetStash<PositionComponent>();
-        var movingFlagStash = World.Default.GetStash<MovingFlag>();
 
         if (!visionStash.Has(entity) || !positionStash.Has(entity))
         {
@@ -29,31 +30,19 @@ public class MoveToFirstVisibleTarget : ActionDelegate
         var targetEntity = visionComponent.visibleEntities[0];
         ref var targetPosition = ref positionStash.Get(targetEntity);
 
-        if (movingFlagStash.Has(entity))
-        {
-            ref var currentPosition = ref positionStash.Get(entity);
+        List<Vector2Int> path = PathfindingAStar.FindPath(positionComponent.position, targetPosition.position, MoveSystem.map);
 
-            if (currentPosition.position == targetPosition.position)
-            {
-                movingFlagStash.Remove(entity);
-                return NodeState.SUCCESS;
-            }
-            else
-            {
-                return NodeState.RUNNING;
-            }
-        }
-        else
+        if (path == null || path.Count == 0)
         {
-            var moveRequest = new MoveRequest
-            {
-                start = positionComponent.position,
-                target = targetPosition.position,
-                entity = entity
-            };
-
-            moveRequestStash.Set(entity, moveRequest);
-            return NodeState.RUNNING;
+            return NodeState.FAILURE;
         }
+
+        var moveComponent = new MoveComponent
+        {
+            path = path
+        };
+
+        moveStash.Set(entity, moveComponent);
+        return NodeState.RUNNING;
     }
 }

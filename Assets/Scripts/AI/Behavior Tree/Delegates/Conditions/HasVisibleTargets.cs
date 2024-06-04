@@ -8,6 +8,7 @@ public class HasVisibleTargets : ConditionDelegate
 {
     public override bool Check(Entity entity)
     {
+        Debug.Log("Check Visible Targets");
         var visionStash = World.Default.GetStash<VisionComponent>();
 
         if (!visionStash.Has(entity))
