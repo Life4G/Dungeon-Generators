@@ -48,6 +48,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 764bd5ba3d778b947b9988d958f78377, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  serializedData:
+    behaviorTree: {fileID: 11400000, guid: 5fa9059294f48484888c3c95c4eaa6d1, type: 2}
 --- !u!114 &1543975897788776354
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -90,7 +92,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   serializedData:
     visibleEntities: []
-    visionRange: 10
+    visionRange: 25
 --- !u!212 &3199000389661809622
 SpriteRenderer:
   m_ObjectHideFlags: 0

@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.github.siccity.xnode": "https://github.com/Siccity/xNode.git",
     "com.codewriter.triinspector": "https://github.com/codewriter-packages/Tri-Inspector.git",
     "com.scellecs.morpeh": "https://github.com/scellecs/morpeh.git",
     "com.unity.collab-proxy": "2.2.0",

@@ -2,6 +2,7 @@ using Scellecs.Morpeh.Systems;
 using UnityEngine;
 using Unity.IL2CPP.CompilerServices;
 using Scellecs.Morpeh;
+using XNode;
 
 namespace ECS
 {
@@ -24,19 +25,30 @@ namespace ECS
 
         public override void OnUpdate(float deltaTime)
         {
+            this.behaviorFilter = this.World.Filter.With<BehaviorComponent>().Build();
+            this.behaviorStash = this.World.GetStash<BehaviorComponent>();
 
             // Выполнение дерева поведения для каждой сущности с BehaviorComponent
             foreach (var entity in this.behaviorFilter)
             {
                 ref var behaviorComponent = ref this.behaviorStash.Get(entity);
 
-                if (behaviorComponent.rootNode == null)
+                if (behaviorComponent.behaviorTree == null)
                 {
-                    Debug.LogError("RootNode is null for entity: " + entity.ID);
-                    continue; // Пропустить сущность, если rootNode не инициализирован
+                    Debug.LogError("BehaviorTreeGraph is null for entity: " + entity.ID);
+                    continue; // Пропустить сущность, если behaviorTree не инициализирован
                 }
 
-                behaviorComponent.rootNode.Execute(entity);
+                // Получение корневого узла и выполнение дерева поведения
+                var rootNode = behaviorComponent.behaviorTree.GetRootNode();
+                if (rootNode != null)
+                {
+                    rootNode.Execute(entity);
+                }
+                else
+                {
+                    Debug.LogError("RootNode is null for graph: " + behaviorComponent.behaviorTree.name);
+                }
             }
         }
     }
