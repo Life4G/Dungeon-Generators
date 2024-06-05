@@ -30,7 +30,7 @@ public class SceneObjectManager : MonoBehaviour
                 List<DungeonRoom> rooms = new List<DungeonRoom>();
                 foreach (DungeonRoom room in roomManager.rooms)
                 {
-                    if ((fractions.Contains(room.fractionIndex) || sceneObject.fractionIds == 0) && (styles.Contains(room.styleId) || sceneObject.styleIds == 0))
+                    if ((fractions.Contains(room.fractionIndex) || sceneObject.fractionIds == 0) && (styles.Contains(room.styleId) || sceneObject.styleIds == 0) && !room.isCorridor)
                         rooms.Add(room);
                 }
                 while (objectsToSpawn > sceneObject.min)

@@ -197,7 +197,7 @@ namespace Assets.Scripts.Map
                 {
                     if (walls[y, x] != -1)
                     { tiles[y, x].roomIndex = walls[y, x]; tiles[y, x].isPassable = false; }
-                    else tiles[y, x].isPassable = tiles[y,x].isPassable;
+                    else tiles[y, x].isPassable = true;
                     tiles[y, x].hasAdjacentWall = false;
                     tiles[y, x].isCorner = false;
 
