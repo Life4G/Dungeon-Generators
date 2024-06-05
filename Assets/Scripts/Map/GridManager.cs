@@ -49,6 +49,9 @@ public class GridManager : MonoBehaviour
     /// </summary>
     private Graph graph;
 
+    [SerializeField]
+    public SceneObjectManager sceneManager;
+
     /// <summary>
     /// Возвращает текущую карту подземелья.
     /// </summary>
@@ -496,6 +499,7 @@ public class GridManager : MonoBehaviour
     void Awake()
     {
         Reload();
+        sceneManager.CalculateObjectsForRooms();
     }
 
     /// <summary>

@@ -4,27 +4,36 @@ using UnityEditor;
 using UnityEngine;
 using UnityEditorInternal;
 using Assets.Scripts.Room;
+using Unity.VisualScripting;
 
 [CustomEditor(typeof(SceneObjectManager))]
 public class SceneObjectEditor : Editor
 {
     private Object fractionManager;
     private Object roomStyleManager;
-    private List<string> fractions;
+    private Object roomManager;
+    private List<string> fractionNames;
+    private List<string> styleNames;
     private ReorderableList sceneObjects;
 
     private void OnEnable()
     {
-        SerializedProperty manager = serializedObject.FindProperty("fractionManager");
-        fractionManager = manager.objectReferenceValue;
+        fractionManager = serializedObject.FindProperty("fractionManager").objectReferenceValue;
         roomStyleManager = serializedObject.FindProperty("roomStyleManager").objectReferenceValue;
+        roomManager = serializedObject.FindProperty("roomManager").objectReferenceValue;
 
         if (fractionManager != null && roomStyleManager != null && ((FractionManager)fractionManager).fractions.Count > 0)
         {
-            fractions = new List<string>();
+            fractionNames = new List<string>();
             for (int i = 0; i < ((FractionManager)fractionManager).fractions.Count; i++)
             {
-                fractions.Add(((FractionManager)fractionManager).fractions[i].name);
+                fractionNames.Add(((FractionManager)fractionManager).fractions[i].name);
+            }
+
+            styleNames = new List<string>();
+            for (int i = 0; i < ((RoomStyleManager)roomStyleManager).roomStyles.Count; i++)
+            {
+                styleNames.Add(((RoomStyleManager)roomStyleManager).roomStyles[i].styleName);
             }
 
             sceneObjects = new ReorderableList(serializedObject,
@@ -38,7 +47,7 @@ public class SceneObjectEditor : Editor
                 float halfWidth = rect.width * 0.3f;
 
                 string newName = EditorGUI.TextField(
-                    new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),"Object Name",
+                    new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), "Object Name",
                     element.FindPropertyRelative("name").stringValue
                 );
                 element.FindPropertyRelative("name").stringValue = newName;
@@ -59,30 +68,57 @@ public class SceneObjectEditor : Editor
                 rect.y += EditorGUIUtility.singleLineHeight + 2;
 
                 int min = EditorGUI.IntField(
-                     new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), "Min spawn",
+                     new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), "Min spawn on map",
                     element.FindPropertyRelative("min").intValue
                 );
                 element.FindPropertyRelative("min").intValue = min;
                 rect.y += EditorGUIUtility.singleLineHeight + 2;
 
                 int max = EditorGUI.IntField(
-                     new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), "Max spawn",
+                     new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), "Max spawn on map",
                     element.FindPropertyRelative("max").intValue
                 );
                 element.FindPropertyRelative("max").intValue = max;
                 rect.y += EditorGUIUtility.singleLineHeight + 2;
 
+                int maxRoom = EditorGUI.IntField(
+                    new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), "Max spawn in room",
+                    element.FindPropertyRelative("maxRoom").intValue
+                );
+                element.FindPropertyRelative("maxRoom").intValue = maxRoom;
+                rect.y += EditorGUIUtility.singleLineHeight + 2;
+
                 int fractions = 0;
                 fractions = EditorGUI.MaskField(
                     new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), "Fraction selector",
-                    element.FindPropertyRelative("fractionsId").intValue, this.fractions.ToArray()
+                    element.FindPropertyRelative("fractionIds").intValue, fractionNames.ToArray()
                 );
-                element.FindPropertyRelative("fractionsId").intValue = fractions;
+                if (fractions == -1)
+                {
+                    fractions = 1;
+                    for (int i = 0; i < fractionNames.Count; i++)
+                        fractions = fractions << 1;
+                }
+                element.FindPropertyRelative("fractionIds").intValue = fractions;
+                rect.y += EditorGUIUtility.singleLineHeight + 2;
+
+                int styles = 0;
+                styles = EditorGUI.MaskField(
+                    new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), "Style selector",
+                    element.FindPropertyRelative("styleIds").intValue, styleNames.ToArray()
+                );
+                if (styles == -1)
+                {
+                    styles = 1;
+                    for (int i = 0; i < styleNames.Count; i++)
+                        styles = styles << 1;
+                }
+                element.FindPropertyRelative("styleIds").intValue = styles;
                 rect.y += EditorGUIUtility.singleLineHeight + 2;
 
             };
 
-            sceneObjects.elementHeight = EditorGUIUtility.singleLineHeight * 7;
+            sceneObjects.elementHeight = EditorGUIUtility.singleLineHeight * 9;
 
             sceneObjects.drawHeaderCallback = (Rect rect) =>
             {
@@ -96,6 +132,7 @@ public class SceneObjectEditor : Editor
     public override void OnInspectorGUI()
     {
         EditorGUI.BeginChangeCheck();
+        roomManager = EditorGUILayout.ObjectField(roomManager, typeof(DungeonRoomManager), true);
         fractionManager = EditorGUILayout.ObjectField(fractionManager, typeof(FractionManager), true);
         roomStyleManager = EditorGUILayout.ObjectField(roomStyleManager, typeof(RoomStyleManager), true);
         if (sceneObjects != null)
@@ -118,6 +155,10 @@ public class SceneObjectEditor : Editor
         if (roomStyleManager != null)
         {
             serializedObject.FindProperty("roomStyleManager").objectReferenceValue = roomStyleManager;
+        }
+        if (roomManager != null)
+        {
+            serializedObject.FindProperty("roomManager").objectReferenceValue = roomManager;
         }
 
         if (GUI.changed)

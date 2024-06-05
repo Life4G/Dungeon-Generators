@@ -3,21 +3,24 @@ using Assets.Scripts.Room;
 using System.Collections.Generic;
 using UnityEngine;
 [System.Serializable]
-public class SceneObject 
+public class SceneObject
 {
     public string name;
     public ScriptableObject type;
-    public MonoBehaviour prefab;
+    public GameObject prefab;
     public int min;
     public int max;
-    public int fractionsId;
+    public int maxRoom;
+    public int fractionIds;
+    public int styleIds;
 
     public SceneObject()
     {
         name = "New Object";
         type = null; prefab = null;
         min = 0; max = 0;
-        fractionsId = 0;
+        fractionIds = 0;
+        styleIds = 0;
     }
 
     public List<int>GetFractionIds()
@@ -25,7 +28,18 @@ public class SceneObject
         List<int> result = new List<int>();
         for (int i = 0; i < sizeof(int) * 8; i++)
         {
-            if ((fractionsId & (1 << i)) > 0)
+            if ((fractionIds & (1 << i)) > 0)
+                result.Add(i);
+        }
+        return result;
+    }
+
+    public List<int> GetStyleIds()
+    {
+        List<int> result = new List<int>();
+        for (int i = 0; i < sizeof(int) * 8; i++)
+        {
+            if ((styleIds & (1 << i)) > 0)
                 result.Add(i);
         }
         return result;

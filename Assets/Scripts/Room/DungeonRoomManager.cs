@@ -144,7 +144,7 @@ namespace Assets.Scripts.Room
                 {
                     for (int x = 0; x < floorMap.GetLength(0); x++)
                     {
-                        int roomId = floorMap[x, y];
+                        int roomId = floorMap[y, x];
                         if (roomId > -1)
                         {
                             if (!roomTiles.ContainsKey(roomId))

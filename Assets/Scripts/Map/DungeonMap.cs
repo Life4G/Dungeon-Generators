@@ -84,7 +84,7 @@ namespace Assets.Scripts.Map
         {
             int width = roomIndices.GetLength(0);
             int height = roomIndices.GetLength(1);
-            this.tiles = new DungeonTile[width, height];
+            this.tiles = new DungeonTile[height,width ];
             InitializeMapWithRoomIndices(roomIndices);
             AddWalls();
         }
@@ -98,7 +98,7 @@ namespace Assets.Scripts.Map
             int width = roomIndices.GetLength(0);
             int height = roomIndices.GetLength(1);
 
-            tiles = new DungeonTile[width, height];
+            tiles = new DungeonTile[height, width];
 
             for (int y = 0; y < height; y++)
             {
@@ -197,7 +197,7 @@ namespace Assets.Scripts.Map
                 {
                     if (walls[y, x] != -1)
                     { tiles[y, x].roomIndex = walls[y, x]; tiles[y, x].isPassable = false; }
-                    else tiles[y, x].isPassable = true;
+                    else tiles[y, x].isPassable = tiles[y,x].isPassable;
                     tiles[y, x].hasAdjacentWall = false;
                     tiles[y, x].isCorner = false;
 

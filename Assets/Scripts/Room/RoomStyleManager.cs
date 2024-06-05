@@ -18,7 +18,7 @@ namespace Assets.Scripts.Room
         /// Список стилей комнат.
         /// </summary>
         [SerializeField]
-        private List<RoomStyle> roomStyles;
+        public List<RoomStyle> roomStyles;
 
         /// <summary>
         /// Возвращает стиль комнаты по имени.
