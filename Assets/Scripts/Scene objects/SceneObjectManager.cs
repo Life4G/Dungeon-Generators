@@ -33,7 +33,6 @@ public class SceneObjectManager : MonoBehaviour
                     if ((fractions.Contains(room.fractionIndex) || sceneObject.fractionIds == 0) && (styles.Contains(room.styleId) || sceneObject.styleIds == 0) && !room.isCorridor)
                         rooms.Add(room);
                 }
-                while (objectsToSpawn > sceneObject.min)
                     foreach (DungeonRoom room in rooms)
                     {
                         for (int objectsInRoom = Random.Range(1, sceneObject.maxRoom); objectsInRoom > 0 && objectsToSpawn > 0; objectsInRoom--, objectsToSpawn--)

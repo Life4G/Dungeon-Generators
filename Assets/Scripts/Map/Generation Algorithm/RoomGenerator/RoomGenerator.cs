@@ -51,7 +51,7 @@ public class RoomGenerator : DungeonGeneratorBase
     /// <summary>
     /// Радиус спавна комнат.
     /// </summary>
-    private int roomSpawnRadius = 60;
+    private int roomSpawnRadius = 90;
 
     /// <summary>
     /// Карта подземелья.
