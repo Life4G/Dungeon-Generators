@@ -105,5 +105,18 @@ namespace Assets.Scripts.Fraction
             return fractions[fractionIndex].color;
         }
 
+        /// <summary>
+        /// Позволяет получить id фракции из списка фракций по объекту
+        /// </summary>
+        /// <param name="fraction">фракция id которой нужно получить</param>
+        /// <returns>Возвращает id фракции</returns>
+        public int GetFractionId(Fraction fraction)
+        {
+            for (int i = 0; i < fractions.Count; i++)
+                if (fractions[i] == fraction)
+                    return i;
+            return -1;
+        }
+
     }
 }
