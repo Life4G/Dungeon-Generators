@@ -515,5 +515,13 @@ public class GridManager : MonoBehaviour
                 Gizmos.DrawSphere(new Vector3(roomManager.rooms[i].centerX, roomManager.rooms[i].centerY, 0), 2);
 
         }
+        //    for (int i = 0; i < graph.gizmoCentres.Count; i++)
+        //        for (int j = 0; j < graph.gizmoCentres.Count; j++)
+        //            if (graph.graphMap[i, j] >= 0)
+        //            {
+        //                Gizmos.color = Color.red ;
+        //                Gizmos.DrawLine(graph.gizmoCentres[i],
+        //                    graph.gizmoCentres[j]);
+        //            }
     }
 }

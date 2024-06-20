@@ -29,12 +29,12 @@ public class Graph : ScriptableObject
     /// <summary>
     /// Список центров комнат для Gizmo.
     /// </summary>
-    private List<Vector3> gizmoCentres;
+    public List<Vector3> gizmoCentres;
     [SerializeField]
     /// <summary>
     /// Матрица смежности графа.
     /// </summary>
-    private int[,] graphMap;
+    public int[,] graphMap;
 
     //public Graph(List<Room> rooms, int maxWidth, int maxHeigth)
     //{
