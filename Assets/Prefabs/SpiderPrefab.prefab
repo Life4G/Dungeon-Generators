@@ -13,7 +13,10 @@ GameObject:
   - component: {fileID: 1543975897788776354}
   - component: {fileID: 8512085612712175741}
   - component: {fileID: 8363561141531327556}
+  - component: {fileID: 1264985381754527909}
+  - component: {fileID: 619542851487933504}
   - component: {fileID: 3199000389661809622}
+  - component: {fileID: 8184337039068688645}
   m_Layer: 0
   m_Name: SpiderPrefab
   m_TagString: Untagged
@@ -92,7 +95,39 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   serializedData:
     visibleEntities: []
-    visionRange: 25
+    visionRange: 10
+--- !u!114 &1264985381754527909
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2118564232435299310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7602d1d958bb5b48bf3fe04d90062b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serializedData:
+    maxHealth: 50
+    currentHealth: 0
+--- !u!114 &619542851487933504
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2118564232435299310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 418340a5e8d86f948ac9d6c18a742672, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serializedData:
+    attackDamage: 10
+    attackRange: 1
+    attackCooldown: 2
+    lastAttackTime: 0
 --- !u!212 &3199000389661809622
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -145,3 +180,15 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &8184337039068688645
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2118564232435299310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c2f44b523635f94e8717352d1e6dd4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

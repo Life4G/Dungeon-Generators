@@ -11,7 +11,6 @@ public class SequenceNode : BehaviorTreeNode
 
     public override NodeState Execute(Entity entity)
     {
-        Debug.Log("Sequence");
         foreach (var child in connectedNodes)
         {
             var state = child.Execute(entity);

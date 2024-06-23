@@ -91,7 +91,6 @@ namespace ECS
 
                     // Обновление позиции сущности в мировых координатах Unity
                     transform.position = MapToWorldPosition(nextPoint);
-                    //Debug.Log("Move Entity " + entity.ID + " To Next Point " + nextPoint.ToString());
                 }
             }
         }

@@ -9,6 +9,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 021a6023200419a4db20a001226c070f, type: 3}
-  m_Name: SayHello
+  m_Script: {fileID: 11500000, guid: b1ea6ea002b6b7745bc36f8627b9a4ca, type: 3}
+  m_Name: New Health System
   m_EditorClassIdentifier: 

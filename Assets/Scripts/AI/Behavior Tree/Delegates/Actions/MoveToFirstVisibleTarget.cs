@@ -43,6 +43,6 @@ public class MoveToFirstVisibleTarget : ActionDelegate
         };
 
         moveStash.Set(entity, moveComponent);
-        return NodeState.RUNNING;
+        return NodeState.SUCCESS;
     }
 }

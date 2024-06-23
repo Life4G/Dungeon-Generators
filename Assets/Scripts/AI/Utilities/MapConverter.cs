@@ -45,11 +45,11 @@ public class MapConverter : MonoBehaviour
         Debug.Log($"Width ={width}, height = {height}");
         bool[,] boolArray = new bool[width, height];
 
-        for (int y = 0; y < height; y++)
+        for (int x = 0; x < height; x++)
         {
-            for (int x = 0; x < width; x++)
+            for (int y = 0; y < width; y++)
             {
-                boolArray[y, x] = dungeonMap.tiles[y, x].isPassable;
+                boolArray[y, x] = dungeonMap.tiles[x, y].isPassable;
             }
         }
 
