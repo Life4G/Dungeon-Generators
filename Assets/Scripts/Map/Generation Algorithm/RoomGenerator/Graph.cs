@@ -81,7 +81,7 @@ public class Graph : ScriptableObject
         graphMap = CalcMap();
         List<Corridor> spanningTree = SpanningTree(edges);
         edges.Except(spanningTree);
-        for (int i = 0; i < UnityEngine.Random.Range(0, edges.Count); i++)
+        for (int i = 0; i < UnityEngine.Random.Range(0, edges.Count/2); i++)
         {
             int index = UnityEngine.Random.Range(0, edges.Count);
             spanningTree.Add(edges[index]);
@@ -108,9 +108,18 @@ public class Graph : ScriptableObject
     }
     public void OnEnable() //On Reload
     {
-        Debug.Log("OnEnable");
+        //Debug.Log("OnEnable");
 
     }
+
+    public void DeleteCorridors(List<Corridor> corridors)
+    {
+        foreach (Corridor corridor in corridors)
+            edges.Remove(corridor);
+        graphMap = CalcMap();
+        FinalizeMap();
+    }
+
     public void ConvertToFile()
     {
         JsonUtility.ToJson(vertices);

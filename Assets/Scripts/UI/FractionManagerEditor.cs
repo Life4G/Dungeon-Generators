@@ -203,11 +203,12 @@ namespace Assets.Scripts.UI
         private void PrintFractionsToDebugger()
         {
             FractionManager manager = (FractionManager)target;
+            var DungeonRoomManager = GameObject.FindObjectOfType<DungeonRoomManager>();
 
             Debug.Log("Fractions:"); int i = 0;
             foreach (var fraction in manager.fractions)
             {
-                Debug.Log($"Fraction name: {fraction.name}, Territory coefficient: {fraction.territoryCoefficient}, Rooms: {manager.CalculateRoomsForFraction(13, i)}");
+                Debug.Log($"Fraction name: {fraction.name}, Territory coefficient: {fraction.territoryCoefficient}, Rooms: {manager.CalculateRoomsForFraction(DungeonRoomManager.CountNonCorridorRooms(), i)}");
                 i++;
             }
         }

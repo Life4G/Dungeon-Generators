@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.U2D;
 
 /// <summary>
 /// Базовый класс для генераторов подземелий, от которого наследуются все остальные.
@@ -34,6 +35,27 @@ public abstract class DungeonGeneratorBase : MonoBehaviour
     /// Массив, содержащий координаты всех плиток.
     /// </summary>
     protected int[,] resultPositions;
+
+    public int roomShapesId;
+
+    protected List<int> roomShapes;
+
+    public void SetRoomShapes(int shapes)
+    {
+        roomShapesId = shapes;
+        roomShapes = new List<int>();
+        if (shapes != -1)
+            for (int i = 0; i < sizeof(int) * 8; i++)
+            {
+                if ((shapes & (1 << i)) > 0)
+                    roomShapes.Add(i);
+            }
+        else
+        {
+            for (int i = 0; i < 4; i++)
+                roomShapes.Add(i);
+        }
+    }
 
     /// <summary>
     /// Генератор сида.

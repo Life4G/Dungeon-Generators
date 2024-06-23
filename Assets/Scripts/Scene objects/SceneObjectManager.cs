@@ -16,23 +16,6 @@ public class SceneObjectManager : MonoBehaviour
 
     public void CalculateObjectsForRooms()
     {
-        if (useCSP) 
-        {
-            Dictionary<DungeonRoom, SceneObject> AllPairs = new Dictionary<DungeonRoom, SceneObject>();
-            int RealRoomNumber = roomManager.CountNonCorridorRooms();
-            AllPairs = SetObjects(AllPairs, roomManager.GetGraph(), RealRoomNumber, sceneObjects);
-            if (AllPairs == null)
-                Debug.Log("Невозможно разместить фракции методом CSP");
-            else
-            {
-                foreach (var pair in AllPairs)
-                {
-                    for (int objectsInRoom = Random.Range(1, pair.maxRoom); objectsInRoom > 0 && objectsToSpawn > 0; objectsInRoom--, objectsToSpawn--)
-                        Instantiate(sceneObject.prefab, CalculatePos(pair.Key), Quaternion.identity);
-                }
-            }
-        }
-        else
         foreach (SceneObject sceneObject in sceneObjects)
         {
             if (sceneObject.min > sceneObject.max || sceneObject.min < 0 || sceneObject.max < 0 || sceneObject.maxRoom < 0 ||
@@ -80,8 +63,8 @@ public class SceneObjectManager : MonoBehaviour
         while(!passible)
         {
 
-            pos.x = Random.Range(room.centerX -room.width/2, room.centerX + room.width/2);
-            pos.y = Random.Range(room.centerY - room.height/2, room.centerY + room.height/2);
+            pos.x = Random.Range((int)(room.centerX -room.width/2), (int)(room.centerX + room.width / 2));
+            pos.y = Random.Range((int)(room.centerY - room.height/ 2), (int)(room.centerY + room.height/ 2));
             DungeonTile tile = dungeonMap.GetTile((int)pos.x, (int)pos.y);
             passible = tile.roomIndex >=0 && tile.isPassable;
         }
