@@ -42,7 +42,7 @@ public class GridEditor : Editor
         }
         seedGeometryString = GUILayout.TextField(seedGeometryString);
         seedGeometry = int.Parse(seedGeometryString);
-        ask = GUILayout.Toggle(ask, "Don't ask");
+        //ask = GUILayout.Toggle(ask, "Don't ask");
      
         if (GUILayout.Button("Generate Geometry"))
         {

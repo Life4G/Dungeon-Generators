@@ -63,8 +63,8 @@ public class SceneObjectManager : MonoBehaviour
         while(!passible)
         {
 
-            pos.x = Random.Range(room.centerX -room.width/2, room.centerX + room.width/2);
-            pos.y = Random.Range(room.centerY - room.height/2, room.centerY + room.height/2);
+            pos.x = Random.Range((int)(room.centerX -room.width/2), (int)(room.centerX + room.width / 2));
+            pos.y = Random.Range((int)(room.centerY - room.height/ 2), (int)(room.centerY + room.height/ 2));
             DungeonTile tile = dungeonMap.GetTile((int)pos.x, (int)pos.y);
             passible = tile.roomIndex >=0 && tile.isPassable;
         }
