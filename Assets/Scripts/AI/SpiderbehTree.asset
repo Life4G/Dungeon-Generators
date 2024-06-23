@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Selector
   m_EditorClassIdentifier: 
   graph: {fileID: 11400000}
-  position: {x: 424, y: -184}
+  position: {x: 440, y: 40}
   ports:
     keys:
     - input
@@ -62,7 +62,7 @@ MonoBehaviour:
   m_Name: Sequence
   m_EditorClassIdentifier: 
   graph: {fileID: 11400000}
-  position: {x: 152, y: -120}
+  position: {x: 152, y: 136}
   ports:
     keys:
     - input
@@ -183,7 +183,7 @@ MonoBehaviour:
   m_Name: Action
   m_EditorClassIdentifier: 
   graph: {fileID: 11400000}
-  position: {x: 680, y: -296}
+  position: {x: 680, y: -56}
   ports:
     keys:
     - input
@@ -248,7 +248,7 @@ MonoBehaviour:
   m_Name: Condition
   m_EditorClassIdentifier: 
   graph: {fileID: 11400000}
-  position: {x: 952, y: -40}
+  position: {x: 952, y: 296}
   ports:
     keys:
     - input
@@ -281,7 +281,7 @@ MonoBehaviour:
   m_Name: Action
   m_EditorClassIdentifier: 
   graph: {fileID: 11400000}
-  position: {x: 152, y: 104}
+  position: {x: 168, y: -200}
   ports:
     keys:
     - input
@@ -314,7 +314,7 @@ MonoBehaviour:
   m_Name: Action
   m_EditorClassIdentifier: 
   graph: {fileID: 11400000}
-  position: {x: 952, y: -200}
+  position: {x: 952, y: 72}
   ports:
     keys:
     - input
@@ -347,7 +347,7 @@ MonoBehaviour:
   m_Name: Condition
   m_EditorClassIdentifier: 
   graph: {fileID: 11400000}
-  position: {x: 408, y: -24}
+  position: {x: 440, y: 216}
   ports:
     keys:
     - input
@@ -380,7 +380,7 @@ MonoBehaviour:
   m_Name: Sequence
   m_EditorClassIdentifier: 
   graph: {fileID: 11400000}
-  position: {x: 680, y: -120}
+  position: {x: 696, y: 168}
   ports:
     keys:
     - input

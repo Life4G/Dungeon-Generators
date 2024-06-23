@@ -11,6 +11,7 @@ namespace ECS
     public struct FractionComponent : IComponent
     {
         public string fractionName;
+        public int fractionIndex;
     }
 
 }
