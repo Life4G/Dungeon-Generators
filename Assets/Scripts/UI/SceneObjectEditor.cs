@@ -135,6 +135,10 @@ public class SceneObjectEditor : Editor
         roomManager = EditorGUILayout.ObjectField(roomManager, typeof(DungeonRoomManager), true);
         fractionManager = EditorGUILayout.ObjectField(fractionManager, typeof(FractionManager), true);
         roomStyleManager = EditorGUILayout.ObjectField(roomStyleManager, typeof(RoomStyleManager), true);
+        if(roomManager!= null && GUILayout.Button("Generate Objects"))
+        {
+            ((SceneObjectManager)target).CalculateObjectsForRooms();
+        }
         if (sceneObjects != null)
             sceneObjects.DoLayoutList();
         if (EditorGUI.EndChangeCheck())
