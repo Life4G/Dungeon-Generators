@@ -9,21 +9,32 @@ public class MakeDamage : ActionDelegate
     {
         var attackStash = World.Default.GetStash<AttackComponent>();
         var attackTargetsStash = World.Default.GetStash<AttackTargetsComponent>();
+        var fractionStash = World.Default.GetStash<FractionComponent>();
 
-        if (!attackStash.Has(entity) || !attackTargetsStash.Has(entity))
+        if (!attackStash.Has(entity) || !attackTargetsStash.Has(entity) || !fractionStash.Has(entity))
         {
             return NodeState.FAILURE;
         }
 
         ref var attackComponent = ref attackStash.Get(entity);
         ref var attackTargetsComponent = ref attackTargetsStash.Get(entity);
+        ref var fractionComponent = ref fractionStash.Get(entity);
 
-        if (attackTargetsComponent.targetsInRange == null || attackTargetsComponent.targetsInRange.Count == 0)
+        Entity targetEntity = null;
+
+        foreach (var potentialTarget in attackTargetsComponent.targetsInRange)
+        {
+            if (fractionStash.Has(potentialTarget) && fractionStash.Get(potentialTarget).fractionName != fractionComponent.fractionName)
+            {
+                targetEntity = potentialTarget;
+                break;
+            }
+        }
+
+        if (targetEntity == null)
         {
             return NodeState.FAILURE;
         }
-
-        var targetEntity = attackTargetsComponent.targetsInRange[0];
 
         // Создаем сущность-событие для нанесения урона
         var damageRequestEntity = World.Default.CreateEntity();
