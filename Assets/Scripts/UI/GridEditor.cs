@@ -41,6 +41,7 @@ public class GridEditor : Editor
             manager.generator.SetSeed(seedGeometry);
         }
         seedGeometryString = GUILayout.TextField(seedGeometryString);
+        seedGeometry = int.Parse(seedGeometryString);
         ask = GUILayout.Toggle(ask, "Don't ask");
      
         if (GUILayout.Button("Generate Geometry"))
@@ -61,6 +62,7 @@ public class GridEditor : Editor
             manager.roomManager.SetSeed(seedFraction);
         }
         seedFractionString = GUILayout.TextField(seedFractionString);
+        seedFraction = int.Parse(seedFractionString);
 
         if (GUILayout.Button("Generate Factions"))
         {

@@ -1047,8 +1047,8 @@ namespace Assets.Scripts.Room
         /// <returns>Если комната соответсвует хотя бы одному правилу то возвращается true</returns>
         private bool CheckRules(DungeonRoom room, Fraction.Fraction fraction, Dictionary<DungeonRoom, Fraction.Fraction> AllPairs, int[,] connections)
         {
-            return (SingleFractionCheck(room, fraction, AllPairs) || HasFractionNeighbour(room, fraction, AllPairs, connections));
-            //&& FractionCountInPairs(fraction, AllPairs) < fractionManager.CalculateRoomsForFraction(CountNonCorridorRooms(), fractionManager.GetFractionId(fraction));
+            return (SingleFractionCheck(room, fraction, AllPairs) || HasFractionNeighbour(room, fraction, AllPairs, connections))
+            && FractionCountInPairs(fraction, AllPairs) < fractionManager.CalculateRoomsForFraction(CountNonCorridorRooms(), fractionManager.GetFractionId(fraction));
 
         }
         /// <summary>
