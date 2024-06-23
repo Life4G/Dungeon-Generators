@@ -11,7 +11,6 @@ public class SelectorNode : BehaviorTreeNode
 
     public override NodeState Execute(Entity entity)
     {
-        Debug.Log("Selector");
         foreach (var child in connectedNodes)
         {
             var state = child.Execute(entity);

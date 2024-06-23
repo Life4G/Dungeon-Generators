@@ -36,42 +36,43 @@ public class Wander : ActionDelegate
 
         ref var positionComponent = ref positionStash.Get(entity);
 
-        // Проверка, достиг ли агент своей цели
-        if (entityTargets.TryGetValue(entity, out Vector2Int targetPosition))
+        Vector2Int targetPosition;
+        int maxAttempts = 10;
+        int attempts = 0;
+
+        while (attempts < maxAttempts)
         {
-            if (positionComponent.position == targetPosition)
+            if (!entityTargets.TryGetValue(entity, out targetPosition) || positionComponent.position == targetPosition)
             {
-                // Агент достиг цели, выбираем новую
+                // Если цели нет или цель достигнута, выбираем новую
                 targetPosition = roomCenters[UnityEngine.Random.Range(0, roomCenters.Count)];
                 entityTargets[entity] = targetPosition;
-                Debug.Log("Сущность достигла цели. Новая цель: " + targetPosition);
+                Debug.Log("Новая цель для сущности: " + targetPosition);
+            }
+
+            List<Vector2Int> path = PathfindingAStar.FindPath(positionComponent.position, targetPosition, MoveSystem.map);
+
+            if (path != null && path.Count > 0)
+            {
+                var moveComponent = new MoveComponent
+                {
+                    path = path
+                };
+
+                moveStash.Set(entity, moveComponent);
+                return NodeState.RUNNING;
+            }
+            else
+            {
+                Debug.LogWarning("Не удалось найти путь до цели: " + targetPosition + ". Попробуем другую цель.");
+                attempts++;
+                // Удаляем текущую цель, чтобы выбрать новую на следующей итерации
+                entityTargets.Remove(entity);
             }
         }
-        else
-        {
-            // У агента еще нет цели, выбираем новую
-            targetPosition = roomCenters[UnityEngine.Random.Range(0, roomCenters.Count)];
-            entityTargets[entity] = targetPosition;
-            Debug.Log("Новая цель для сущности: " + targetPosition);
-        }
 
-        
-        List<Vector2Int> path = PathfindingAStar.FindPath(positionComponent.position, targetPosition, MoveSystem.map);
-
-        if (path == null || path.Count == 0)
-        {
-            Debug.LogError("Не удалось найти путь до цели: " + targetPosition);
-            return NodeState.FAILURE;
-        }
-
-        var moveComponent = new MoveComponent
-        {
-            path = path
-        };
-
-        moveStash.Set(entity, moveComponent);
-
-        return NodeState.RUNNING;
+        Debug.LogError("Не удалось найти путь после нескольких попыток.");
+        return NodeState.FAILURE;
     }
 
     private List<Vector2Int> GetRoomCenters(DungeonRoom[] rooms)
