@@ -93,12 +93,6 @@ public class SceneObjectEditor : Editor
                     new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), "Fraction selector",
                     element.FindPropertyRelative("fractionIds").intValue, fractionNames.ToArray()
                 );
-                if (fractions == -1)
-                {
-                    fractions = 1;
-                    for (int i = 0; i < fractionNames.Count; i++)
-                        fractions = fractions << 1;
-                }
                 element.FindPropertyRelative("fractionIds").intValue = fractions;
                 rect.y += EditorGUIUtility.singleLineHeight + 2;
 
@@ -107,12 +101,6 @@ public class SceneObjectEditor : Editor
                     new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), "Style selector",
                     element.FindPropertyRelative("styleIds").intValue, styleNames.ToArray()
                 );
-                if (styles == -1)
-                {
-                    styles = 1;
-                    for (int i = 0; i < styleNames.Count; i++)
-                        styles = styles << 1;
-                }
                 element.FindPropertyRelative("styleIds").intValue = styles;
                 rect.y += EditorGUIUtility.singleLineHeight + 2;
 

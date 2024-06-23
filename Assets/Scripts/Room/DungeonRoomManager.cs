@@ -70,6 +70,11 @@ namespace Assets.Scripts.Room
             return ((text == "") ? 0 : text.GetHashCode());
         }
 
+        public int[,] GetGraph()
+        {
+            return graph;
+        }    
+
         /// <summary>
         /// Позволяет установить сид.
         /// </summary>
@@ -896,10 +901,15 @@ namespace Assets.Scripts.Room
             Dictionary<DungeonRoom, Fraction.Fraction> AllPairs = new Dictionary<DungeonRoom, Fraction.Fraction>();
             int RealRoomNumber = CountNonCorridorRooms();
             AllPairs = SetFactions(AllPairs, connections, RealRoomNumber);
-            for (int i = 0; i < rooms.Count(); i++)
-                foreach (var pair in AllPairs)
-                    if (rooms[i].id == pair.Key.id)
-                        rooms[i].fractionIndex = fractionManager.GetFractionId(pair.Value);
+            if (AllPairs == null)
+                Debug.Log("Невозможно разместить фракции методом CSP");
+            else
+            {
+                for (int i = 0; i < rooms.Count(); i++)
+                    foreach (var pair in AllPairs)
+                        if (rooms[i].id == pair.Key.id)
+                            rooms[i].fractionIndex = fractionManager.GetFractionId(pair.Value);
+            }
         }
 
         /// <summary>
@@ -918,13 +928,11 @@ namespace Assets.Scripts.Room
             for (int i = 0; i < rooms.Count() && R == null; i++)
                 if (!rooms[i].isCorridor && !AllPairs.ContainsKey(rooms[i]))
                     R = rooms[i];
-            if (R == null)
-                return null;
 
-            foreach (Fraction.Fraction fraction in fractionManager.fractions)
-                if (CheckRules(R, fraction, AllPairs, connections))
+            foreach (Fraction.Fraction F in fractionManager.fractions)
+                if (CheckRules(R, F, AllPairs, connections))
                 {
-                    AllPairs.Add(R, fraction);
+                    AllPairs.Add(R, F);
                     Dictionary<DungeonRoom, Fraction.Fraction> Result = SetFactions(AllPairs, connections, RealRoomNumber);
                     if (Result != null)
                         return Result;
@@ -938,29 +946,32 @@ namespace Assets.Scripts.Room
         {
             Dictionary<DungeonRoom, Fraction.Fraction> AllPairs = new Dictionary<DungeonRoom, Fraction.Fraction>();
             Dictionary<DungeonRoom, List<Fraction.Fraction>> PossibleFactions = new Dictionary<DungeonRoom, List<Fraction.Fraction>>();
-            foreach(var room in rooms)
+            foreach (var room in rooms)
             {
-                if(!room.isCorridor)
+                if (!room.isCorridor)
                 {
                     PossibleFactions.Add(room, (fractionManager.fractions.ToList()));
                 }
             }
             int RealRoomNumber = CountNonCorridorRooms();
-            AllPairs = SetFactionsMod(AllPairs,PossibleFactions, connections, RealRoomNumber);
-            for (int i = 0; i < rooms.Count(); i++)
-                foreach (var pair in AllPairs)
-                    if (rooms[i].id == pair.Key.id)
-                        rooms[i].fractionIndex = fractionManager.GetFractionId(pair.Value);
+            AllPairs = SetFactionsMod(AllPairs, PossibleFactions, connections, RealRoomNumber);
+            if (AllPairs == null)
+                Debug.Log("Невозможно разместить фракции модифицированным методом CSP");
+            else
+            {
+                for (int i = 0; i < rooms.Count(); i++)
+                    foreach (var pair in AllPairs)
+                        if (rooms[i].id == pair.Key.id)
+                            rooms[i].fractionIndex = fractionManager.GetFractionId(pair.Value);
+            }
         }
 
         public Dictionary<DungeonRoom, List<Fraction.Fraction>> GetNewPossibileFactions(Dictionary<DungeonRoom, Fraction.Fraction> AllPairs, Dictionary<DungeonRoom, List<Fraction.Fraction>> PossibleFactions, int[,] connections)
         {
             Dictionary<DungeonRoom, List<Fraction.Fraction>> NewPossibleFactions = new Dictionary<DungeonRoom, List<Fraction.Fraction>>();
-            foreach (var PF in NewPossibleFactions)
+            foreach (var PF in PossibleFactions)
             {
                 DungeonRoom R = PF.Key;
-                if (AllPairs.ContainsKey(R)) //В презентации вместо AllPairs NewPair???
-                    continue;
                 List<Fraction.Fraction> Factions = new List<Fraction.Fraction>();
                 foreach (Fraction.Fraction F in fractionManager.fractions)
                 {
@@ -979,17 +990,17 @@ namespace Assets.Scripts.Room
         {
             if (AllPairs.Count == RealRoomNumber)
                 return AllPairs;
-            
+
             int min = int.MaxValue;
             foreach (var pair in PossibleFactions)
-                if (pair.Value.Count < min)
+                if (!AllPairs.ContainsKey(pair.Key) && pair.Value.Count < min)
                     min = pair.Value.Count;
 
-            List<DungeonRoom> Rooms = new List<DungeonRoom>(); 
+            List<DungeonRoom> Rooms = new List<DungeonRoom>();
             foreach (var pair in PossibleFactions)
-                if (pair.Value.Count == min)
+                if (!AllPairs.ContainsKey(pair.Key) && pair.Value.Count == min)
                     Rooms.Add(pair.Key);
-            
+
             DungeonRoom R = Rooms[Random.Range(0, Rooms.Count)];
             List<Fraction.Fraction> Factions;
             PossibleFactions.TryGetValue(R, out Factions);
@@ -1014,7 +1025,7 @@ namespace Assets.Scripts.Room
                     AllPairs.Remove(R);
                     continue;
                 }
-                var Result = SetFactionsMod(AllPairs, NewPF, connections,RealRoomNumber);
+                var Result = SetFactionsMod(AllPairs, NewPF, connections, RealRoomNumber);
                 if (Result != null)
                     return Result;
                 else
@@ -1033,8 +1044,8 @@ namespace Assets.Scripts.Room
         /// <returns>Если комната соответсвует хотя бы одному правилу то возвращается true</returns>
         private bool CheckRules(DungeonRoom room, Fraction.Fraction fraction, Dictionary<DungeonRoom, Fraction.Fraction> AllPairs, int[,] connections)
         {
-            return (SingleFractionCheck(room, fraction, AllPairs) || HasFractionNeighbour(room, fraction, AllPairs, connections))
-            && FractionCountInPairs(fraction, AllPairs) < fractionManager.CalculateRoomsForFraction(CountNonCorridorRooms(), fractionManager.GetFractionId(fraction));
+            return (SingleFractionCheck(room, fraction, AllPairs) || HasFractionNeighbour(room, fraction, AllPairs, connections));
+            //&& FractionCountInPairs(fraction, AllPairs) < fractionManager.CalculateRoomsForFraction(CountNonCorridorRooms(), fractionManager.GetFractionId(fraction));
 
         }
         /// <summary>
