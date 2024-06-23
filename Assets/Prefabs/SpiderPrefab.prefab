@@ -34,7 +34,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 7, y: 7, z: 7}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 953096795648881603}
@@ -68,6 +68,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   serializedData:
     fractionName: Spider
+    fractionIndex: 0
 --- !u!114 &8512085612712175741
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -126,7 +127,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   serializedData:
     attackDamage: 10
-    attackRange: 2
+    attackRange: 3
     attackCooldown: 2
     lastAttackTime: 0
 --- !u!212 &3199000389661809622
@@ -170,7 +171,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 2
-  m_Sprite: {fileID: 21300000, guid: e4cf816fd5c53b147acf508d4b19a7d8, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 66bf880cc6d6ea34ab8d16f5a2944abe, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -193,6 +194,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c2f44b523635f94e8717352d1e6dd4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fractionManager: {fileID: 0}
 --- !u!1001 &8312114410546837421
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -206,12 +208,20 @@ PrefabInstance:
       value: HealthMeter
       objectReference: {fileID: 0}
     - target: {fileID: 9106424098283209838, guid: ef87191a873da47479e388234a9dfae0, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.55
+      objectReference: {fileID: 0}
+    - target: {fileID: 9106424098283209838, guid: ef87191a873da47479e388234a9dfae0, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.06784493
+      objectReference: {fileID: 0}
+    - target: {fileID: 9106424098283209838, guid: ef87191a873da47479e388234a9dfae0, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 0.001
       objectReference: {fileID: 0}
     - target: {fileID: 9106424098283209838, guid: ef87191a873da47479e388234a9dfae0, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.1
+      value: -0.3685
       objectReference: {fileID: 0}
     - target: {fileID: 9106424098283209838, guid: ef87191a873da47479e388234a9dfae0, type: 3}
       propertyPath: m_LocalPosition.z

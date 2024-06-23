@@ -6,8 +6,8 @@ using UnityEngine;
 
 public class HealthMeterScript : MonoBehaviour
 {
-    public const float MaxLen = 0.15f;
-    public const float MinLen = 0.02f;
+    public const float MaxLen = 0.55f;
+    public const float MinLen = 0.07f;
     public Vector3 MaxColor = new Vector3(0.0f, 1.0f, 0.0f);
     public Vector3 MinColor = new Vector3(1.0f, 0.0f, 0.0f);
 
