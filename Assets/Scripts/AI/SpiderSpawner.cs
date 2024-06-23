@@ -48,27 +48,6 @@ public class SpiderSpawner : MonoBehaviour
 
             // Создание экземпляра паука
             GameObject spider = Instantiate(spiderPrefab, new Vector3(spawnPosition.x, spawnPosition.y, 0), Quaternion.identity);
-
-            // Получение сущности из EntityProvider
-            var entityProvider = spider.GetComponent<EntityProvider>();
-            
-            var entity = entityProvider.Entity;
-            
-            // Инициализация компонента позиции
-            var positionStash = World.Default.GetStash<PositionComponent>();
-            if (positionStash.Has(entity))
-            {
-                ref var positionComponent = ref positionStash.Get(entity);
-                positionComponent.position = spawnPosition;
-                positionStash.Set(entity, positionComponent);
-            }
-
-            // Добавляем EntityProviderComponent
-            var providerStash = World.Default.GetStash<EntityProviderComponent>();
-            ref var providerComponent = ref providerStash.Add(entity);
-            providerComponent.entityProvider = entityProvider;
-
-
         }
     }
 }
