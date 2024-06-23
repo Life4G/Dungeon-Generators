@@ -141,6 +141,9 @@ namespace Assets.Scripts.Room
                 case DistributionMethod.CSP_Base:
                     CSP(graph);
                     break;
+                case DistributionMethod.CSP_MOD:
+                    CSP_MOD(graph);
+                    break;
             }
             Random.state = state;
         }
