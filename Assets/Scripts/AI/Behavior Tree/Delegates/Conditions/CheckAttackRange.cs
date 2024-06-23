@@ -41,8 +41,9 @@ public class CheckAttackRange : ConditionDelegate
 
         if (targetsInRange.Count > 0)
         {
-            ref var attackTargetsComponent = ref attackTargetsStash.Add(entity);
+            ref var attackTargetsComponent = ref attackTargetsStash.Get(entity);
             attackTargetsComponent.targetsInRange = targetsInRange;
+            attackTargetsStash.Set(entity, attackTargetsComponent);
             return true;
         }
 

@@ -2,6 +2,7 @@ using UnityEngine;
 using Scellecs.Morpeh;
 using Scellecs.Morpeh.Providers;
 using ECS;
+using System.Collections.Generic;
 
 public class EntityInitializer : MonoBehaviour
 {
@@ -45,5 +46,15 @@ public class EntityInitializer : MonoBehaviour
         var providerStash = World.Default.GetStash<EntityProviderComponent>();
         ref var providerComponent = ref providerStash.Add(entity);
         providerComponent.entityProvider = entityProvider;
+
+        // Инициализация компонента AttackTargetsComponent, если существует AttackComponent
+        var attackStash = World.Default.GetStash<AttackComponent>();
+        if (attackStash.Has(entity))
+        {
+            var attackTargetsStash = World.Default.GetStash<AttackTargetsComponent>();
+            ref var attackTargetsComponent = ref attackTargetsStash.Add(entity);
+            attackTargetsComponent.targetsInRange = new List<Entity>();
+            attackTargetsStash.Set(entity, attackTargetsComponent);
+        }
     }
 }

@@ -125,7 +125,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   serializedData:
     attackDamage: 10
-    attackRange: 1
+    attackRange: 2
     attackCooldown: 2
     lastAttackTime: 0
 --- !u!212 &3199000389661809622
