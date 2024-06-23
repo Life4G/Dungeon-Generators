@@ -58,10 +58,10 @@ public class Room : ScriptableObject
     /// Генерирует случайную комнату.
     /// </summary>
     /// <returns>Сгенерированная комната.</returns>
-    public static Room CreateRandomRoom(Vector2Int pos)
+    public static Room CreateRandomRoom(Vector2Int pos,List<int> roomShapes)
     {
         Room room = CreateInstance<Room>();
-        switch (Random.Range(0, 4))
+        switch (roomShapes[Random.Range(0, roomShapes.Count)])
         {
             case 0:
                 room.InitSquareRoom(pos);
