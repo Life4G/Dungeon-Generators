@@ -255,13 +255,36 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 8185658874923819029, guid: ef87191a873da47479e388234a9dfae0, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 273849575775834448, guid: ef87191a873da47479e388234a9dfae0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2031212183548467237}
   m_SourcePrefab: {fileID: 100100000, guid: ef87191a873da47479e388234a9dfae0, type: 3}
 --- !u!4 &953096795648881603 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 9106424098283209838, guid: ef87191a873da47479e388234a9dfae0, type: 3}
   m_PrefabInstance: {fileID: 8312114410546837421}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &8112804513293674237 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 273849575775834448, guid: ef87191a873da47479e388234a9dfae0, type: 3}
+  m_PrefabInstance: {fileID: 8312114410546837421}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2031212183548467237
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8112804513293674237}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71263972ab94b404b9b0d8dcfaec2153, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MaxColor: {x: 0, y: 1, z: 0}
+  MinColor: {x: 1, y: 0, z: 0}

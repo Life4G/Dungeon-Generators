@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9106424098283209838}
   - component: {fileID: 6195972740194320431}
-  - component: {fileID: 8185658874923819029}
+  - component: {fileID: 8193256607763648324}
   m_Layer: 0
   m_Name: HealthMeter
   m_TagString: Untagged
@@ -85,7 +85,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &8185658874923819029
+--- !u!114 &8193256607763648324
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -94,7 +94,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 273849575775834448}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b5a1ee5808e5b36439662c47145bb857, type: 3}
+  m_Script: {fileID: 11500000, guid: 71263972ab94b404b9b0d8dcfaec2153, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MaxColor: {x: 0, y: 1, z: 0}
