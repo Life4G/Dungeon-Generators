@@ -4,6 +4,7 @@ using System.Text;
 using UnityEngine.UIElements;
 using Unity.VisualScripting;
 using UnityEditor.EditorTools;
+using System.Collections.Generic;
 
 [CustomEditor(typeof(GridManager))]
 public class GridEditor : Editor
@@ -12,23 +13,35 @@ public class GridEditor : Editor
     private string seedGeometryString;
     private static int seedFraction = 0;
     private string seedFractionString;
+    private int roomShape;
+    private List<string> roomShapeString;
 
     private bool ask = true;
 
     private void OnEnable()
     {
+
         GridManager manager = (GridManager)target;
         seedGeometry = manager.generator.GetSeed();
         seedGeometryString = seedGeometry.ToString();
         seedFraction = manager.roomManager.GenerateSeed();
         seedFractionString = seedFraction.ToString();
+        roomShape = manager.generator.roomShapesId;
+        roomShapeString = new List<string>
+        {
+            "Square",
+            "Circle",
+            "Rombus",
+            "Polygon"
+        };
     }
 
     public override void OnInspectorGUI()
     {
         DrawDefaultInspector();
         GridManager manager = (GridManager)target;
-
+        roomShape = EditorGUILayout.MaskField("Room shapes", roomShape, roomShapeString.ToArray());
+        manager.generator.SetRoomShapes(roomShape);
         GUILayout.Label("Geometry seed");
         if (GUILayout.Button("Randomize Geometry seed"))
         {
@@ -41,7 +54,8 @@ public class GridEditor : Editor
             manager.generator.SetSeed(seedGeometry);
         }
         seedGeometryString = GUILayout.TextField(seedGeometryString);
-        ask = GUILayout.Toggle(ask, "Don't ask");
+        seedGeometry = int.Parse(seedGeometryString);
+        //ask = GUILayout.Toggle(ask, "Don't ask");
      
         if (GUILayout.Button("Generate Geometry"))
         {
@@ -61,6 +75,7 @@ public class GridEditor : Editor
             manager.roomManager.SetSeed(seedFraction);
         }
         seedFractionString = GUILayout.TextField(seedFractionString);
+        seedFraction = int.Parse(seedFractionString);
 
         if (GUILayout.Button("Generate Factions"))
         {

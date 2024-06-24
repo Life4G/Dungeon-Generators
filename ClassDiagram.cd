@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="Assets.Scripts.Fraction.Fraction">
+    <Position X="4.75" Y="2.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAEAACAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Fraction\Fraction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Assets.Scripts.Fraction.FractionManager">
+    <Position X="8.75" Y="2.25" Width="2.25" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAgABAAAAAAAAAAAAAAAAAAAQAAAAAAAgAAAQAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Fraction\FractionManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Assets.Scripts.Fraction.FractionRelationship">
+    <Position X="1.5" Y="7.75" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAEBAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Fraction\FractionRelationship.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Assets.Scripts.Map.DungeonMap">
+    <Position X="4.75" Y="4" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>ARAAAAQAAAABEAAAAAAAAABAAoAIAAAAAAABAEAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Map\DungeonMap.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Assets.Scripts.Map.DungeonTile">
+    <Position X="13.75" Y="2.25" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAAAAAAAAAABAAAAAAgBAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Map\DungeonTile.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GridManager">
+    <Position X="13.75" Y="5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>BAAlEBAACACBACAAEAAAAAAAiCAAAEAAGAAARABAAEA=</HashCode>
+      <FileName>Assets\Scripts\Map\GridManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RoomStyle">
+    <Position X="1.5" Y="2.25" Width="2.75" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AQAAABAKAgUAAAAABAAAIEAIAAEAAAQAACAAAIApAAA=</HashCode>
+      <FileName>Assets\Scripts\Room\RoomStyle.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SceneObject">
+    <Position X="6.5" Y="8" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AgAAEAAAAKAQAAgAAAAAAAIAAAAFQAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Scene objects\SceneObject.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SceneObjectManager">
+    <Position X="8.75" Y="9.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAAACAAEAAAAAAAAAAAAAAAAAACAgAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Scene objects\SceneObjectManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Assets.Scripts.Room.DungeonRoom">
+    <Position X="16.75" Y="2.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAAAAQBQIAAABgAAAAEAAAAAAAAAAAAAgQ=</HashCode>
+      <FileName>Assets\Scripts\Room\DungeonRoom.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Assets.Scripts.Room.DungeonRoomManager">
+    <Position X="11.5" Y="2.25" Width="2" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <NestedTypes>
+      <Enum Name="Assets.Scripts.Room.DungeonRoomManager.DistributionMethod" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Scripts\Room\DungeonRoomManager.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAIgAIAABJAAQQQAAAIAABIICAAgAIIAAIAAAoAACQQ=</HashCode>
+      <FileName>Assets\Scripts\Room\DungeonRoomManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Assets.Scripts.Room.RoomStyleManager">
+    <Position X="8.75" Y="5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAABAAAAAQAAAAAAAAAAAAAAAAIBAAAAAAAAAAAAI=</HashCode>
+      <FileName>Assets\Scripts\Room\RoomStyleManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="Assets.Scripts.Fraction.RelationshipType">
+    <Position X="4.75" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAAAAAAAAAAAAAAAAAAQAAAIAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Fraction\FractionManager.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

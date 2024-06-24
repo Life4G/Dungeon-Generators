@@ -81,7 +81,7 @@ public class RoomGenerator : DungeonGeneratorBase
     /// Запуск генерации подземелья.
     /// </summary>
     /// <returns>Сгенерированная карта подземелья.</returns>
-   protected int[,] GenerateMap()
+    protected int[,] GenerateMap()
     {
         map = new int[mapMaxWidth, mapMaxHeight];
         List<Room> rooms = new List<Room>();
@@ -89,7 +89,7 @@ public class RoomGenerator : DungeonGeneratorBase
         int roomNumber = Random.Range(roomNumberMin, roomNumberMax);
         for (int i = 0; i < roomNumber; i++)
         {
-            roomList.Add(Room.CreateRandomRoom(CalculateRoomPos()));
+            roomList.Add(Room.CreateRandomRoom(CalculateRoomPos(),roomShapes));
         }
 
         int roomNumberCur = roomNumber;
@@ -271,6 +271,7 @@ public class RoomGenerator : DungeonGeneratorBase
     /// <param name="offset">Смещение для идентификаторов.</param>
     private void DrawCorridors(List<Corridor> corridors, int offset)
     {
+ 
         for (int index = 0; index < corridors.Count; index++)
         {
             double x1 = corridors[index].posPoint1.x, x2 = corridors[index].posPoint2.x, y1 = corridors[index].posPoint1.y, y2 = corridors[index].posPoint2.y;

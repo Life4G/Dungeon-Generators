@@ -1,27 +1,24 @@
 {
   "dependencies": {
     "com.codewriter.triinspector": {
-      "version": "https://github.com/codewriter-packages/Tri-Inspector.git",
+      "version": "file:tri/Tri-Inspector-1.14.0",
       "depth": 0,
-      "source": "git",
+      "source": "local",
       "dependencies": {
         "com.unity.localization": "1.0.0"
-      },
-      "hash": "0c5b8f4480f55bf4fdd21c8e6da9620571c3ff43"
+      }
     },
     "com.github.siccity.xnode": {
-      "version": "https://github.com/Siccity/xNode.git",
+      "version": "file:xnd/xNode-1.8.0",
       "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "82f78879316817dc5c7f8703352f5660a22ec3d4"
+      "source": "local",
+      "dependencies": {}
     },
     "com.scellecs.morpeh": {
-      "version": "https://github.com/scellecs/morpeh.git",
+      "version": "file:mor/morpeh-2023.1.0",
       "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "2eb519ce4a4c3d0cc3096e92d0db1166aa69d88a"
+      "source": "local",
+      "dependencies": {}
     },
     "com.unity.2d.animation": {
       "version": "9.0.4",
