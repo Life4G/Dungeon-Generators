@@ -41,6 +41,7 @@ public class GridEditor : Editor
         DrawDefaultInspector();
         GridManager manager = (GridManager)target;
         roomShape = EditorGUILayout.MaskField("Room shapes", roomShape, roomShapeString.ToArray());
+        manager._roomShape = roomShape;
         manager.generator.SetRoomShapes(roomShape);
         GUILayout.Label("Geometry seed");
         if (GUILayout.Button("Randomize Geometry seed"))

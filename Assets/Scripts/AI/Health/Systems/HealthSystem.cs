@@ -35,7 +35,7 @@ namespace ECS
                     if (!this.deadFlagStash.Has(entity))
                     {
                         ref var deadFlagComponent = ref this.deadFlagStash.Add(entity);
-                        Debug.Log($"Entity {entity.ID} is dead.");
+                        //Debug.Log($"Entity {entity.ID} is dead.");
                     }
                 }
             }

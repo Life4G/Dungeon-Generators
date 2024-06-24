@@ -2,6 +2,7 @@ using Assets.Scripts.Fraction;
 using Assets.Scripts.Map;
 using Assets.Scripts.Room;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
@@ -16,6 +17,21 @@ public class SceneObjectManager : MonoBehaviour
 
     public void CalculateObjectsForRooms()
     {
+        Transform folder;
+        var go = GameObject.Find("ObjectsPlacedOnScene");
+        if (go == null)
+        {
+            folder = (new GameObject("ObjectsPlacedOnScene")).transform;
+            folder.parent = transform.parent;
+        }
+        else
+        {
+            folder = go.transform;
+            foreach (Transform child in folder)
+            {
+                GameObject.DestroyImmediate(child.gameObject);
+            }
+        }
         foreach (SceneObject sceneObject in sceneObjects)
         {
             if (sceneObject.min > sceneObject.max || sceneObject.min < 0 || sceneObject.max < 0 || sceneObject.maxRoom < 0 ||
@@ -26,7 +42,7 @@ public class SceneObjectManager : MonoBehaviour
             }
             else
             {
-                int objectsToSpawn = Random.Range(sceneObject.min, sceneObject.max);
+                int objectsToSpawn = Random.Range(sceneObject.min, sceneObject.max+1);
                 List<int> fractions;
                 if (sceneObject.fractionIds!=0)
                     fractions = sceneObject.GetFractionIds();
@@ -41,14 +57,17 @@ public class SceneObjectManager : MonoBehaviour
                 List<DungeonRoom> rooms = new List<DungeonRoom>();
                 foreach (DungeonRoom room in roomManager.rooms)
                 {
-                    if ((fractions.Contains(room.fractionIndex) || sceneObject.fractionIds == -1) && (styles.Contains(room.styleId) || sceneObject.styleIds == -1) && !room.isCorridor)
+                    if ((fractions.Contains(room.fractionIndex) || sceneObject.fractionIds == -1) && (styles.Contains(room.styleId) || sceneObject.styleIds == 0 || sceneObject.styleIds == -1) && !room.isCorridor)
                         rooms.Add(room);
                 }
-                    foreach (DungeonRoom room in rooms)
+                foreach (DungeonRoom room in rooms)
+                {
+                    for (int objectsInRoom = Random.Range(1, sceneObject.maxRoom); objectsInRoom > 0 && objectsToSpawn > 0; objectsInRoom--, objectsToSpawn--)
                     {
-                        for (int objectsInRoom = Random.Range(1, sceneObject.maxRoom); objectsInRoom > 0 && objectsToSpawn > 0; objectsInRoom--, objectsToSpawn--)
-                            Instantiate(sceneObject.prefab, CalculatePos(room), Quaternion.identity);
+                        var obj = Instantiate(sceneObject.prefab, CalculatePos(room), Quaternion.identity);
+                        obj.transform.parent = folder;
                     }
+                }
             }
         }
     }
@@ -62,7 +81,6 @@ public class SceneObjectManager : MonoBehaviour
         bool passible = false;
         while(!passible)
         {
-
             pos.x = Random.Range((int)(room.centerX -room.width/2), (int)(room.centerX + room.width / 2));
             pos.y = Random.Range((int)(room.centerY - room.height/ 2), (int)(room.centerY + room.height/ 2));
             DungeonTile tile = dungeonMap.GetTile((int)pos.x, (int)pos.y);

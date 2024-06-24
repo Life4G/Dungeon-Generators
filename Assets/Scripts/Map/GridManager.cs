@@ -56,18 +56,23 @@ public class GridManager : MonoBehaviour
     /// Возвращает текущую карту подземелья.
     /// </summary>
     /// <returns>Объект карты подземелья.</returns>
+    /// 
+
+    [DoNotSerialize]
+    public int _roomShape;
+
     public DungeonMap GetDungeonMap()
     {
-        if (map != null) Debug.Log("map != null");
-        for (int y = 0; y < map.GetHeight(); y++)
-        {
-            for (int x = 0; x < map.GetWidth(); x++)
-            {
-                DungeonTile tile = map.GetTile(x, y);
-                //boolArray[y, x] = tile.isPassable;
-                //Debug.Log($"Tile ({x}, {y}): isPassable = {tile.isPassable}");
-            }
-        }
+        //if (map != null) Debug.Log("map != null");
+        //for (int y = 0; y < map.GetHeight(); y++)
+        //{
+        //    for (int x = 0; x < map.GetWidth(); x++)
+        //    {
+        //        DungeonTile tile = map.GetTile(x, y);
+        //        //boolArray[y, x] = tile.isPassable;
+        //        //Debug.Log($"Tile ({x}, {y}): isPassable = {tile.isPassable}");
+        //    }
+        //}
         return map;
 
     }
@@ -498,6 +503,7 @@ public class GridManager : MonoBehaviour
     /// </summary>
     void Awake()
     {
+        generator.SetRoomShapes(_roomShape);
         Reload();
         sceneManager.CalculateObjectsForRooms();
     }

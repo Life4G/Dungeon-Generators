@@ -47,7 +47,7 @@ public class Wander : ActionDelegate
                 // Если цели нет или цель достигнута, выбираем новую
                 targetPosition = roomCenters[UnityEngine.Random.Range(0, roomCenters.Count)];
                 entityTargets[entity] = targetPosition;
-                Debug.Log("Новая цель для сущности: " + targetPosition);
+                //Debug.Log("Новая цель для сущности: " + targetPosition);
             }
 
             List<Vector2Int> path = PathfindingAStar.FindPath(positionComponent.position, targetPosition, MoveSystem.map);

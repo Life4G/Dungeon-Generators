@@ -12,7 +12,7 @@ public class MoveToFirstVisibleTarget : ActionDelegate
 
     public override NodeState Execute(Entity entity)
     {
-        Debug.Log("Move to visible target");
+        //Debug.Log("Move to visible target");
 
         if (fractionManager == null)
         {

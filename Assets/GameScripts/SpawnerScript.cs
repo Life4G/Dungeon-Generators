@@ -7,8 +7,8 @@ using UnityEngine;
 public class SpawnerScript : MonoBehaviour
 {
     public GameObject monsterPrefab;
-    public float cooldown = 10;
-    public float cooldownRange = 5;
+    public float cooldown = 12;
+    public float cooldownRange = 3;
 
     private GridManager gridManager;
     private float timer = 0;
@@ -17,7 +17,7 @@ public class SpawnerScript : MonoBehaviour
     void Start()
     {
         gridManager = GameObject.Find("Grid").GetComponent<GridManager>();
-        timer = cooldown + Random.Range(-cooldownRange, cooldownRange);
+        timer = 1;
     }
 
     // Update is called once per frame
@@ -26,7 +26,7 @@ public class SpawnerScript : MonoBehaviour
         timer -= Time.deltaTime;
         if (timer < 0 )
         {
-            timer = cooldown + Random.Range(-cooldownRange, cooldownRange);
+            timer = Mathf.Clamp(cooldown + Random.Range(-cooldownRange, cooldownRange), 2, 1000);
             SpawnMonster();
         }
     }
